@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+._*
+
+# Generated packages and browser verification artifacts
+/.dist/
+/output/playwright/
+/.playwright-cli/
+/playwright-report/
+/test-results/
+
+# Local tooling and editor files
+/.workbuddy/
+node_modules/
+__pycache__/
+*.py[cod]
+*.log
+*.swp
+*.swo
+*~
+
+# Local environment configuration
+.env
+.env.*
+!.env.example

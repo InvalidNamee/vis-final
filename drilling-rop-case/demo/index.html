@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>钻速预测与参数优化 · 交互实验</title>
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<main>
+  <header class="intro">
+    <div>
+      <h1>钻速预测与参数优化</h1>
+      <p>先用历史样本学习参数与机械钻速的关系，再在给定约束内寻找更好的参数组合。</p>
+    </div>
+    <span class="source">教学合成数据 · 本地计算</span>
+  </header>
+
+  <section class="experiment" aria-label="钻井参数实验">
+    <aside class="controls">
+      <h2>当前钻井工况</h2>
+      <label class="field" for="rock">当前钻遇岩层
+        <select id="rock"><option value="0">砂岩 · 较易钻进</option><option value="1">页岩 · 中等可钻性</option><option value="2">致密灰岩 · 较难钻进</option></select>
+      </label>
+      <p class="hint">软硬排序仅用于本例；实际可钻性还受胶结、强度、钻头等影响。</p>
+      <div class="slider"><label for="wob">钻压 <span><output id="wob-value" for="wob">84</output> kN</span></label><input id="wob" type="range" min="40" max="160" step="4" value="84"><small>钻头向下压在岩石上的力</small></div>
+      <div class="slider"><label for="rpm">转速 <span><output id="rpm-value" for="rpm">108</output> r/min</span></label><input id="rpm" type="range" min="60" max="220" step="4" value="108"><small>钻头每分钟旋转的圈数</small></div>
+      <div class="slider"><label for="flow">排量 <span><output id="flow-value" for="flow">28</output> L/s</span></label><input id="flow" type="range" min="18" max="38" step="1" value="28"><small>钻井液的循环流量，影响井底清洁</small></div>
+      <fieldset>
+        <legend>本次搜索的操作上限</legend>
+        <div class="slider"><label for="max-wob">钻压上限 <span><output id="max-wob-value" for="max-wob">140</output> kN</span></label><input id="max-wob" type="range" min="40" max="160" step="4" value="140"></div>
+        <div class="slider"><label for="max-rpm">转速上限 <span><output id="max-rpm-value" for="max-rpm">180</output> r/min</span></label><input id="max-rpm" type="range" min="60" max="220" step="4" value="180"></div>
+        <p class="hint">上限是教学约束，不代表现场安全限值。</p>
+      </fieldset>
+      <button id="reset" type="button" class="quiet">恢复初始工况</button>
+    </aside>
+
+    <div class="landscape">
+      <div class="section-heading"><div><h2>钻速预测与参数推荐</h2><p>固定岩层与排量，比较 1,271 组钻压 / 转速组合。</p></div><span class="unit">预测钻速 m/h</span></div>
+      <svg id="heatmap" viewBox="0 0 690 440" role="img" aria-labelledby="heat-title heat-desc"><title id="heat-title">参数组合与预测机械钻速热力图</title><desc id="heat-desc">横轴为钻压，纵轴为转速。颜色越深预测钻速越高，灰色斜线区超出操作上限。圆圈为当前参数，菱形为推荐参数。</desc></svg>
+      <div class="legend"><span><i class="current-dot"></i>当前设置</span><span><i class="best-dot"></i>约束内推荐</span><span><i class="mask-dot"></i>超出上限</span></div>
+      <p id="map-summary" class="explanation"></p>
+      <div class="result" aria-live="polite" aria-atomic="true">
+        <div><span>当前预测</span><strong id="current-rop">—</strong><small>m/h</small></div>
+        <div><span>推荐预测</span><strong id="best-rop">—</strong><small>m/h</small></div>
+        <div><span id="gain-label">预测变化</span><strong id="gain">—</strong><small id="gain-unit">%</small></div>
+      </div>
+      <div class="recommendation"><p id="recommend-text"></p><button id="apply" type="button">应用推荐参数</button></div>
+      <p id="status" class="status" role="status"></p>
+    </div>
+  </section>
+
+  <section class="interpretation" aria-label="解释参数与验证模型">
+    <article class="mechanics">
+      <h2>钻压与钻速响应曲线</h2>
+      <p>更大的钻压帮助钻头压入岩石，更高的转速增加切削次数；但收益不会无限增加。本例让模型从样本中学习这种弯曲的响应关系。</p>
+      <svg id="response" viewBox="0 0 510 280" role="img" aria-label="固定当前转速和排量时，钻压与预测钻速的关系"></svg>
+      <p class="hint">曲线固定当前转速、排量及岩层；圆点对应当前钻压。推荐方案同时搜索钻压和转速，因此不一定落在这条曲线上。</p>
+      <details><summary>机械钻速与钻进时间换算</summary><p id="time-story"></p><p>机械钻速只统计钻头实际破岩时的进尺速度；接单根、起下钻等非钻进时间没有计入。</p></details>
+    </article>
+    <article class="validation">
+      <div class="section-heading"><div><h2>独立测试井预测误差</h2><p>测试集只评价，不用于挑选模型或参数。</p></div></div>
+      <svg id="scatter" viewBox="0 0 510 280" role="img" aria-label="独立测试井上，合成观测钻速与模型预测钻速的对比散点图"></svg>
+      <div class="legend rock-legend"><span><i style="background:#2f7d6b"></i>砂岩</span><span><i style="background:#41699b"></i>页岩</span><span><i style="background:#b26a39"></i>致密灰岩</span></div>
+      <div class="metrics"><span>测试 MAE <b id="mae">—</b> m/h</span><span>测试 R² <b id="r2">—</b></span><span>均值基线 MAE <b id="baseline">—</b> m/h</span></div>
+      <p class="hint">点越靠近对角线，预测越接近合成观测值。MAE 是平均绝对误差；R² 衡量相对均值预测的拟合程度，可为负数。</p>
+    </article>
+  </section>
+
+  <details class="model-notes" open>
+    <summary>模型训练与参数搜索方法</summary>
+    <div class="split" aria-label="按井划分数据：12口训练井720条，3口验证井180条，3口测试井180条"><span>训练 · 12 井 / 720 条</span><span>验证 · 3 井 / 180 条</span><span>测试 · 3 井 / 180 条</span></div>
+    <div class="model-grid">
+      <div><h3>多项式岭回归训练</h3><p>固定随机种子生成 18 口虚拟井。用钻压、转速、排量的二次项与交互项，以及岩层类别训练岭回归。特征的均值与标准差只从训练井计算。合成观测与模型预测均采用 0.5 m/h 的教学下限，避免出现负钻速。</p><p id="model-choice"></p></div>
+      <div><h3>约束参数网格搜索</h3><p>每次调整控件，都由训练好的模型重新预测参数网格。去掉超出上限的组合后，选预测钻速最高的一组。搜索步长：钻压 4 kN、转速 4 r/min；排量保持当前值。</p><p>本例为表格回归与网格寻优，没有使用时序网络或强化学习。</p></div>
+    </div>
+    <div id="lambda-results" class="lambda-results" aria-label="不同正则化强度的验证误差"></div>
+    <button id="download" type="button" class="quiet">导出合成样本 CSV</button>
+  </details>
+  <footer>这是智能化方法的教学实验。合成样本中的相关性由生成规则设定，不能证明真实井上的提速收益；现场还需验证钻头、扭矩、泵压、振动与井壁稳定等条件。</footer>
+</main>
+<script src="demo.js"></script>
+</body>
+</html>

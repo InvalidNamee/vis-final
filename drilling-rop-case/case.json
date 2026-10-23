@@ -1,0 +1,152 @@
+{
+  "id": "drilling-rop",
+  "sceneId": "d1",
+  "methods": [
+    "opt"
+  ],
+  "title": "钻速预测与参数优化：回归代理与约束搜索",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "钻压、转速、循环流量与岩层共同影响机械钻速。用可复现的合成数据学习响应，再在限定范围内比较参数，理解预测、优化与工程安全之间的边界。",
+      "judge": [
+        {
+          "label": "数据形态",
+          "value": "多变量记录",
+          "desc": "参数、岩层与机械钻速，按井分组"
+        },
+        {
+          "label": "模型方法",
+          "value": "回归 + 寻优",
+          "desc": "标准化多项式岭回归与网格搜索"
+        },
+        {
+          "label": "可见收益",
+          "value": "批量比较",
+          "desc": "用响应面比较 1,271 组候选参数"
+        },
+        {
+          "label": "落地难度",
+          "value": "高",
+          "desc": "跨井泛化与真实作业约束待验证"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "钻速影响因素",
+          "html": "<p>机械钻速 ROP 是钻头破岩、使井眼加深的速度，本例用 m/h 表示。钻压 WOB 是施加在钻头上的轴向力，用 kN 表示；转速 RPM 用 r/min 表示；流量 Q 是单位时间循环的钻井液体积，用 L/s 表示。流量参与井底清洁和岩屑输送，不能把它当作泵压。岩层的强度与可钻性改变破岩响应，因此相同的钻压、转速和流量不保证得到相同钻速。</p><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 416\" width=\"100%\" role=\"img\" aria-label=\"钻头、岩层与钻压、转速、流量、机械钻速的关系示意\" style=\"display:block;max-width:100%;height:auto;background:#f8fafc;border-radius:12px\"><title>钻头、岩层与钻压、转速、流量、机械钻速的关系示意</title><g font-family=\"system-ui,sans-serif\" font-size=\"16\" fill=\"#1e293b\">\n<rect x=\"24\" y=\"104\" width=\"752\" height=\"85\" rx=\"8\" fill=\"#fef3c7\"/>\n<rect x=\"24\" y=\"189\" width=\"752\" height=\"85\" fill=\"#e2e8f0\"/>\n<rect x=\"24\" y=\"274\" width=\"752\" height=\"80\" rx=\"8\" fill=\"#ffedd5\"/>\n<text x=\"46\" y=\"147\">砂岩（示意）</text><text x=\"46\" y=\"232\">页岩（示意）</text><text x=\"46\" y=\"316\">致密灰岩（示意）</text>\n<rect x=\"288\" y=\"104\" width=\"182\" height=\"176\" fill=\"#fff\" stroke=\"#94a3b8\" stroke-width=\"2\"/>\n<rect x=\"349\" y=\"90\" width=\"60\" height=\"156\" rx=\"8\" fill=\"#cbd5e1\" stroke=\"#64748b\" stroke-width=\"2\"/>\n<path d=\"M334 246 H424 L413 277 H345 Z\" fill=\"#64748b\"/><circle cx=\"351\" cy=\"270\" r=\"9\" fill=\"#94a3b8\"/><circle cx=\"379\" cy=\"275\" r=\"9\" fill=\"#94a3b8\"/><circle cx=\"407\" cy=\"270\" r=\"9\" fill=\"#94a3b8\"/>\n<text x=\"40\" y=\"36\" font-weight=\"700\">机械输入 + 循环携岩 + 岩层条件 → 机械钻速</text>\n<path d=\"M379 48 V82 M372 72 L379 82 L386 72\" fill=\"none\" stroke=\"#b45309\" stroke-width=\"3\"/><text x=\"436\" y=\"69\">WOB 钻压 / kN：向钻头施力</text>\n<path d=\"M314 105 C279 65 459 65 438 105 M429 97 L438 105 L447 97\" fill=\"none\" stroke=\"#7c3aed\" stroke-width=\"3\"/><text x=\"503\" y=\"111\">RPM / r/min：旋转破岩</text>\n<path d=\"M379 118 V224 M372 214 L379 224 L386 214 M322 234 V139 M315 149 L322 139 L329 149\" fill=\"none\" stroke=\"#0284c7\" stroke-width=\"3\"/>\n<text x=\"499\" y=\"183\">Q 流量 / L/s</text><text x=\"499\" y=\"209\">钻柱内下行、环空返出携岩</text>\n<path d=\"M453 286 V327 M446 317 L453 327 L460 317\" fill=\"none\" stroke=\"#0f766e\" stroke-width=\"3\"/>\n<text x=\"499\" y=\"300\">ROP / m/h：井眼加深速度</text><text x=\"499\" y=\"326\">同一参数在不同岩层响应不同</text>\n<text x=\"40\" y=\"390\" font-size=\"14\" fill=\"#475569\">概念示意，不表示尺寸比例、真实分层或通用最优参数；流量不等于泵压。</text>\n</g></svg><p>现场调整通常综合作业设计、邻井资料和实时工况。数据模型可以帮助比较参数组合，但提高输入并不保证钻速持续上升。这里的岩层名称只用于分类编码，不宣称“某岩性一定更快”。术语依据：<a href=\"https://glossary.slb.com/terms/r/rate_of_penetration\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：ROP</a>、<a href=\"https://glossary.slb.com/terms/d/drill_collar\" target=\"_blank\" rel=\"noopener noreferrer\">钻压与钻铤</a>、<a href=\"https://glossary.slb.com/terms/h/hole_cleaning\" target=\"_blank\" rel=\"noopener noreferrer\">携岩</a>。</p>"
+        },
+        {
+          "no": 2,
+          "en": "INTERVENTION",
+          "title": "钻速回归与参数优化",
+          "html": "<p>本例把多变量回归作为代理模型：由 WOB、RPM、Q 与岩层估计 ROP。连续参数按固定尺度变换后构造多项式非线性与交互项，岩层用以砂岩为参照的 one-hot 编码并加入岩层与参数交互；全部特征仅用训练集统计量标准化，再用岭回归控制系数规模。随后固定流量和岩层，在钻压上限、转速上限及演示采样范围内网格搜索，推荐模型预测钻速最高的候选点。这是静态监督回归与离散寻优演示，不使用深度网络或强化学习，也不预测未来完整时序。</p><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 348\" width=\"100%\" role=\"img\" aria-label=\"合成数据经回归模型进入约束网格搜索，测试集用于独立评价\" style=\"display:block;max-width:100%;height:auto;background:#f8fafc;border-radius:12px\"><title>合成数据经回归模型进入约束网格搜索，测试集用于独立评价</title><g font-family=\"system-ui,sans-serif\" font-size=\"16\" fill=\"#1e293b\">\n<text x=\"28\" y=\"34\" font-weight=\"700\">先学习响应，再在限定范围内比较候选参数</text>\n<rect x=\"24\" y=\"65\" width=\"222\" height=\"130\" rx=\"10\" fill=\"#e0f2fe\"/>\n<text x=\"42\" y=\"94\" font-weight=\"700\">固定种子合成数据</text><text x=\"42\" y=\"124\">WOB / RPM / Q / 岩层</text><text x=\"42\" y=\"150\">目标：合成 ROP</text><text x=\"42\" y=\"176\">按虚拟井分组</text>\n<path d=\"M252 127 H279 L270 120 M279 127 L270 134\" stroke=\"#64748b\" stroke-width=\"2\" fill=\"none\"/>\n<rect x=\"286\" y=\"65\" width=\"228\" height=\"130\" rx=\"10\" fill=\"#ede9fe\"/>\n<text x=\"304\" y=\"94\" font-weight=\"700\">标准化多项式岭回归</text><text x=\"304\" y=\"124\">非线性项 + 参数交互</text><text x=\"304\" y=\"150\">岩层 one-hot</text><text x=\"304\" y=\"176\">输出：预测 ROP</text>\n<path d=\"M520 127 H547 L538 120 M547 127 L538 134\" stroke=\"#64748b\" stroke-width=\"2\" fill=\"none\"/>\n<rect x=\"554\" y=\"65\" width=\"222\" height=\"130\" rx=\"10\" fill=\"#ccfbf1\"/>\n<text x=\"572\" y=\"94\" font-weight=\"700\">约束内网格搜索</text><text x=\"572\" y=\"124\">固定 Q 与岩层</text><text x=\"572\" y=\"150\">限制 WOB / RPM 上限</text><text x=\"572\" y=\"176\">取网格内预测最大值</text>\n<rect x=\"24\" y=\"222\" width=\"490\" height=\"69\" rx=\"10\" fill=\"#f1f5f9\" stroke=\"#cbd5e1\"/>\n<text x=\"42\" y=\"250\">测试井 → 预测与合成观测散点 → MAE / R²</text><text x=\"42\" y=\"275\" font-size=\"14\">评价集不参与拟合、标准化或调参</text>\n<rect x=\"554\" y=\"222\" width=\"222\" height=\"69\" rx=\"10\" fill=\"#fef3c7\"/>\n<text x=\"572\" y=\"250\">推荐只更新演示输入</text><text x=\"572\" y=\"275\" font-size=\"14\">预测增量 ≠ 现场实测收益</text>\n<text x=\"28\" y=\"325\" font-size=\"14\" fill=\"#475569\">矩形范围只表达教学约束，不包含扭矩、泵压、振动、井控与井壁稳定判定。</text>\n</g></svg><p>热力图展示的是模型预测响应面；当前与推荐的钻速对比必须由同一模型、同一流量与岩层计算。界面中的增量是预测差值，不是现场实测提速。原始研究证明了机器学习建模这一研究方向，但没有验证本例模型：<a href=\"https://link.springer.com/article/10.1007/s13202-020-01066-1\" target=\"_blank\" rel=\"noopener noreferrer\">Brenjkar 等，2021，原文</a>。</p><p>合成观测与预测统一设 0.5 m/h 的教学下限，用于避免出现负钻速；这不是现场停钻阈值。参考方向：非线性回归、代理模型、约束优化。</p>"
+        },
+        {
+          "no": 3,
+          "en": "DATA",
+          "title": "数据准备与样本划分",
+          "html": "<p>演示在浏览器中以固定种子生成多口虚拟井，每条记录包含井标识、WOB（kN）、RPM（r/min）、Q（L/s）、岩层类别及合成观测 ROP（m/h）。岩层采用砂岩、页岩、致密灰岩，其响应排序仅为教学设定。合成关系包含非线性、交互、井间差异与噪声；它只是教学假设，不是经过标定的破岩定律。井标识用于分组切分，不作为可记忆井号的预测输入。</p><p>先按虚拟井划分训练、验证、测试集，同一井不能跨集合；训练集拟合标准化统计量和回归系数，验证集选择正则强度，测试井仅作最终评价。这样减少同井相似样本混入两端带来的乐观偏差。未来使用真实资料，还需核对时间或深度对齐、钻进工况、传感器量纲、岩性解释在预测时是否可获得，以及钻头与钻井液等遗漏因素。方法依据：<a href=\"https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GroupShuffleSplit.html\" target=\"_blank\" rel=\"noopener noreferrer\">按组切分</a>、<a href=\"https://scikit-learn.org/stable/common_pitfalls.html\" target=\"_blank\" rel=\"noopener noreferrer\">数据泄漏防范</a>。</p>"
+        },
+        {
+          "no": 4,
+          "en": "LIMITS",
+          "title": "模型适用范围与工程约束",
+          "html": "<p>钻压与转速过高可能加剧钻头磨损、井眼清洁问题与钻柱不稳定，关系也随地层和工具变化。只最大化 ROP 无法替代扭矩、泵压、振动、井控、井壁稳定和设备能力检查。工程使用需依据具体井段设计及设备资料建立约束并经专业人员审核；本例不提供通用工程阈值。依据：<a href=\"https://link.springer.com/article/10.1007/s13202-020-01066-1\" target=\"_blank\" rel=\"noopener noreferrer\">原文引言中的非线性与作业风险讨论</a>。</p><p>演示中的上限是用户调整的教学搜索边界，不是安全认证；网格最优只针对当前模型和离散候选点。“应用推荐”只把推荐 WOB/RPM 写回浏览器演示控件，不控制钻机。独立测试井仍来自同一个合成生成器；即使 MAE 很小、R² 很高，也不能证明真实井泛化能力、安全性或工程提效，不预填任何真实提升比例。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "钻速建模与参数优化流程",
+      "lead": [
+        "浏览器完成数据生成、按井切分、回归拟合、独立测试和预测网格搜索。数值结果由演示运行时计算，不预填工程效果。"
+      ],
+      "stats": [
+        [
+          "数据来源",
+          "固定种子合成"
+        ],
+        [
+          "切分单位",
+          "虚拟井"
+        ],
+        [
+          "推荐范围",
+          "教学约束内"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "合成数据生成与井组划分",
+          "role": "数据",
+          "do": "固定种子生成多口虚拟井的钻压、转速、流量、岩层与合成观测钻速；按井标识分训练、验证、测试集。",
+          "effect": "获得可复现且井标识互不交叉的三个集合，界面展示各集合规模。",
+          "trap": "不能把同井相邻记录逐行打散到训练与测试；合成井不代表真实井的变化。"
+        },
+        {
+          "name": "特征构造与回归训练",
+          "role": "模型",
+          "do": "先按固定尺度构造 WOB、RPM、Q 的一次、平方及交互项，加入岩层 one-hot 和岩层与参数交互；仅用训练集统计量标准化特征并拟合岭回归。",
+          "effect": "得到由参数与岩层到预测 ROP 的映射，单位为 m/h。",
+          "trap": "验证与测试数据只能复用训练得到的变换；未见岩层与超范围输入不能假装可靠。"
+        },
+        {
+          "name": "模型选择与独立测试",
+          "role": "评价",
+          "do": "以验证井 MAE 选择正则强度，保留所选训练模型且不重新拟合；在独立测试井计算 MAE 与 R²，绘制合成观测对预测的散点图。",
+          "effect": "检查未参与训练的合成井上误差大小，以及预测偏差和离群点。",
+          "trap": "不能依据测试误差继续调参；测试集同源于合成生成器，不是现场验证。"
+        },
+        {
+          "name": "约束参数网格搜索",
+          "role": "优化",
+          "do": "选择流量和岩层，调整钻压与转速上限；在演示采样范围和上限的交集内，逐点用冻结模型预测 WOB/RPM 网格。",
+          "effect": "热力图显示预测响应面，并标出当前点与网格内推荐点。",
+          "trap": "操作上限只在样本范围内变化，界面始终保留至少一个候选点；不能把这两个上限当作完整安全校核。"
+        },
+        {
+          "name": "推荐参数对比与应用",
+          "role": "交互",
+          "do": "在相同流量、岩层与模型下比较当前和推荐预测 ROP；点击应用推荐，将 WOB/RPM 更新到演示控件。",
+          "effect": "观察推荐参数、预测差值与热力图位置之间的对应关系。",
+          "trap": "预测增量不等于实测收益；点击仅改变页面状态，不代表工程执行或安全许可。"
+        }
+      ],
+      "metrics": {
+        "title": "模型误差与参数约束评价",
+        "html": "<div style=\"display:flex;flex-wrap:wrap;gap:16px;margin:16px 0\"><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>1. 数据：按井分开</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"1. 数据：按井分开\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><rect x=\"10\" y=\"30\" width=\"133\" height=\"30\" fill=\"#2f7d6b\"/><rect x=\"146\" y=\"30\" width=\"32\" height=\"30\" fill=\"#41699b\"/><rect x=\"181\" y=\"30\" width=\"32\" height=\"30\" fill=\"#b26a39\"/><text x=\"10\" y=\"22\">18 口虚拟井 / 1,080 条记录</text><text x=\"10\" y=\"86\">训练 12 井 · 验证 3 井 · 测试 3 井</text></g></svg><figcaption style=\"font-size:13px;color:#4d565b;line-height:1.7\">同井样本留在同一集合。训练学规律、验证选模型、测试检查未见井误差。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>2. 模型：学习弯曲响应</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"2. 模型：学习弯曲响应\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><path d=\"M25 10V95H210\" fill=\"none\" stroke=\"#9ba3a9\"/><path d=\"M30 87Q125-25 205 42\" fill=\"none\" stroke=\"#2f7d6b\" stroke-width=\"3\"/><g fill=\"#41699b\"><circle cx=\"45\" cy=\"72\" r=\"4\"/><circle cx=\"75\" cy=\"48\" r=\"4\"/><circle cx=\"105\" cy=\"28\" r=\"4\"/><circle cx=\"135\" cy=\"23\" r=\"4\"/><circle cx=\"165\" cy=\"22\" r=\"4\"/><circle cx=\"192\" cy=\"36\" r=\"4\"/></g><text x=\"30\" y=\"117\">参数 → 非线性特征 → 预测钻速</text></g></svg><figcaption style=\"font-size:13px;color:#4d565b;line-height:1.7\">平方项与交互项让回归描述非线性；标准化参数只从训练井估计。曲线是机制示意。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>3. 评价：预测对照观测</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"3. 评价：预测对照观测\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><path d=\"M25 10V95H210\" fill=\"none\" stroke=\"#9ba3a9\"/><path d=\"M30 90L200 15\" fill=\"none\" stroke=\"#9ba3a9\" stroke-dasharray=\"4 3\"/><g fill=\"#2f7d6b\"><circle cx=\"45\" cy=\"80\" r=\"4\"/><circle cx=\"65\" cy=\"78\" r=\"4\"/><circle cx=\"90\" cy=\"60\" r=\"4\"/><circle cx=\"115\" cy=\"49\" r=\"4\"/><circle cx=\"140\" cy=\"49\" r=\"4\"/><circle cx=\"170\" cy=\"24\" r=\"4\"/><circle cx=\"193\" cy=\"26\" r=\"4\"/></g><text x=\"30\" y=\"117\">越靠近对角线，误差越小</text></g></svg><figcaption style=\"font-size:13px;color:#4d565b;line-height:1.7\">验证集从 5 个 λ 中选型；冻结模型后，用测试井计算 MAE、R² 并与均值基线比较。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>4. 寻优：筛掉越界组合</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"4. 寻优：筛掉越界组合\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><rect x=\"15\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"39\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"63\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"87\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"111\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"135\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"159\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"25\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"39\" y=\"25\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"63\" y=\"25\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"87\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"111\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"135\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"25\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"25\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"42\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"39\" y=\"42\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"63\" y=\"42\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"87\" y=\"42\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"111\" y=\"42\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"135\" y=\"42\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"42\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"42\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"39\" y=\"59\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"63\" y=\"59\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"87\" y=\"59\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"111\" y=\"59\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"135\" y=\"59\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"39\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"63\" y=\"76\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"87\" y=\"76\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"111\" y=\"76\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"135\" y=\"76\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"159\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><circle cx=\"75\" cy=\"67\" r=\"5\" fill=\"white\" stroke=\"#242b2e\" stroke-width=\"2\"/><path d=\"M147 27l6 6-6 6-6-6z\" fill=\"#41699b\"/><text x=\"15\" y=\"117\">圆：当前　菱形：推荐　灰：越界</text></g></svg><figcaption style=\"font-size:13px;color:#4d565b;line-height:1.7\">固定岩层与排量，比较 1,271 组钻压 / 转速。只从满足上限的点中选预测最高者。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>5. 应用：比较同一模型</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"5. 应用：比较同一模型\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><text x=\"10\" y=\"25\">当前</text><rect x=\"55\" y=\"10\" width=\"85\" height=\"23\" fill=\"#9ba3a9\"/><text x=\"10\" y=\"65\">推荐</text><rect x=\"55\" y=\"50\" width=\"140\" height=\"23\" fill=\"#2f7d6b\"/><text x=\"10\" y=\"108\">预测对比示意 · 运行值由模型计算</text></g></svg><figcaption style=\"font-size:13px;color:#4d565b;line-height:1.7\">应用推荐会更新当前参数，预测差值随之归零。收紧上限可能使推荐值低于越界的当前值。</figcaption></figure></div><p><b>评价对象</b>：测试井的合成观测 ROP 与模型预测 ROP。散点图横轴为合成观测值、纵轴为预测值，均为 m/h；y = x 是理想一致线，偏离表示误差，不是参数寻优曲线。</p><p><b>MAE</b> = Σ|预测值 − 合成观测值| / n，单位 m/h，越小表示本测试集平均绝对误差越小。<b>R²</b> = 1 − Σ(观测值 − 预测值)² / Σ(观测值 − 测试均值)²，无量纲，可能为负；观测值无方差时应显示不可定义，不能伪报满分。展示实际运行结果，不设置无来源的“工程达标线”。</p><p><b>推荐对比</b>：Δ预测 ROP = 推荐点预测值 − 当前点预测值；若展示相对增量，必须说明以当前预测值为分母，且分母须大于零。推荐需满足当前 WOB/RPM 上限和演示采样范围；当前点若越界应明确标识。热力图颜色表示预测钻速，不能表示安全等级。</p><p><b>切分边界</b>：训练井确定变换和系数，验证井选择模型，测试井只计算最终指标。井数、样本数、种子与切分应可核对；所有结果仅衡量同源合成数据上的拟合与泛化，无法验证真实工程效果。</p>"
+      },
+      "fails": [
+        {
+          "name": "同井数据泄漏",
+          "why": "把同井相关记录分散到多个集合，模型可能利用相似背景得到过于乐观的测试结果。"
+        },
+        {
+          "name": "模型外推与遗漏变量",
+          "why": "超出样本覆盖或更换工具、岩层后预测可能失真；当前模型未显式描述扭矩、磨损、压力和振动。"
+        },
+        {
+          "name": "工程约束缺失",
+          "why": "仅限制 WOB/RPM 不能证明井控、携岩或井壁稳定满足要求。"
+        },
+        {
+          "name": "合成评价与现场验证差异",
+          "why": "合成标签与训练样本来自同一生成机制，预测差值和高评分均不构成真实提效证据。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "height": 1000,
+      "label": "案例演示",
+      "intro": "固定种子生成虚拟井，按井训练并测试多项式岭回归；调整流量、岩层与参数上限，观察预测热力图、当前与推荐对比、独立测试散点及 MAE/R²，点击应用推荐更新演示参数。全部数据为教学合成，不连接现场设备。"
+    }
+  }
+}
