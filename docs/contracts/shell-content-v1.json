@@ -1,0 +1,74 @@
+{
+  "baselineCommit": "8bfd451",
+  "globalAPIs": {
+    "Cases": [
+      "register",
+      "unregister",
+      "get",
+      "byScene",
+      "bySceneAll",
+      "list",
+      "validate",
+      "validateAll",
+      "stats",
+      "problems"
+    ],
+    "K": [
+      "esc",
+      "pad",
+      "rich",
+      "mtag",
+      "dtag",
+      "figure",
+      "sec4",
+      "judge",
+      "dtable",
+      "checklist",
+      "refs",
+      "meter",
+      "cells",
+      "pipeline",
+      "fails",
+      "callout",
+      "code",
+      "tree",
+      "highlight"
+    ],
+    "CaseImport": [
+      "open",
+      "close",
+      "loadSaved",
+      "remove",
+      "restore",
+      "updateMeta",
+      "blockedList",
+      "list",
+      "template",
+      "check",
+      "makeZip",
+      "templates"
+    ],
+    "CaseDemoHost": [
+      "create",
+      "resolveMode",
+      "buildPageDoc",
+      "findFile",
+      "isText",
+      "mimeOf"
+    ],
+    "Admin": [
+      "loggedIn",
+      "route",
+      "bind"
+    ]
+  },
+  "moduleAPI": [
+    "asset",
+    "readText",
+    "list",
+    "scene",
+    "kase",
+    "onDestroy",
+    "height"
+  ]
+}

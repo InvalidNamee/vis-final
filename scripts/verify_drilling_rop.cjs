@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const m = require('../drilling-rop-case/demo/demo.js');
+const m = require('../plugins/drilling/d1/drilling-rop/demo/demo.js');
 const data = m.generate(20261023);
 assert.deepEqual(data,m.generate(20261023),'fixed seed must reproduce data');
 assert.equal(data.length,1080);

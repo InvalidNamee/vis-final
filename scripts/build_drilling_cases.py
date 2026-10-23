@@ -1,28 +1,33 @@
-"""Build all five source folders with the original importer contract."""
+"""Validate source plugins; create distribution ZIPs only with explicit --zip."""
+import argparse
 import json
+import subprocess
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
-from build_drilling_rop import ADAPTER
-
 ROOT = Path(__file__).resolve().parents[1]
 
-def build(package_name='drilling-rop-case'):
-    package = ROOT / package_name
+def build(package_name='drilling-rop-case', *, make_zip=False):
+    key = package_name.removesuffix('-case')
+    packages = list((ROOT / 'plugins' / 'drilling').glob('*/' + key))
+    if len(packages) != 1:
+        raise ValueError('Unknown drilling package: ' + package_name)
+    package = packages[0]
     manifest = json.loads((package / 'case.json').read_text(encoding='utf-8'))
-    files = [dict(name=p.relative_to(package).as_posix(), size=p.stat().st_size,
-                  enc='text', data=p.read_text(encoding='utf-8'))
-             for p in sorted((package / 'demo').rglob('*')) if p.is_file()]
-    payload = json.dumps(dict(manifest=manifest, files=files), ensure_ascii=False, separators=(',', ':'))
-    adapter = ADAPTER.replace('__PACKAGE__', package_name).replace('__PAYLOAD__', payload)
-    (ROOT / 'assets/cases' / (manifest['id'] + '.case.js')).write_text(adapter, encoding='utf-8')
-    dist = ROOT / '.dist'
-    dist.mkdir(exist_ok=True)
-    with ZipFile(dist / (package_name + '.zip'), 'w', ZIP_DEFLATED) as archive:
-        for p in sorted(package.rglob('*')):
-            if p.is_file() and p.name != '.DS_Store':
-                archive.write(p, p.relative_to(ROOT))
-    print('Built ' + package_name)
+    if not (package / manifest['tabs']['demo']['html']).is_file():
+        raise ValueError('Missing demo HTML')
+    if make_zip:
+        dist = ROOT / '.dist'
+        dist.mkdir(exist_ok=True)
+        with ZipFile(dist / (key + '-case.zip'), 'w', ZIP_DEFLATED) as archive:
+            for p in sorted(package.rglob('*')):
+                if p.is_file() and p.name != '.DS_Store':
+                    archive.write(p, Path(key + '-case') / p.relative_to(package))
+    print('Validated ' + str(package.relative_to(ROOT)) + (' (ZIP requested)' if make_zip else ' (Vite reads source directly; no ZIP)'))
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--zip', action='store_true', help='Create ZIPs only when the user requests distribution')
+    args = parser.parse_args()
+    subprocess.run(['node', str(ROOT / 'scripts/check_plugins.cjs')], cwd=ROOT, check=True)
     for key in ['rop', 'warning', 'trajectory', 'failure', 'fluid']:
-        build('drilling-' + key + '-case')
+        build('drilling-' + key + '-case', make_zip=args.zip)
