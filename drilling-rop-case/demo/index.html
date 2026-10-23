@@ -37,7 +37,7 @@
 
     <div class="landscape">
       <div class="section-heading"><div><h2>钻速预测与参数推荐</h2><p>固定岩层与排量，比较 1,271 组钻压 / 转速组合。</p></div><span class="unit">预测钻速 m/h</span></div>
-      <svg id="heatmap" viewBox="0 0 690 440" role="img" aria-labelledby="heat-title heat-desc"><title id="heat-title">参数组合与预测机械钻速热力图</title><desc id="heat-desc">横轴为钻压，纵轴为转速。颜色越深预测钻速越高，灰色斜线区超出操作上限。圆圈为当前参数，菱形为推荐参数。</desc></svg>
+      <div class="chart-scroll" tabindex="0" role="region" aria-label="交互图表，窄屏可横向滚动"><svg id="heatmap" viewBox="0 0 690 440" role="img" aria-labelledby="heat-title heat-desc"><title id="heat-title">参数组合与预测机械钻速热力图</title><desc id="heat-desc">横轴为钻压，纵轴为转速。颜色越深预测钻速越高，灰色斜线区超出操作上限。圆圈为当前参数，菱形为推荐参数。</desc></svg></div>
       <div class="legend"><span><i class="current-dot"></i>当前设置</span><span><i class="best-dot"></i>约束内推荐</span><span><i class="mask-dot"></i>超出上限</span></div>
       <p id="map-summary" class="explanation"></p>
       <div class="result" aria-live="polite" aria-atomic="true">
@@ -54,13 +54,13 @@
     <article class="mechanics">
       <h2>钻压与钻速响应曲线</h2>
       <p>更大的钻压帮助钻头压入岩石，更高的转速增加切削次数；但收益不会无限增加。本例让模型从样本中学习这种弯曲的响应关系。</p>
-      <svg id="response" viewBox="0 0 510 280" role="img" aria-label="固定当前转速和排量时，钻压与预测钻速的关系"></svg>
+      <div class="chart-scroll" tabindex="0" role="region" aria-label="交互图表，窄屏可横向滚动"><svg id="response" viewBox="0 0 510 280" role="img" aria-label="固定当前转速和排量时，钻压与预测钻速的关系"></svg></div>
       <p class="hint">曲线固定当前转速、排量及岩层；圆点对应当前钻压。推荐方案同时搜索钻压和转速，因此不一定落在这条曲线上。</p>
       <details><summary>机械钻速与钻进时间换算</summary><p id="time-story"></p><p>机械钻速只统计钻头实际破岩时的进尺速度；接单根、起下钻等非钻进时间没有计入。</p></details>
     </article>
     <article class="validation">
       <div class="section-heading"><div><h2>独立测试井预测误差</h2><p>测试集只评价，不用于挑选模型或参数。</p></div></div>
-      <svg id="scatter" viewBox="0 0 510 280" role="img" aria-label="独立测试井上，合成观测钻速与模型预测钻速的对比散点图"></svg>
+      <div class="chart-scroll" tabindex="0" role="region" aria-label="交互图表，窄屏可横向滚动"><svg id="scatter" viewBox="0 0 510 280" role="img" aria-label="独立测试井上，合成观测钻速与模型预测钻速的对比散点图"></svg></div>
       <div class="legend rock-legend"><span><i style="background:#2f7d6b"></i>砂岩</span><span><i style="background:#41699b"></i>页岩</span><span><i style="background:#b26a39"></i>致密灰岩</span></div>
       <div class="metrics"><span>测试 MAE <b id="mae">—</b> m/h</span><span>测试 R² <b id="r2">—</b></span><span>均值基线 MAE <b id="baseline">—</b> m/h</span></div>
       <p class="hint">点越靠近对角线，预测越接近合成观测值。MAE 是平均绝对误差；R² 衡量相对均值预测的拟合程度，可为负数。</p>

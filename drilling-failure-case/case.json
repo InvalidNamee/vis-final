@@ -1,0 +1,138 @@
+{
+  "id": "drilling-failure",
+  "sceneId": "d4",
+  "title": "钻具失效预测",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "ts"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "钻柱承担旋转与载荷传递，反复交变载荷可能导致疲劳。服役小时相同并不意味着退化状态相同；用历史退化指标估计趋势与剩余寿命，有助于把后续作业时长与检查计划联系起来。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子，可导出核查"
+        },
+        {
+          "label": "方法类型",
+          "value": "退化趋势与寿命外推",
+          "desc": "纯前端轻量计算"
+        },
+        {
+          "label": "输出用途",
+          "value": "教学比较",
+          "desc": "不连接设备与现场系统"
+        },
+        {
+          "label": "评价边界",
+          "value": "合成任务",
+          "desc": "不声称真实工程收益"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "载荷历史与钻具退化",
+          "html": "<p>钻柱包括钻杆、底部钻具组合及其他驱动钻头的工具。扭转波动与振动可能影响连接和钻头。真实疲劳评价依赖应力、几何、材料、腐蚀和检查记录；本例用人为损伤指标说明载荷历史与剩余寿命关系，绝不从单一振动值推导真实断裂时刻。</p><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"载荷历史与钻具退化\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">服役载荷</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">交变弯曲 / 扭转载荷</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">退化代理量</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">已标定传感器假设</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">剩余寿命</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">趋势到阈值的距离</text></svg></div><figcaption class=\"figcap\">业务关系示意，不是测量结果。窄屏可在图内横向滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "退化趋势与寿命外推",
+          "html": "<p>隐藏合成损伤随载荷倍率的三次方累积，传感器代理量叠加噪声。估计器看不到隐藏损伤或未来值，只在近期观测窗口最小二乘拟合直线，外推到教学阈值 1。窗口长度体现平滑与响应滞后的折中，寿命敏感性范围说明噪声怎样改变外推结果。实现不是经过钻具试验标定的疲劳定律。</p>"
+        },
+        {
+          "no": 3,
+          "en": "DATA",
+          "title": "数据准备与评价切分",
+          "html": "<p>固定种子 20261025，每小时一条，共 161 条合成记录。可修改载荷倍率、观测时间、回归窗口和计划作业时长。现场数据需要钻具唯一标识、累计服役、载荷谱、检修、探伤及失效记录，未失效钻具属于删失样本，不能虚构准确失效标签。</p>"
+        },
+        {
+          "no": 4,
+          "en": "LIMITS",
+          "title": "模型适用范围与工程约束",
+          "html": "<p>RUL 假设未来载荷与当前趋势保持不变。±2 残差标准差转成的范围仅用于敏感性分析，不是已校准置信区间。当前观测期还未见失效时，不报告真实 RUL 误差；只有失效已发生才回溯评价。教学阈值不是报废标准，模型不能代替探伤或作业决策。</p><p>专业资料与方法来源：</p><ul><li><a href=\"https://glossary.slb.com/terms/d/drillstring\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：drillstring</a>：支持钻柱组成的定义。</li><li><a href=\"https://www.slb.com/-/media/files/drilling/brochure/drillstring-vib-br\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：Drillstring Vibrations and Vibration Modeling</a>：支持扭转振动可能导致连接疲劳和钻头损伤的背景，不支持本例合成寿命系数。</li><li><a href=\"https://data.nasa.gov/dataset/prognostics\" target=\"_blank\" rel=\"noopener noreferrer\">NASA：Prognostics</a>：支持 RUL 为功能失效前剩余时间的概念；本例未使用 NASA 数据，不代表 NASA 方法复现。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "退化趋势与寿命外推",
+      "lead": [
+        "钻柱承担旋转与载荷传递，反复交变载荷可能导致疲劳。服役小时相同并不意味着退化状态相同；用历史退化指标估计趋势与剩余寿命，有助于把后续作业时长与检查计划联系起来。"
+      ],
+      "stats": [
+        [
+          "数据",
+          "固定种子合成"
+        ],
+        [
+          "运行方式",
+          "浏览器本地"
+        ],
+        [
+          "工程用途",
+          "方法教学"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "服役数据整理",
+          "role": "数据",
+          "do": "按钻具标识保留按时序排列的历史与检查记录。",
+          "effect": "形成可追溯退化序列。",
+          "trap": "真实数据需处理换件、检修及右删失。"
+        },
+        {
+          "name": "局部退化回归",
+          "role": "算法",
+          "do": "仅用已观测窗口拟合时间与传感器代理量的斜率。",
+          "effect": "把噪声观测转换为趋势。",
+          "trap": "窗口短会抖动，长窗口会落后于工况变化。"
+        },
+        {
+          "name": "阈值寿命外推",
+          "role": "算法",
+          "do": "正斜率时计算到阈值的时间，非正斜率不输出有限寿命。",
+          "effect": "与后续计划时长形成条件对比。",
+          "trap": "趋势外推不能保证未来载荷不变。"
+        },
+        {
+          "name": "回溯误差与检查",
+          "role": "评价",
+          "do": "失效已观测后，对此前多个起点计算预测 RUL 与真实剩余小时差。",
+          "effect": "区分在线预测与事后评价。",
+          "trap": "同一钻具的多个起点不是独立测试样本。"
+        }
+      ],
+      "metrics": {
+        "title": "计算指标与评价边界",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">历史窗口</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">仅当前及过去观测</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">退化趋势外推</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">斜率 / 阈值 / 敏感性</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">寿命与检查</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">删失标记 / 回溯误差</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>RUL=max(0,(1−当前拟合退化量)/正斜率)，单位 h。已观测隐藏损伤首次达到 1 的小时为合成失效时刻；失效已知后，每隔 5 h 的历史起点分别只用当时窗口预测，以平均绝对误差评价。未观测到失效时显示右删失，不报告 MAE。多个起点共享同一序列，不能当跨钻具泛化结果。</p>"
+      },
+      "fails": [
+        {
+          "name": "数据分布变化",
+          "why": "RUL 假设未来载荷与当前趋势保持不变。±2 残差标准差转成的范围仅用于敏感性分析，不是已校准置信区间。当前观测期还未见失效时，不报告真实 RUL 误差；只有失效已发生才回溯评价。教学阈值不是报废标准，模型不能代替探伤或作业决策。"
+        },
+        {
+          "name": "合成结果误用",
+          "why": "所有数据、参数范围、阈值和响应系数均为教学合成设定；资料只支持业务定义和方法动机，不支持本例数值与现场收益。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1200,
+      "intro": "钻柱承担旋转与载荷传递，反复交变载荷可能导致疲劳。服役小时相同并不意味着退化状态相同；用历史退化指标估计趋势与剩余寿命，有助于把后续作业时长与检查计划联系起来。"
+    }
+  }
+}

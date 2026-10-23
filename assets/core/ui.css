@@ -948,3 +948,26 @@ html.mdl-open{overflow:hidden}
 .adm-form .imp-f{margin-bottom:10px}
 .adm-f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .adm-f3{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px}
+
+/* Case reading scale: prose, process and labels have separate hierarchy. */
+.dh-sub,.lede-block p,.sec4 p,.case-lead p{font-size:16px;line-height:1.85}
+.sec4 h3,.case-lead h3{font-size:21px}
+.tab{font-size:16px}.tab .num{font-size:12px}
+.judge .jl,.case-cells .l,.pstep h4 .role{font-size:12px;letter-spacing:.03em;color:var(--ink-3)}
+.judge .jv,.case-cells .v{font-size:16px}.judge .jd{font-size:14px}
+.pstep h4{font-size:18px}.pstep .pdo{font-size:16px;line-height:1.8}
+.pstep .peff{font-size:14px;line-height:1.75}.pstep .peff .k{font-size:12px}
+.fail h5{font-size:16px}.fail p{font-size:14px;line-height:1.75}
+.demo-head h3{font-size:20px}.demo-head p{font-size:15px;max-width:85ch}
+.sec4 .sn{font-size:13px}.sec4 .sn span{font-size:11px}
+.figure{max-width:820px;margin:20px auto 12px;padding:16px}
+.figure svg{max-width:760px;margin-inline:auto}
+.figcap,.figcap b{font-size:14px;color:var(--ink-2);letter-spacing:0}
+.dtable{font-size:15px}.dtable th{font-size:13px;color:var(--ink-3)}
+.panel ul{font-size:16px;line-height:1.85;padding-left:24px;color:var(--ink-2)}
+.panel li+li{margin-top:8px}.panel li a{text-decoration:underline;text-underline-offset:3px}
+.btn,.btn.sm{font-size:14px}.mtag,.dtag{font-size:12px}
+.sr-name{font-size:18px}.sr-point{font-size:15px;line-height:1.75}
+.filters .lbl,.filters .count{font-size:12px}.filters button{font-size:14px}
+@media(max-width:650px){.sec4{grid-template-columns:1fr;gap:8px}.sec4 .sn span{display:inline;margin-left:8px}.case-lead{grid-template-columns:1fr}.fails{grid-template-columns:1fr 1fr}.figure{padding:10px}}
+@media(max-width:420px){.fails{grid-template-columns:1fr}}

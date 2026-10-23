@@ -3,3 +3,15 @@
 @media(min-width:1100px){.landscape{padding:26px 30px}#heatmap{max-width:750px;margin-left:auto;margin-right:auto}}
 @media(max-width:760px){main{padding:14px}.intro{display:block}.source{display:inline-block;margin-top:12px}.experiment{grid-template-columns:1fr}.controls{border-right:0;border-bottom:1px solid var(--line);padding:18px}.controls .slider{margin-top:14px}.landscape{padding:16px}.interpretation{grid-template-columns:1fr;gap:24px}.model-grid{grid-template-columns:1fr;gap:18px}.recommendation{flex-wrap:wrap}.result strong{font-size:25px}.split{flex-wrap:wrap}.split span{flex:1!important;min-width:110px}.unit{display:none}.legend{gap:12px;margin-left:0}.section-heading{display:block}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Readable controls and bounded charts; narrow screens scroll charts locally. */
+:root{font-size:16px}h2{font-size:20px}h3{font-size:17px}
+main{max-width:1220px}.experiment{grid-template-columns:300px minmax(0,1fr)}
+.hint,.slider small,.section-heading p,.unit,.legend,.explanation,.result span,.result small,.status,.metrics,.interpretation .hint,.model-grid p,.lambda-option,footer,legend,.source{font-size:14px}
+.slider label,.recommendation p,.interpretation p,summary{font-size:16px}
+svg text{font-size:16px}#heatmap{max-width:690px}#response,#scatter{max-width:560px;margin-inline:auto}
+.chart-scroll{overflow-x:auto;overscroll-behavior-x:contain;padding:4px 2px 8px}
+.chart-scroll:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.split span{font-size:14px}.model-grid{line-height:1.85}
+@media(max-width:1000px){.experiment{grid-template-columns:1fr}.controls{border-right:0;border-bottom:1px solid var(--line)}.interpretation{grid-template-columns:1fr}.landscape{padding:20px}}
+@media(max-width:600px){.chart-scroll #heatmap{width:620px;max-width:none}.chart-scroll #response,.chart-scroll #scatter{width:480px;max-width:none}.result{gap:8px}.result strong{font-size:26px}.section-heading p{margin-top:8px}main{padding:12px}.landscape{padding:14px}}

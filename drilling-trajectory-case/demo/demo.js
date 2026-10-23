@@ -1,0 +1,10 @@
+(function(){
+  'use strict';const M=TrajectoryModel,F=CaseUI.f;
+  CaseUI.mount({id:'drilling-trajectory',title:'井眼轨迹智能控制',intro:'在固定方位的二维井段内，辨识简化工具响应，再滚动搜索未来三个测段的造斜指令。目标位置、曲率限制与未建模扰动共同影响最终偏差。',boundary:'仅表示固定方位二维轨迹，不实现三维工具面控制、地质导向、避碰、摩阻或井控。实际响应超限会明确显示。',controls:[{id:'target',label:'靶点水平位移',min:100,max:380,step:10,value:250,unit:'m'},{id:'angle',label:'初始井斜角',min:5,max:65,step:1,value:20,unit:'°'},{id:'limit',label:'预测曲率上限',min:.5,max:3,step:.25,value:2,unit:'°/30m'},{id:'disturbance',label:'未建模造斜扰动',min:-.6,max:.6,step:.1,value:.2,unit:'°/30m'}],method:'24 条独立合成校准记录回归 Δ井斜=增益×指令+自然漂移，随后冻结辨识结果。每个 30 m 测段枚举 9³=729 个三步指令序列，剔除预测井斜或曲率越界序列，按靶点距离、末端井斜与动作平滑性组成的教学代价选优，只执行第一步，再用新状态重新规划。总计 20 段、600 m 测深。积分采用平均井斜近似，不是完整最小曲率法。',
+    compute:s=>{const a=M.simulate(s,true),b=M.simulate(s,false),m=a.model,within=a.maxDls<=s.limit+1e-9;
+      return {metrics:[['控制轨迹终点距靶',F(a.miss,1)+' m'],['零指令终点距靶',F(b.miss,1)+' m'],['实际最大曲率',F(a.maxDls)+' °/30m'],['完成测深',(a.rows.length-1)*30+' m']],summary:`辨识增益 ${F(m.gain,3)}、漂移 ${F(m.drift,3)} °/30m。${a.infeasible?'出现无可行序列，已停止模拟。':within?'本次实际曲率处于所设教学上限内。':'未建模扰动导致实际曲率超过预测约束，须重新辨识或扩大约束余量。'} 距靶以固定 600 m 测深终点计算，不保证轨迹穿过靶点。`,
+        plots:[{title:'二维井眼轨迹与靶点',xLabel:'水平位移 m',yLabel:'向下垂深的负值 m',yRange:[-650,20],note:'为使图上向下对应井深增加，纵轴显示 −TVD；靶点为垂深 500 m。蓝线是同样扰动下的零指令基线。',series:[{name:'滚动优化轨迹',points:a.rows.map(r=>[r.x,-r.z])},{name:'零指令基线',points:b.rows.map(r=>[r.x,-r.z])},{name:'靶点',dots:true,points:[[s.target,-500]]}]},
+        {title:'测段曲率与操作指令',xLabel:'测深 m',yLabel:'曲率 °/30m',yRange:[0,4],hlines:[s.limit],note:'每个点是相邻测段井斜差的绝对值，固定方位下等于本例曲率；红虚线为教学上限。动作指令见数据表。',series:[{name:'实际曲率',points:a.rows.map((r,i)=>[i*30,r.dls])},{name:'零指令曲率',points:b.rows.map((r,i)=>[i*30,r.dls])}]}],
+        table:{title:'控制轨迹测段记录',headers:['测深 m','水平 m','垂深 m','井斜 °','归一化指令','曲率 °/30m'],rows:a.rows.map((r,i)=>[i*30,F(r.x,1),F(r.z,1),F(r.angle),F(r.u),F(r.dls)]),note:'指令 −1 到 1 表示教学造斜强度，不是可直接下发的工具面角。终点距离是欧氏距离，不表示真实中靶率。'},records:a.rows.map((r,i)=>({measured_depth_m:i*30,...r}))};}
+  });
+})();
