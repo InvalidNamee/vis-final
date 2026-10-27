@@ -9,6 +9,23 @@ beforeEach(async()=>{
   window.__ImportUI={open:vi.fn(),close:vi.fn()};window.__restorePlugin=vi.fn();await import('../../src/services/packages.js');
 });
 describe('public service contracts',()=>{
+  it('restores builtin references before the replacement plugin registers',()=>{
+    const pkg={id:'old-reference',sceneId:'w1',title:'旧引用包',tabs:{background:{sections:[{title:'背景',html:'说明'}]},demo:{builtin:'welllog-layer'}}};
+    localStorage.setItem('atlas.casepack.v1',JSON.stringify([{pkg,meta:pkg,files:[],savedAt:1}]));
+    const saved=localStorage.getItem('atlas.casepack.v1');window.CaseImport.loadSaved();
+    const mountDemo=vi.fn(),unmountDemo=vi.fn();
+    window.Cases.register({id:'welllog-layer',sceneId:'w1',tabs:{demo:{mount:mountDemo,unmount:unmountDemo}}});
+    const demo=window.Cases.get('old-reference').tabs.demo,root=document.createElement('div'),ctx={scene:{id:'w1'}};
+    demo.mount(root,ctx);expect(mountDemo).toHaveBeenCalledWith(root,ctx);demo.unmount();expect(unmountDemo).toHaveBeenCalledOnce();
+    expect(localStorage.getItem('atlas.casepack.v1')).toBe(saved);
+  });
+  it('reports cyclic builtin archives without recursive mounting or cleanup',()=>{
+    const records=['ref-a','ref-b'].map((id,i)=>{const pkg={id,sceneId:'w1',title:'引用示例',tabs:{background:{sections:[{title:'背景',html:'说明'}]},demo:{builtin:i?'ref-a':'ref-b'}}};return {pkg,meta:pkg,files:[],savedAt:1};});
+    localStorage.setItem('atlas.casepack.v1',JSON.stringify(records));window.CaseImport.loadSaved();
+    const demo=window.Cases.get('ref-a').tabs.demo;
+    expect(()=>demo.mount(document.createElement('div'),{})).toThrow('循环引用');
+    expect(()=>demo.unmount()).not.toThrow();
+  });
   it('rejects invalid edits without partially changing imported metadata',()=>{
     const pkg={id:'editable',sceneId:'d1',title:'原案例',tabs:{background:{sections:[{title:'背景',html:'业务说明'}]}}};
     localStorage.setItem('atlas.casepack.v1',JSON.stringify([{pkg,meta:pkg,savedAt:1}]));window.CaseImport.loadSaved();

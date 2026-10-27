@@ -233,17 +233,30 @@ import {zipSync,strToU8} from 'fflate';
     var mode = files.length ? global.CaseDemoHost.resolveMode({ files: files, demo: cfg }) : 'none';
     var handle = null;
 
-    if (cfg.builtin && mode === 'none') {
-      var src = global.Cases.get(cfg.builtin);
-      if (src && src.tabs && src.tabs.demo && typeof src.tabs.demo.mount === 'function') {
-        tabs.demo = {
-          label: cfg.label || src.tabs.demo.label || '可运行示范',
-          intro: cfg.intro || '',
-          mode: 'builtin',
-          mount: src.tabs.demo.mount,
-          unmount: src.tabs.demo.unmount
-        };
-      }
+    if (cfg.builtin && (mode === 'none' || mode === 'builtin')) {
+      var src = global.Cases.get(cfg.builtin), builtinDemo = null, resolvingBuiltin = false;
+      tabs.demo = {
+        label: cfg.label || (src && src.tabs && src.tabs.demo && src.tabs.demo.label) || '可运行示范',
+        intro: cfg.intro || '',
+        mode: 'builtin',
+        // Saved uploads restore before source plugins register. Resolve at mount,
+        // keeping both old references and replacement plugin IDs usable.
+        mount: function (root, ctx) {
+          if (resolvingBuiltin) throw new Error('内置演示存在循环引用：' + cfg.builtin);
+          var target = global.Cases.get(cfg.builtin);
+          if (!target || !target.tabs || !target.tabs.demo || target.tabs.demo === tabs.demo || typeof target.tabs.demo.mount !== 'function') {
+            throw new Error('复用的内置演示不可用：' + cfg.builtin);
+          }
+          builtinDemo = target.tabs.demo;
+          resolvingBuiltin = true;
+          try { return builtinDemo.mount(root, ctx); }
+          finally { resolvingBuiltin = false; }
+        },
+        unmount: function () {
+          var previous = builtinDemo; builtinDemo = null;
+          if (previous && typeof previous.unmount === 'function') previous.unmount();
+        }
+      };
     } else if (mode === 'page' || mode === 'module') {
       tabs.demo = {
         label: cfg.label || '可运行示范',
