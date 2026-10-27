@@ -63,22 +63,22 @@
     },
     "workflow": {
       "label": "案例流程",
-      "title": "退化趋势与寿命外推",
+      "title": "钻具退化寿命估计",
       "lead": [
-        "钻柱承担旋转与载荷传递，反复交变载荷可能导致疲劳。服役小时相同并不意味着退化状态相同；用历史退化指标估计趋势与剩余寿命，有助于把后续作业时长与检查计划联系起来。"
+        "钻具管理人员需要用已观测退化趋势估计剩余时间，结合历史回溯误差安排检查。 本例使用教学合成资料，案例规模与处理口径如下。"
       ],
       "stats": [
         [
-          "数据",
-          "固定种子合成"
+          "拟合资料",
+          "已观测窗口"
         ],
         [
-          "运行方式",
-          "浏览器本地"
+          "外推对象",
+          "退化阈值到达时间"
         ],
         [
-          "工程用途",
-          "方法教学"
+          "回溯指标",
+          "剩余小时误差"
         ]
       ],
       "steps": [
@@ -86,43 +86,35 @@
           "name": "服役数据整理",
           "role": "数据",
           "do": "按钻具标识保留按时序排列的历史与检查记录。",
-          "effect": "形成可追溯退化序列。",
-          "trap": "真实数据需处理换件、检修及右删失。"
+          "effect": "明确本例处理规模与资料分组：拟合资料 已观测窗口；外推对象 退化阈值到达时间；回溯指标 剩余小时误差。"
         },
         {
           "name": "局部退化回归",
           "role": "算法",
           "do": "仅用已观测窗口拟合时间与传感器代理量的斜率。",
-          "effect": "把噪声观测转换为趋势。",
-          "trap": "窗口短会抖动，长窗口会落后于工况变化。"
+          "effect": "保留局部退化回归的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "阈值寿命外推",
           "role": "算法",
           "do": "正斜率时计算到阈值的时间，非正斜率不输出有限寿命。",
-          "effect": "与后续计划时长形成条件对比。",
-          "trap": "趋势外推不能保证未来载荷不变。"
+          "effect": "保留阈值寿命外推的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "回溯误差与检查",
           "role": "评价",
           "do": "失效已观测后，对此前多个起点计算预测 RUL 与真实剩余小时差。",
-          "effect": "区分在线预测与事后评价。",
-          "trap": "同一钻具的多个起点不是独立测试样本。"
+          "effect": "交付退化曲线、剩余时间与回溯误差；对斜率不稳定或近期误差偏大的钻具优先检查。"
         }
       ],
       "metrics": {
-        "title": "计算指标与评价边界",
-        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">历史窗口</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">仅当前及过去观测</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">退化趋势外推</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">斜率 / 阈值 / 敏感性</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">寿命与检查</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">删失标记 / 回溯误差</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>RUL=max(0,(1−当前拟合退化量)/正斜率)，单位 h。已观测隐藏损伤首次达到 1 的小时为合成失效时刻；失效已知后，每隔 5 h 的历史起点分别只用当时窗口预测，以平均绝对误差评价。未观测到失效时显示右删失，不报告 MAE。多个起点共享同一序列，不能当跨钻具泛化结果。</p>"
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"服役数据整理 → 局部退化回归 → 阈值寿命外推 → 回溯误差与检查\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">服役数据整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">局部退化回归</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">阈值寿命外推</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">回溯误差与检查</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">历史窗口</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">仅当前及过去观测</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">退化趋势外推</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">斜率 / 阈值 / 敏感性</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">寿命与检查</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">删失标记 / 回溯误差</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>RUL=max(0,(1−当前拟合退化量)/正斜率)，单位 h。已观测隐藏损伤首次达到 1 的小时为合成失效时刻；失效已知后，每隔 5 h 的历史起点分别只用当时窗口预测，以平均绝对误差评价。未观测到失效时显示右删失，不报告 MAE。多个起点共享同一序列，不能当跨钻具泛化结果。</p><p><strong>成果交付：</strong>交付退化曲线、剩余时间与回溯误差；对斜率不稳定或近期误差偏大的钻具优先检查。</p>"
       },
       "fails": [
         {
-          "name": "数据分布变化",
-          "why": "RUL 假设未来载荷与当前趋势保持不变。±2 残差标准差转成的范围仅用于敏感性分析，不是已校准置信区间。当前观测期还未见失效时，不报告真实 RUL 误差；只有失效已发生才回溯评价。教学阈值不是报废标准，模型不能代替探伤或作业决策。"
-        },
-        {
-          "name": "合成结果误用",
-          "why": "所有数据、参数范围、阈值和响应系数均为教学合成设定；资料只支持业务定义和方法动机，不支持本例数值与现场收益。"
+          "name": "局部趋势不稳定",
+          "why": "短窗口斜率受噪声影响较大，非正斜率时也无法得到有限的到阈值时间。"
         }
       ]
     },

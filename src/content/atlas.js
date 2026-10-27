@@ -9,10 +9,10 @@
 window.ATLAS = {
   meta: {
     title: '石油勘探开发的智能化可能性地图',
-    tagline: '按石油作业链条逐环节展示可被深度学习改造的候选场景，标注技术介入点、数据条件与难度等级。',
+    tagline: '按石油作业链条逐环节展示智能化候选场景，结合可运行教学案例说明业务问题、计算方法与工程边界。',
     version: 'v1.0',
     updated: '2026-10',
-    upstreamNote: '上游环节（地质勘察 → 采油）已详解；下游 4 个环节标注为「待扩展」。',
+    upstreamNote: '覆盖 13 个作业环节与 61 个业务场景。演示采用教学合成数据和轻量方法，案例实际算法与产业研究方向分别说明。',
     email: 'atlas@example.com'
   },
 
@@ -705,7 +705,7 @@ window.ATLAS = {
           ],
           refs: ['知识图谱', '案例推理', '文本信息抽取'],
           cross: ['采油'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'wo2', name: '落物打捞工具智能选型', methods: ['kg'], diff: '中',
@@ -720,7 +720,7 @@ window.ATLAS = {
           ],
           refs: ['知识图谱', '相似度检索', '规则匹配'],
           cross: ['修井'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'wo3', name: '套管损伤智能识别', methods: ['cv'], diff: '中',
@@ -735,7 +735,7 @@ window.ATLAS = {
           ],
           refs: ['曲线 + 图像融合', '异常检测', '分级分类'],
           cross: ['测井'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'wo4', name: '修井作业风险预警', methods: ['ts'], diff: '中',
@@ -750,7 +750,7 @@ window.ATLAS = {
           ],
           refs: ['流式异常检测', '无监督基线', '分级预警'],
           cross: ['钻井'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'wo5', name: '修井周期预测', methods: ['ts'], diff: '中',
@@ -786,7 +786,7 @@ window.ATLAS = {
           ],
           refs: ['代理模型', '贝叶斯优化', '多目标优化'],
           cross: ['采油'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'e2', name: '压裂裂缝形态预测', methods: ['cv', 'opt'], diff: '高',
@@ -801,7 +801,7 @@ window.ATLAS = {
           ],
           refs: ['多源反演', '不适定问题正则化', '不确定性量化'],
           cross: ['物探'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'e3', name: '化学驱配方智能筛选', methods: ['opt'], diff: '中',
@@ -815,7 +815,7 @@ window.ATLAS = {
             ['矿场试验', '增油效果', '少量真值']
           ],
           refs: ['主动学习', '高斯过程回归', '实验设计'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'e4', name: '蒸汽吞吐注采参数优化', methods: ['ts', 'opt'], diff: '中',
@@ -829,7 +829,7 @@ window.ATLAS = {
             ['温度监测', '井温、测温点', '辅助判断']
           ],
           refs: ['时序预测', '序列优化', '跨井迁移'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'e5', name: '微生物采油菌群活性预测', methods: ['ts'], diff: '高',
@@ -843,7 +843,7 @@ window.ATLAS = {
             ['矿场试验', '增油量', '少量真值']
           ],
           refs: ['小样本学习', '机理—数据混合建模', '软测量'],
-          status: 'ext'
+          status: 'full'
         }
       ]
     },
@@ -865,7 +865,7 @@ window.ATLAS = {
             ['工况操作记录', '调阀、启停泵', '用于剔除误报']
           ],
           refs: ['多源异常检测', '水力模型', '误报抑制'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 't2', name: '管道腐蚀智能评估', methods: ['cv', 'ts'], diff: '中',
@@ -879,7 +879,7 @@ window.ATLAS = {
             ['开挖验证', '实测深度', '真值']
           ],
           refs: ['缺陷匹配', '退化建模', '可靠性评估'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 't3', name: '集输系统工况优化', methods: ['opt'], diff: '中',
@@ -893,7 +893,7 @@ window.ATLAS = {
             ['电价与产量计划', '分时电价', '优化目标']
           ],
           refs: ['混合整数优化', '水力仿真', '能耗建模'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 't4', name: '油气计量智能校正', methods: ['ts'], diff: '低',
@@ -907,7 +907,7 @@ window.ATLAS = {
             ['维护记录', '清洗、检修', '事件']
           ],
           refs: ['漂移检测', '数据协调', '机理校正'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 't5', name: '储罐液位与泄漏智能监控', methods: ['cv'], diff: '低',
@@ -921,7 +921,7 @@ window.ATLAS = {
             ['报警与处置记录', '事件', '作为标签']
           ],
           refs: ['目标检测', '读数识别', '多源交叉校验'],
-          status: 'ext'
+          status: 'full'
         }
       ]
     },
@@ -943,7 +943,7 @@ window.ATLAS = {
             ['产品质量', '馏程、闪点', '化验']
           ],
           refs: ['代理模型', '实时优化 RTO', '软测量'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'r2', name: '催化裂化产物预测', methods: ['opt', 'ts'], diff: '高',
@@ -957,7 +957,7 @@ window.ATLAS = {
             ['运行工况', '再生温度、催化剂活性', '过程数据']
           ],
           refs: ['深度回归', '机理约束', '数据对齐'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'r3', name: '炼化设备预测性维护', methods: ['ts'], diff: '中',
@@ -971,7 +971,7 @@ window.ATLAS = {
             ['设备台账', '型号、服役年限', '辅助特征']
           ],
           refs: ['退化建模', '剩余寿命预测', '迁移学习'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'r4', name: '化验数据智能审核', methods: ['nlp', 'opt'], diff: '低',
@@ -985,7 +985,7 @@ window.ATLAS = {
             ['工艺背景', '正常范围', '规则来源']
           ],
           refs: ['异常检测', '规则引擎', '文本抽取'],
-          status: 'ext'
+          status: 'full'
         },
         {
           id: 'r5', name: '产品质量在线软测量', methods: ['ts'], diff: '中',
@@ -999,7 +999,7 @@ window.ATLAS = {
             ['在线分析仪', '若已配置', '作参考']
           ],
           refs: ['软测量', '半监督回归', '不确定度估计'],
-          status: 'ext'
+          status: 'full'
         }
       ]
     }

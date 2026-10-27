@@ -1,7 +1,9 @@
 import type { CaseFile } from '../types';
 const manifests = import.meta.glob('../../plugins/**/case.json', { eager:true, import:'default' }) as Record<string, any>;
-const texts = import.meta.glob(['../../plugins/**/*','!../../plugins/_templates/**','!../../plugins/**/case.json','!../../plugins/**/plugin.json'], { query:'?raw', import:'default' });
-const urls = import.meta.glob(['../../plugins/**/*','!../../plugins/_templates/**','!../../plugins/**/case.json','!../../plugins/**/plugin.json'], { query:'?url', import:'default' });
+const descriptors = import.meta.glob('../../plugins/**/plugin.json', { eager:true, import:'default' }) as Record<string, any>;
+const texts = import.meta.glob(['../../plugins/**/*.{html,htm,js,mjs,cjs,css,svg,json,csv,txt,md}','!../../plugins/_templates/**','!../../plugins/**/case.json','!../../plugins/**/plugin.json'], { query:'?raw', import:'default' });
+const urls = import.meta.glob(['../../plugins/**/*','!../../plugins/**/*.{html,htm,js,mjs,cjs,css,svg,json,csv,txt,md}','!../../plugins/_templates/**'], { query:'?url', import:'default' });
+const resourcePaths=[...new Set([...Object.keys(texts),...Object.keys(urls)])];
 const legacy = import.meta.glob(['../../plugins/**/*.case.js', '!../../plugins/_templates/**']);
 const legacyDemo = import.meta.glob(['../../plugins/**/*.demo.js', '!../../plugins/_templates/**']);
 const registrations = new Map<string,()=>void>();
@@ -14,19 +16,19 @@ export async function initializePlugins(){
     if(ids.has(manifest.id))throw Error(`Duplicate plugin ID: ${manifest.id}`);
     ids.add(manifest.id);
     if(manifest.id!==id || manifest.sceneId!==scene || window.ATLAS.index.byScene[scene]?.stageId!==stage)throw Error(`Plugin classification mismatch: ${path}`);
-    // Teacher's sample remains import-only, never implicitly published.
-    if(id==='firstbreak-stalta')continue;
+    // Reference/import fixtures can coexist with a replacement built-in case.
+    if(descriptors[path.replace('case.json','plugin.json')]?.builtin===false)continue;
     const register=()=>{
       if(window.Cases.get(id)||window.CaseImport.blockedList().includes(id))return;
       const c=structuredClone(manifest),cfg=c.tabs.demo,base=path.slice(0,-'case.json'.length);
       let handle:any=null,epoch=0;
       c.tabs.demo={label:cfg.label,intro:cfg.intro,mount(root:HTMLElement,ctx:any){
         const token=++epoch;root.textContent='演示资源加载中…';
-        const entries=Object.entries(texts).filter(([p])=>p.startsWith(base));
-        Promise.all(entries.map(async ([p,load])=>{
+        const entries=resourcePaths.filter(p=>p.startsWith(base));
+        Promise.all(entries.map(async p=>{
           const name=p.slice(base.length);
-          if(/\.(html?|[cm]?js|css|svg|json|csv|txt|md)$/i.test(name)){
-            const data=String(await load());return {name,enc:'text',data,size:new TextEncoder().encode(data).length} as CaseFile;
+          if(texts[p]){
+            const data=String(await texts[p]());return {name,enc:'text',data,size:new TextEncoder().encode(data).length} as CaseFile;
           }
           const response=await fetch(String(await urls[p]()));if(!response.ok)throw Error(`Resource HTTP ${response.status}: ${name}`);
           const blob=await response.blob();return window.__PackageService.readOne(new File([blob],name,{type:blob.type}));

@@ -1,0 +1,126 @@
+{
+  "id": "workover-duration",
+  "sceneId": "wo5",
+  "title": "修井周期预测",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "ts"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "修井排班需要时间范围而不是一个承诺工期。以深度和故障复杂度检索历史井次，按准备、起下管、处理、试验四工序汇总，从相似井次的总时长估计分位区间。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "相似工序条件分位数",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>修井排班需要时间范围而不是一个承诺工期。以深度和故障复杂度检索历史井次，按准备、起下管、处理、试验四工序汇总，从相似井次的总时长估计分位区间。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>修井周期预测业务对象示意</title><rect x=\"225\" y=\"20\" width=\"76\" height=\"185\" fill=\"#e6ece5\" stroke=\"#667c75\" stroke-width=\"3\"/><path d=\"M245 20V170H281V20\" fill=\"white\" stroke=\"#21796a\" stroke-width=\"3\"/><path d=\"M246 115l16 15 17-15\" fill=\"none\" stroke=\"#b96b38\" stroke-width=\"6\"/><path d=\"M283 126H383\" stroke=\"#b96b38\" stroke-width=\"2\"/><text x=\"393\" y=\"131\" font-size=\"17\">故障井段与作业工具</text><text x=\"35\" y=\"60\" font-size=\"17\">井史与检测证据</text><path d=\"M166 68l65 34\" stroke=\"#21796a\" stroke-width=\"2\"/><text x=\"345\" y=\"195\" font-size=\"17\">诊断 ≠ 处置指令</text></svg></div><figcaption class=\"figcap\">修井周期预测涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "相似工序条件分位数",
+          "html": "<p>生成180个独立合成井次，前120条为参考库、后60条仅评价。用归一距离找k近邻，返回总工期P10/P50/P90；测试输出中位数MAE与P10–P90区间覆盖率。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"相似工序条件分位数默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>相似工序条件分位数默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">总工期 / h</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">50.0</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">1.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">57.2</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">4.8</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">64.5</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">8.5</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">71.8</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">12.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">79.1</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">16.0</text><path d=\"M82.00 201.53 L124.53 123.99 L167.07 193.38 L209.60 181.10 L252.13 233.07 L294.67 259.24 L337.20 74.76 L379.73 131.13 L422.27 194.03 L464.80 102.46 L507.33 249.72 L549.87 128.35 L592.40 159.29 L634.93 192.87 L677.47 252.26 L720.00 198.21\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82.00 193.12 L124.53 193.12 L167.07 193.12 L209.60 193.12 L252.13 193.12 L294.67 193.12 L337.20 193.12 L379.73 193.12 L422.27 193.12 L464.80 193.12 L507.33 193.12 L549.87 193.12 L592.40 193.12 L634.93 193.12 L677.47 193.12 L720.00 193.12\" stroke=\"#b96b38\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">邻近井次序号</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：相似井次工期 / 条件中位数。预测总工期P50 60.96h；独立井次MAE 8.82h；P10–P90覆盖率 76.67%。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>经验分位区间没有分布无关覆盖保证；稀有事故与物资等待未建模，不能当排班承诺。每条代表独立井次，没有拆散同井工序泄漏。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://glossary.slb.com/en/terms/f/fishing_tool\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：Fishing tool</a>：打捞工艺有诊断、接合及施力等不同功能环节，支持分工序建模动机，不支持工时数值。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "修井工期区间估计",
+      "lead": [
+        "计划人员需要用类似井次估计修井总工期和波动范围，支持排班与资源预留。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "井次记录",
+          "180 条"
+        ],
+        [
+          "参考 / 评价",
+          "120 / 60 条"
+        ],
+        [
+          "工期分位数",
+          "P10 / P50 / P90"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "工况资料整理",
+          "role": "数据",
+          "do": "核对深度、故障复杂度和总工期，分开参考案例库与待评价井次。",
+          "effect": "形成井次记录：180 条；参考 / 评价：120 / 60 条；工期分位数：P10 / P50 / P90的处理任务。"
+        },
+        {
+          "name": "相似工序条件分位数",
+          "role": "计算",
+          "do": "生成180个独立合成井次，前120条为参考库、后60条仅评价。用归一距离找k近邻，返回总工期P10/P50/P90；测试输出中位数MAE与P10–P90区间覆盖率。",
+          "effect": "形成可与原始观测或备选方案逐项对照的修井周期预测结果。"
+        },
+        {
+          "name": "工期误差与区间覆盖",
+          "role": "评价",
+          "do": "在60条留出井次计算P50工期MAE，统计真实工期落入P10—P90的比例。",
+          "effect": "同时检查排班中心估计偏差与资源预留区间。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付工期中位数、上下分位数与留出覆盖率；对区间较宽的任务预留资源并核对复杂工序。",
+          "effect": "为修井工期区间估计提供可追溯的候选、误差或约束依据。",
+          "trap": "近邻样本缺少复杂工序时，工期上分位数仍可能偏低。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"工况资料整理 → 相似工序条件分位数 → 工期误差与区间覆盖 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">工况资料整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">相似工序条件分位数</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">工期误差与区间覆盖</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>在60条留出井次计算P50工期MAE，统计真实工期落入P10—P90的比例。</p><p><strong>成果交付：</strong>交付工期中位数、上下分位数与留出覆盖率；对区间较宽的任务预留资源并核对复杂工序。</p>"
+      },
+      "fails": [
+        {
+          "name": "稀有复杂工序",
+          "why": "近邻样本缺少复杂工序时，工期上分位数仍可能偏低。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "修井排班需要时间范围而不是一个承诺工期。以深度和故障复杂度检索历史井次，按准备、起下管、处理、试验四工序汇总，从相似井次的总时长估计分位区间。"
+    }
+  }
+}

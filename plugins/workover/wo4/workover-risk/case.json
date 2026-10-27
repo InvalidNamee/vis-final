@@ -1,0 +1,126 @@
+{
+  "id": "workover-risk",
+  "sceneId": "wo4",
+  "title": "修井作业风险预警",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "ts"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "磨铣修井中相同工序内扭矩缓慢升高可能提示负荷变化。相较单点阈值，累积和监测可保留持续的小偏移；工序切换必须先单独识别。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "单侧累积和异常监测",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>磨铣修井中相同工序内扭矩缓慢升高可能提示负荷变化。相较单点阈值，累积和监测可保留持续的小偏移；工序切换必须先单独识别。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>修井作业风险预警业务对象示意</title><rect x=\"225\" y=\"20\" width=\"76\" height=\"185\" fill=\"#e6ece5\" stroke=\"#667c75\" stroke-width=\"3\"/><path d=\"M245 20V170H281V20\" fill=\"white\" stroke=\"#21796a\" stroke-width=\"3\"/><path d=\"M246 115l16 15 17-15\" fill=\"none\" stroke=\"#b96b38\" stroke-width=\"6\"/><path d=\"M283 126H383\" stroke=\"#b96b38\" stroke-width=\"2\"/><text x=\"393\" y=\"131\" font-size=\"17\">故障井段与作业工具</text><text x=\"35\" y=\"60\" font-size=\"17\">井史与检测证据</text><path d=\"M166 68l65 34\" stroke=\"#21796a\" stroke-width=\"2\"/><text x=\"345\" y=\"195\" font-size=\"17\">诊断 ≠ 处置指令</text></svg></div><figcaption class=\"figcap\">修井作业风险预警涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "单侧累积和异常监测",
+          "html": "<p>前40个点拟合正常均值和标准差。随后单侧CUSUM S=max(0,S+z−0.5)因果递推。第75点后人为加入漂移，以观测点为单位统计误报和检出延迟。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"单侧累积和异常监测默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>单侧累积和异常监测默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">累积标准分</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">-12</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">40</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">32</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">60</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">76</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">80</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">119</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">99</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">163</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">119</text><path d=\"M82.00 259.24 L90.08 259.24 L98.15 259.24 L106.23 259.24 L114.30 259.24 L122.38 259.24 L130.46 258.39 L138.53 259.24 L146.61 258.81 L154.68 257.32 L162.76 257.23 L170.84 257.63 L178.91 256.06 L186.99 258.20 L195.06 259.24 L203.14 257.83 L211.22 258.34 L219.29 259.24 L227.37 259.24 L235.44 259.24 L243.52 258.05 L251.59 258.79 L259.67 258.34 L267.75 257.58 L275.82 258.16 L283.90 258.18 L291.97 259.24 L300.05 259.24 L308.13 259.24 L316.20 259.24 L324.28 259.24 L332.35 259.24 L340.43 257.79 L348.51 256.39 L356.58 258.59 L364.66 259.24 L372.73 259.24 L380.81 256.96 L388.89 257.74 L396.96 256.77 L405.04 255.67 L413.11 255.61 L421.19 254.21 L429.27 251.33 L437.34 249.13 L445.42 243.57 L453.49 241.77 L461.57 235.98 L469.65 232.27 L477.72 228.68 L485.80 224.85 L493.87 220.47 L501.95 214.03 L510.03 208.78 L518.10 202.57 L526.18 196.16 L534.25 191.78 L542.33 186.60 L550.41 180.73 L558.48 175.67 L566.56 172.10 L574.63 166.76 L582.71 161.95 L590.78 155.55 L598.86 151.50 L606.94 145.80 L615.01 142.45 L623.09 135.63 L631.16 130.32 L639.24 127.17 L647.32 122.56 L655.39 117.06 L663.47 109.97 L671.54 104.32 L679.62 97.49 L687.70 91.06 L695.77 85.69 L703.85 82.40 L711.92 79.47 L720.00 74.76\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82.00 250.69 L90.08 250.69 L98.15 250.69 L106.23 250.69 L114.30 250.69 L122.38 250.69 L130.46 250.69 L138.53 250.69 L146.61 250.69 L154.68 250.69 L162.76 250.69 L170.84 250.69 L178.91 250.69 L186.99 250.69 L195.06 250.69 L203.14 250.69 L211.22 250.69 L219.29 250.69 L227.37 250.69 L235.44 250.69 L243.52 250.69 L251.59 250.69 L259.67 250.69 L267.75 250.69 L275.82 250.69 L283.90 250.69 L291.97 250.69 L300.05 250.69 L308.13 250.69 L316.20 250.69 L324.28 250.69 L332.35 250.69 L340.43 250.69 L348.51 250.69 L356.58 250.69 L364.66 250.69 L372.73 250.69 L380.81 250.69 L388.89 250.69 L396.96 250.69 L405.04 250.69 L413.11 250.69 L421.19 250.69 L429.27 250.69 L437.34 250.69 L445.42 250.69 L453.49 250.69 L461.57 250.69 L469.65 250.69 L477.72 250.69 L485.80 250.69 L493.87 250.69 L501.95 250.69 L510.03 250.69 L518.10 250.69 L526.18 250.69 L534.25 250.69 L542.33 250.69 L550.41 250.69 L558.48 250.69 L566.56 250.69 L574.63 250.69 L582.71 250.69 L590.78 250.69 L598.86 250.69 L606.94 250.69 L615.01 250.69 L623.09 250.69 L631.16 250.69 L639.24 250.69 L647.32 250.69 L655.39 250.69 L663.47 250.69 L671.54 250.69 L679.62 250.69 L687.70 250.69 L695.77 250.69 L703.85 250.69 L711.92 250.69 L720.00 250.69\" stroke=\"#b96b38\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">采样点</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：CUSUM / 教学控制限。正常窗误报点 0.00/35；漂移窗召回率 80.00%；首次检出延迟 9.00点。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>只模拟固定磨铣工况；变化不是事故诊断，控制限未按现场误报率标定，不能自动井控或处置。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc31.htm\" target=\"_blank\" rel=\"noopener noreferrer\">NIST：Control charts</a>：控制图利用正常中心线和控制限监控过程变化；本例CUSUM参数为教学设定。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "磨铣扭矩异常监测",
+      "lead": [
+        "作业人员需要在磨铣扭矩逐步抬升时及时发现偏移，并检查正常段误报。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "基线样本",
+          "前 40 点"
+        ],
+        [
+          "监测方法",
+          "单侧 CUSUM"
+        ],
+        [
+          "参考漂移起点",
+          "第 75 点后"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "工况资料整理",
+          "role": "数据",
+          "do": "核对扭矩观测顺序，从正常段计算基线均值与标准差并冻结。",
+          "effect": "形成基线样本：前 40 点；监测方法：单侧 CUSUM；参考漂移起点：第 75 点后的处理任务。"
+        },
+        {
+          "name": "单侧累积和异常监测",
+          "role": "计算",
+          "do": "前40个点拟合正常均值和标准差。随后单侧CUSUM S=max(0,S+z−0.5)因果递推。第75点后人为加入漂移，以观测点为单位统计误报和检出延迟。",
+          "effect": "形成可与原始观测或备选方案逐项对照的修井作业风险预警结果。"
+        },
+        {
+          "name": "误报与检出延迟评价",
+          "role": "评价",
+          "do": "区分参考漂移前的正常监测段和漂移后的异常段，核对首次报警位置与检出延迟。",
+          "effect": "比较控制限变化带来的提前误报与报警滞后。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付累积和曲线、首次报警及延迟；结合磨铣进尺与工况变化复核异常原因。",
+          "effect": "为磨铣扭矩异常监测提供可追溯的候选、误差或约束依据。",
+          "trap": "连续正向冲击可抬高CUSUM并提前报警，应区分短时扰动和持续负荷变化。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"工况资料整理 → 单侧累积和异常监测 → 误报与检出延迟评价 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">工况资料整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">单侧累积和异常监测</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">误报与检出延迟评价</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>区分参考漂移前的正常监测段和漂移后的异常段，核对首次报警位置与检出延迟。</p><p><strong>成果交付：</strong>交付累积和曲线、首次报警及延迟；结合磨铣进尺与工况变化复核异常原因。</p>"
+      },
+      "fails": [
+        {
+          "name": "短时冲击累积",
+          "why": "连续正向冲击可抬高CUSUM并提前报警，应区分短时扰动和持续负荷变化。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "磨铣修井中相同工序内扭矩缓慢升高可能提示负荷变化。相较单点阈值，累积和监测可保留持续的小偏移；工序切换必须先单独识别。"
+    }
+  }
+}

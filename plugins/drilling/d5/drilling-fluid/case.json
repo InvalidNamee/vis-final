@@ -64,22 +64,22 @@
     },
     "workflow": {
       "label": "案例流程",
-      "title": "双输出回归与配方搜索",
+      "title": "钻井液目标窗口配方筛选",
       "lead": [
-        "钻井液流变性能影响流动阻力和岩屑输送，处理剂作用又随温度和固相状态改变。小试记录可用于建立轻量代理模型，比较性能窗口内的加剂方案，减少只凭单一性能调节的盲目性。"
+        "钻井液工程师需要根据小试数据估计PV与YP，筛选同时满足目标窗口且相对成本较低的配方。 本例使用教学合成资料，案例规模与处理口径如下。"
       ],
       "stats": [
         [
-          "数据",
-          "固定种子合成"
+          "小试批次",
+          "18 批"
         ],
         [
-          "运行方式",
-          "浏览器本地"
+          "训练 / 验证 / 测试",
+          "12 / 3 / 3 批"
         ],
         [
-          "工程用途",
-          "方法教学"
+          "配方网格",
+          "961 组"
         ]
       ],
       "steps": [
@@ -87,43 +87,35 @@
           "name": "小试批次切分",
           "role": "数据",
           "do": "18 批按 12/3/3 训练、验证和测试分组。",
-          "effect": "保留独立批次评价。",
-          "trap": "实测小试必须记录温度、仪器和批次条件。"
+          "effect": "明确本例处理规模与资料分组：小试批次 18 批；训练 / 验证 / 测试 12 / 3 / 3 批；配方网格 961 组。"
         },
         {
           "name": "流变代理模型",
           "role": "算法",
           "do": "两项岭回归预测 PV、YP，验证集从四个 λ 选择模型。",
-          "effect": "快速比较候选组合响应。",
-          "trap": "测试标签不能参与选型或系数拟合。"
+          "effect": "保留流变代理模型的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "约束配方网格搜索",
           "role": "优化",
           "do": "在 961 个组合中筛选目标窗口内最低相对成本。",
-          "effect": "同时考虑两项性能和加剂代价。",
-          "trap": "目标冲突或模型覆盖不足时可能无解。"
+          "effect": "保留约束配方网格搜索的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "独立批次评价",
           "role": "评价",
           "do": "计算 PV、YP 的测试 MAE，并与训练均值基线比较。",
-          "effect": "使预测误差和推荐依据可核查。",
-          "trap": "预测可行性仍需真实小试验证。"
+          "effect": "交付配方可行区、推荐用量与PV/YP测试误差；比较目标窗口收紧时的成本和可行性。"
         }
       ],
       "metrics": {
-        "title": "计算指标与评价边界",
-        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">分批训练与验证</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">PV / YP 双代理模型</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">目标约束搜索</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">961 配方 / 相对成本</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">小试复核入口</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">独立测试误差 / 无解</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>PV 与 YP 的 MAE 分别以 mPa·s 和 Pa 报告，不混合物理单位。模型选择使用经人为尺度 1 mPa·s 与 1 Pa 归一化的两项验证 MAE 之和；测试集不参加选择。相对成本=2×增黏剂+稀释剂；推荐仅从符合 PV/YP 上下限的组合产生。Bingham 曲线中 PV 除以 1000 完成 mPa·s 到 Pa·s 换算。</p>"
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"小试批次切分 → 流变代理模型 → 约束配方网格搜索 → 独立批次评价\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">小试批次切分</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">流变代理模型</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 优化</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">约束配方网格搜索</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">独立批次评价</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">分批训练与验证</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">PV / YP 双代理模型</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">目标约束搜索</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">961 配方 / 相对成本</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">小试复核入口</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">独立测试误差 / 无解</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>PV 与 YP 的 MAE 分别以 mPa·s 和 Pa 报告，不混合物理单位。模型选择使用经人为尺度 1 mPa·s 与 1 Pa 归一化的两项验证 MAE 之和；测试集不参加选择。相对成本=2×增黏剂+稀释剂；推荐仅从符合 PV/YP 上下限的组合产生。Bingham 曲线中 PV 除以 1000 完成 mPa·s 到 Pa·s 换算。</p><p><strong>成果交付：</strong>交付配方可行区、推荐用量与PV/YP测试误差；比较目标窗口收紧时的成本和可行性。</p>"
       },
       "fails": [
         {
-          "name": "数据分布变化",
-          "why": "没有预测密度、滤失、ECD 或化学相容性，不能称全性能闭环调控。归一化剂量和成本不对应现场浓度或金额；点击应用是替换假想配方，不是向已有体系连续加药。训练与测试共用人工响应机制，高评分不能证明真实配方优化收益。"
-        },
-        {
-          "name": "合成结果误用",
-          "why": "所有数据、参数范围、阈值和响应系数均为教学合成设定；资料只支持业务定义和方法动机，不支持本例数值与现场收益。"
+          "name": "目标窗口过窄",
+          "why": "PV与YP的可行区域可能没有交集，此时需要调整目标或补充小试方案。"
         }
       ]
     },

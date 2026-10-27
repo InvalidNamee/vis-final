@@ -1,0 +1,17 @@
+(function(root,factory){if(typeof module==="object"&&module.exports)module.exports=factory();else root.OperationsModel=factory()})(typeof globalThis!=="undefined"?globalThis:this,function(){"use strict";
+
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+const quant=(a,p)=>{const b=[...a].sort((x,y)=>x-y),i=(b.length-1)*p,l=Math.floor(i);return b[l]+(b[Math.ceil(i)]-b[l])*(i-l)};
+const median=a=>quant(a,.5),clamp=(v,l,h)=>Math.max(l,Math.min(h,v));
+const rng=(seed=20261023)=>()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296};
+const fit=points=>{const x=mean(points.map(p=>p[0])),y=mean(points.map(p=>p[1])),den=points.reduce((s,p)=>s+(p[0]-x)**2,0),b=den?points.reduce((s,p)=>s+(p[0]-x)*(p[1]-y),0)/den:0;return {a:y-b*x,b,predict:t=>y+b*(t-x)}};
+const mae=(a,b)=>mean(a.map((v,i)=>Math.abs(v-b[i])));
+const metric=(label,value,unit='')=>({label,value:Number.isFinite(value)?value:null,unit});
+const line=(name,points,color)=>({name,points,color});
+const row=(label,value,note='')=>({label,value,note});
+const round=v=>Math.round(v*1000)/1000;
+
+
+function run(p){const random=rng(1041),n=Math.round(240*p.fraction/100),theta=p.angle*Math.PI/180,events=Array.from({length:n},()=>{const u=(random()-.5)*300,v=(random()-.5)*18,x=u*Math.cos(theta)-v*Math.sin(theta),y=u*Math.sin(theta)+v*Math.cos(theta);return {x:x+(random()-.5)*p.noise*2,y:y+(random()-.5)*p.noise*2,u}}),mx=mean(events.map(r=>r.x)),my=mean(events.map(r=>r.y)),xx=mean(events.map(r=>(r.x-mx)**2)),yy=mean(events.map(r=>(r.y-my)**2)),xy=mean(events.map(r=>(r.x-mx)*(r.y-my))),angle=.5*Math.atan2(2*xy,xx-yy),deg=(angle*180/Math.PI+180)%180,proj=events.map(r=>(r.x-mx)*Math.cos(angle)+(r.y-my)*Math.sin(angle)),lo=quant(proj,.05),hi=quant(proj,.95),truth=quant(events.map(r=>r.u),.95)-quant(events.map(r=>r.u),.05),err=Math.abs(deg-p.angle);return {metrics:[metric('方位误差',Math.min(err,180-err),'°'),metric('事件云主轴跨度',hi-lo,'m'),metric('同分位跨度误差',Math.abs(hi-lo-truth),'m')],series:[line('事件位置',events.map(r=>[r.x,r.y]),'#21796a'),line('PCA主轴',[[mx+lo*Math.cos(angle),my+lo*Math.sin(angle)],[mx+hi*Math.cos(angle),my+hi*Math.sin(angle)]],'#b96b38')],axes:['东向 / m','北向 / m'],scatter:true,rows:[row('反演方位',deg.toFixed(2)+'°','180°轴向等价'),row('保留事件',n+'个','不是独立井数'),row('真实同分位跨度',truth.toFixed(2)+' m','仅评价时可见')],recommendation:'事件云方向 '+deg.toFixed(1)+'°；需与地质、施工及示踪联合解释',detail:'P5–P95是事件投影范围而非置信区间。增加噪声会改变主轴和跨度，不输出缝网成功率。',samples:events};}
+
+const config={"id":"fracture-geometry","title":"压裂裂缝形态预测","method":"微地震事件云主轴反演","business":"微地震事件云可描述受激区域的方向和范围，但不直接等于具有导流能力的裂缝。演示从二维带定位误差的事件坐标估计主方向和稳健长度，再与隐藏几何比较。","controls":[{"key":"angle","label":"裂缝方位","min":0,"max":170,"step":10,"value":40,"unit":"°"},{"key":"noise","label":"事件定位噪声","min":1,"max":30,"step":1,"value":12,"unit":"m"},{"key":"fraction","label":"事件保留比例","min":30,"max":100,"step":5,"value":80,"unit":"%"}],"seed":1041};const defaults={"angle":40,"noise":12,"fraction":80};const calculate=run;return {config,defaults,run(inputs={}){const p={...defaults,...inputs};for(const c of config.controls){if(!Number.isFinite(p[c.key])||p[c.key]<c.min||p[c.key]>c.max)throw Error("Input outside teaching range: "+c.key)}const r=calculate(p);return {...r,charts:[{title:config.method+"计算结果",xlabel:r.axes[0],ylabel:r.axes[1],series:r.series,equalAspect:config.id==="fracture-geometry"}],note:r.detail,audit:{...r.audit,synthetic:true,seed:config.seed,method:config.method,inputs:p}}}};});

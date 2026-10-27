@@ -1,0 +1,126 @@
+{
+  "id": "fracturing-search",
+  "sceneId": "e1",
+  "title": "压裂参数智能优化",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "opt"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "压裂排量与支撑剂量同时影响裂缝延伸和施工压力。对紧砂岩单段，在教学成本和压力约束内比较不同组合，帮助解释产能代理值与可行域的区别。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "压裂约束网格搜索",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>压裂排量与支撑剂量同时影响裂缝延伸和施工压力。对紧砂岩单段，在教学成本和压力约束内比较不同组合，帮助解释产能代理值与可行域的区别。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>压裂参数智能优化业务对象示意</title><rect x=\"30\" y=\"95\" width=\"590\" height=\"110\" fill=\"#ece8d8\"/><path d=\"M145 22V151H457V22\" fill=\"none\" stroke=\"#21796a\" stroke-width=\"7\"/><path d=\"M250 120l-20-26m20 57-25 35m135-35 28-42m-28 42 25 34\" stroke=\"#b96b38\" stroke-width=\"3\"/><text x=\"47\" y=\"60\" font-size=\"17\">注入参数</text><text x=\"450\" y=\"60\" font-size=\"17\">产出或监测</text><text x=\"257\" y=\"193\" font-size=\"17\">储层 · 流体 · 响应</text></svg></div><figcaption class=\"figcap\">压裂参数智能优化涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "压裂约束网格搜索",
+          "html": "<p>枚举排量2–8 m³/min和砂量20–100 t。简化压力=25+2.4排量+0.055砂量+0.8应力差；响应代理为饱和增长乘应力抑制项。仅在教学成本及压力可行域内最大化代理值。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"压裂约束网格搜索默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>压裂约束网格搜索默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">合成响应 / 分</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">31.0</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">2.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">39.1</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">3.4</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">47.2</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">4.9</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">55.4</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">6.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">63.5</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">7.8</text><path d=\"M82.00 237.22 L109.74 216.97 L137.48 198.34 L165.22 181.20 L192.96 165.43 L220.70 150.92 L248.43 137.57 L276.17 125.29 L303.91 119.18 L331.65 108.93 L359.39 105.62 L387.13 97.09 L414.87 89.23 L442.61 89.28 L470.35 82.76 L498.09 85.14 L525.83 79.73 L553.57 74.76 L581.30 79.91 L609.04 86.79 L636.78 109.35 L664.52 139.24 L692.26 178.20 L720.00 259.24\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">排量 / m³·min⁻¹</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：各排量可行最优响应。枚举组合 425.00组；可行组合 326.00组；最优响应代理 61.29分。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>这是显式教学响应函数的穷举，不是现场压裂模拟、训练神经代理或贝叶斯优化。未建模层间应力、缝高失控、砂堵与近井摩阻。响应分不可当真实产量。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://www.energy.gov/hgeo/hydraulic-fracturing-technology\" target=\"_blank\" rel=\"noopener noreferrer\">DOE：Hydraulic fracturing technology</a>：压裂将水、砂和添加剂注入低渗地层以改善流动，支持参数业务背景，不支持响应系数。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "压裂排量砂量方案比选",
+      "lead": [
+        "压裂设计人员需要在预算与施工压力约束内比较排量、砂量组合，整理响应较高的候选方案。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "排量范围",
+          "2—8 m³/min"
+        ],
+        [
+          "砂量范围",
+          "20—100 t"
+        ],
+        [
+          "约束条件",
+          "成本、压力"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "工况资料整理",
+          "role": "数据",
+          "do": "核对应力差、压力上限和成本预算，建立排量与砂量的候选网格。",
+          "effect": "形成排量范围：2—8 m³/min；砂量范围：20—100 t；约束条件：成本、压力的处理任务。"
+        },
+        {
+          "name": "压裂约束网格搜索",
+          "role": "计算",
+          "do": "枚举排量2–8 m³/min和砂量20–100 t。简化压力=25+2.4排量+0.055砂量+0.8应力差；响应代理为饱和增长乘应力抑制项。仅在教学成本及压力可行域内最大化代理值。",
+          "effect": "形成可与原始观测或备选方案逐项对照的压裂参数智能优化结果。"
+        },
+        {
+          "name": "成本压力可行性校核",
+          "role": "评价",
+          "do": "逐个检查候选成本与施工压力，剔除越界组合后比较剩余候选的响应代理值。",
+          "effect": "把响应较高但超出施工条件的组合与可行候选分开。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付可行域、推荐排量砂量及压力成本；重点比较约束边缘候选的余量。",
+          "effect": "为压裂排量砂量方案比选提供可追溯的候选、误差或约束依据。",
+          "trap": "高应力差与严格压力上限可能排除全部候选，需要重新核对施工条件。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"工况资料整理 → 压裂约束网格搜索 → 成本压力可行性校核 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">工况资料整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">压裂约束网格搜索</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">成本压力可行性校核</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>逐个检查候选成本与施工压力，剔除越界组合后比较剩余候选的响应代理值。</p><p><strong>成果交付：</strong>交付可行域、推荐排量砂量及压力成本；重点比较约束边缘候选的余量。</p>"
+      },
+      "fails": [
+        {
+          "name": "可行域消失",
+          "why": "高应力差与严格压力上限可能排除全部候选，需要重新核对施工条件。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "压裂排量与支撑剂量同时影响裂缝延伸和施工压力。对紧砂岩单段，在教学成本和压力约束内比较不同组合，帮助解释产能代理值与可行域的区别。"
+    }
+  }
+}

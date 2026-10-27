@@ -63,22 +63,22 @@
     },
     "workflow": {
       "label": "案例流程",
-      "title": "响应辨识与滚动优化",
+      "title": "定向井测段轨迹调配",
       "lead": [
-        "定向钻井需要根据随钻测点调整后续井段，使井眼接近目标并限制过度弯曲。这个实验将地层响应辨识与滚动约束搜索连接起来，比较当前状态下控制轨迹和零指令轨迹的终点距离。"
+        "定向井工程师需要根据测段响应选择后续指令，在曲率和井斜约束内减小距靶偏差。 本例使用教学合成资料，案例规模与处理口径如下。"
       ],
       "stats": [
         [
-          "数据",
-          "固定种子合成"
+          "辨识记录",
+          "24 条"
         ],
         [
-          "运行方式",
-          "浏览器本地"
+          "规划测段",
+          "3 段"
         ],
         [
-          "工程用途",
-          "方法教学"
+          "指令序列",
+          "729 组"
         ]
       ],
       "steps": [
@@ -86,43 +86,35 @@
           "name": "测段响应辨识",
           "role": "数据",
           "do": "24 条独立记录回归增益与自然漂移。",
-          "effect": "建立可核对的轻量预测模型。",
-          "trap": "校准模型不随目标值改变，也不读取未来扰动。"
+          "effect": "明确本例处理规模与资料分组：辨识记录 24 条；规划测段 3 段；指令序列 729 组。"
         },
         {
           "name": "有限动作序列搜索",
           "role": "算法",
           "do": "枚举三段共 729 个指令序列并预测测段终点。",
-          "effect": "比较未来响应而不是只纠正当前误差。",
-          "trap": "短预测窗不保证全局最优。"
+          "effect": "保留有限动作序列搜索的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "约束筛选与执行",
           "role": "控制",
           "do": "剔除预测曲率和井斜越界序列，只执行首个动作。",
-          "effect": "限制教学模型中的急弯并滚动纠偏。",
-          "trap": "实际扰动可能使曲率超出预测上限。"
+          "effect": "保留约束筛选与执行的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "轨迹对比与复核",
           "role": "评价",
           "do": "按相同初态和扰动运行零指令基线，核对终点距靶与实际曲率。",
-          "effect": "同时显示跟踪效果与约束偏差。",
-          "trap": "基线没有控制动作，不代表工程师的最佳手动策略。"
+          "effect": "交付逐段指令、预测轨迹与零指令对照；核查执行首步后的实际曲率和距靶变化。"
         }
       ],
       "metrics": {
-        "title": "计算指标与评价边界",
-        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">响应校准</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">24 条独立合成记录</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">三段约束搜索</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">729 序列 / 首步执行</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">新测点反馈</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">终点偏差 / 实际曲率</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>终点距靶=√((x末−x靶)²+(z末−500)²)，单位 m。实际曲率=相邻段井斜差绝对值，单位 °/30m。零指令基线在同样扰动下计算；两者均固定最多 600 m 测深，终点距离不保证沿途是否穿靶。模型代价含人为权重，不代表真实经济损失。</p>"
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"测段响应辨识 → 有限动作序列搜索 → 约束筛选与执行 → 轨迹对比与复核\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">测段响应辨识</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">有限动作序列搜索</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 控制</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">约束筛选与执行</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">轨迹对比与复核</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"案例计算流程\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">响应校准</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">24 条独立合成记录</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">三段约束搜索</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">729 序列 / 首步执行</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">新测点反馈</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">终点偏差 / 实际曲率</text></svg></div><figcaption class=\"figcap\">输入、计算与评价之间的关系示意；结果由演示实际计算。</figcaption></figure><p>终点距靶=√((x末−x靶)²+(z末−500)²)，单位 m。实际曲率=相邻段井斜差绝对值，单位 °/30m。零指令基线在同样扰动下计算；两者均固定最多 600 m 测深，终点距离不保证沿途是否穿靶。模型代价含人为权重，不代表真实经济损失。</p><p><strong>成果交付：</strong>交付逐段指令、预测轨迹与零指令对照；核查执行首步后的实际曲率和距靶变化。</p>"
       },
       "fails": [
         {
-          "name": "数据分布变化",
-          "why": "轨迹采用测段平均井斜积分，不实现完整最小曲率法、三维方位与工具面控制、避碰或摩阻计算。预测可行不保证实际可行：扰动可能使真实模拟曲率超限，页面单独报告。无可行序列时停止模拟，不能强行输出动作。固定测深终点距离不是中靶率或最优性证明。"
-        },
-        {
-          "name": "合成结果误用",
-          "why": "所有数据、参数范围、阈值和响应系数均为教学合成设定；资料只支持业务定义和方法动机，不支持本例数值与现场收益。"
+          "name": "响应增益漂移",
+          "why": "钻具与地层响应改变后，历史增益可能偏离当前工况，轨迹误差会累积。"
         }
       ]
     },

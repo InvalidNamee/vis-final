@@ -1,0 +1,127 @@
+{
+  "id": "laboratory-audit",
+  "sceneId": "r4",
+  "title": "化验数据智能审核",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "nlp",
+    "opt"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "LIMS化验报告中的单位混用、量纲错误和异常录入会干扰装置判断。演示审核合成柴油硫含量报告，将单位转换、物理范围和正常基线MAD分数分开显示，输出可复核原因。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "单位规则与稳健异常审核",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>LIMS化验报告中的单位混用、量纲错误和异常录入会干扰装置判断。演示审核合成柴油硫含量报告，将单位转换、物理范围和正常基线MAD分数分开显示，输出可复核原因。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>化验数据智能审核业务对象示意</title><rect x=\"245\" y=\"18\" width=\"105\" height=\"190\" rx=\"28\" fill=\"#e7f0e7\" stroke=\"#667c75\" stroke-width=\"3\"/><path d=\"M60 135H245M350 60H495M350 110H495M350 160H495M245 75H350M245 125H350\" fill=\"none\" stroke=\"#21796a\" stroke-width=\"4\"/><text x=\"35\" y=\"112\" font-size=\"17\">原料与热量</text><text x=\"505\" y=\"65\" font-size=\"17\">轻组分</text><text x=\"505\" y=\"115\" font-size=\"17\">中组分</text><text x=\"505\" y=\"165\" font-size=\"17\">重组分</text><text x=\"36\" y=\"205\" font-size=\"16\">过程观测 → 模型估计 → 化验与人工复核</text></svg></div><figcaption class=\"figcap\">化验数据智能审核涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "单位规则与稳健异常审核",
+          "html": "<p>前40条清洁记录拟合中位数和1.4826×MAD；后80条为审核集。注入单位误标或数值离群，按报告单位换算mg/kg，再做非负/教学上界与稳健分数检查。评价精确率、召回率与漏审数。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"单位规则与稳健异常审核默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>单位规则与稳健异常审核默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">硫含量 / mg·kg⁻¹</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">-223659</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">0.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">587192</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">19.8</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">1398042</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">39.5</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">2208893</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">59.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">3019743</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">79.0</text><path d=\"M82.00 236.49 L90.08 259.23 L98.15 239.97 L106.23 104.17 L114.30 242.92 L122.38 259.23 L130.46 242.66 L138.53 259.23 L146.61 236.07 L154.68 74.76 L162.76 259.24 L170.84 259.24 L178.91 259.24 L186.99 259.24 L195.06 259.24 L203.14 259.24 L211.22 259.24 L219.29 259.24 L227.37 259.24 L235.44 259.24 L243.52 259.24 L251.59 259.24 L259.67 259.24 L267.75 259.24 L275.82 259.24 L283.90 259.24 L291.97 259.24 L300.05 259.24 L308.13 259.24 L316.20 259.24 L324.28 259.24 L332.35 259.24 L340.43 259.24 L348.51 259.24 L356.58 259.24 L364.66 259.24 L372.73 259.24 L380.81 259.24 L388.89 259.24 L396.96 259.24 L405.04 259.24 L413.11 259.24 L421.19 259.24 L429.27 259.24 L437.34 259.24 L445.42 259.24 L453.49 259.24 L461.57 259.24 L469.65 259.24 L477.72 259.24 L485.80 259.24 L493.87 259.24 L501.95 259.24 L510.03 259.24 L518.10 259.24 L526.18 259.24 L534.25 259.24 L542.33 259.24 L550.41 259.24 L558.48 259.24 L566.56 259.24 L574.63 259.24 L582.71 259.24 L590.78 259.24 L598.86 259.24 L606.94 259.24 L615.01 259.24 L623.09 259.24 L631.16 259.24 L639.24 259.24 L647.32 259.24 L655.39 259.24 L663.47 259.24 L671.54 259.24 L679.62 259.24 L687.70 259.24 L695.77 259.24 L703.85 259.24 L711.92 259.24 L720.00 259.24\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82.00 259.24 L720.00 259.24\" stroke=\"#b96b38\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">审核报告编号</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：单位处理后硫含量 / 教学范围上界。审核精确率 100.00%；异常召回率 100.00%；漏审报告 0.00条。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>已结构化文本，不实现OCR或大模型抽取。教学正常范围不是产品国标，异常只进入复核，不自动拒收或改写化验结果。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc31.htm\" target=\"_blank\" rel=\"noopener noreferrer\">NIST：Control charts</a>：NIST介绍以统计监控识别过程偏离；单位、上界及MAD阈值均为本例教学规则。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "化验报告单位与离群审核",
+      "lead": [
+        "化验管理人员需要把单位混用和数值异常分别列出，减少报告审核中的漏项。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "清洁标定",
+          "40 条"
+        ],
+        [
+          "待审核报告",
+          "80 条"
+        ],
+        [
+          "统一单位",
+          "mg/kg"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "报告字段整理",
+          "role": "数据",
+          "do": "核对报告单位和数值，使用清洁记录标定稳健中心与尺度。",
+          "effect": "形成清洁标定：40 条；待审核报告：80 条；统一单位：mg/kg的处理任务。"
+        },
+        {
+          "name": "单位规则与稳健异常审核",
+          "role": "计算",
+          "do": "前40条清洁记录拟合中位数和1.4826×MAD；后80条为审核集。注入单位误标或数值离群，按报告单位换算mg/kg，再做非负/教学上界与稳健分数检查。评价精确率、召回率与漏审数。",
+          "effect": "形成可与原始观测或备选方案逐项对照的化验数据智能审核结果。"
+        },
+        {
+          "name": "误审漏审逐条评价",
+          "role": "评价",
+          "do": "在80条审核记录上对照异常注入标签，计算精确率、召回率并查看漏审记录。",
+          "effect": "定位单位规则和数值阈值各自遗漏的异常。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付单位换算、规则命中和异常分数；对漏审与误审样本逐条回查原始报告。",
+          "effect": "为化验报告单位与离群审核提供可追溯的候选、误差或约束依据。",
+          "trap": "数值与单位一起录错时，换算可能放大错误，应保留原值和换算路径复核。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"报告字段整理 → 单位规则与稳健异常审核 → 误审漏审逐条评价 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">报告字段整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">单位规则与稳健异常</text><text x=\"287\" y=\"103\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">审核</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">误审漏审逐条评价</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>在80条审核记录上对照异常注入标签，计算精确率、召回率并查看漏审记录。</p><p><strong>成果交付：</strong>交付单位换算、规则命中和异常分数；对漏审与误审样本逐条回查原始报告。</p>"
+      },
+      "fails": [
+        {
+          "name": "单位误标",
+          "why": "数值与单位一起录错时，换算可能放大错误，应保留原值和换算路径复核。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "LIMS化验报告中的单位混用、量纲错误和异常录入会干扰装置判断。演示审核合成柴油硫含量报告，将单位转换、物理范围和正常基线MAD分数分开显示，输出可复核原因。"
+    }
+  }
+}

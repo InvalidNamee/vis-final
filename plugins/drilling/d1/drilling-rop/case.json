@@ -62,22 +62,34 @@
     },
     "workflow": {
       "label": "案例流程",
-      "title": "钻速建模与参数优化流程",
+      "title": "同岩层钻速参数比选",
       "lead": [
-        "浏览器完成数据生成、按井切分、回归拟合、独立测试和预测网格搜索。数值结果由演示运行时计算，不预填工程效果。"
+        "钻井工程师需要在岩层与排量固定时，比较钻压、转速组合的预测钻速，并在操作上限内选择候选参数。 本例使用教学合成资料，案例规模与处理口径如下。"
       ],
       "stats": [
         [
-          "数据来源",
-          "固定种子合成"
+          "虚拟井数",
+          "18 口"
         ],
         [
-          "切分单位",
-          "虚拟井"
+          "数据记录",
+          "1080 条"
         ],
         [
-          "推荐范围",
-          "教学约束内"
+          "训练 / 验证 / 测试",
+          "12 / 3 / 3 口井"
+        ],
+        [
+          "模型输入",
+          "钻压、转速、排量、岩层"
+        ],
+        [
+          "参数网格",
+          "1271 组"
+        ],
+        [
+          "模型选择",
+          "验证井 MAE"
         ]
       ],
       "steps": [
@@ -85,58 +97,41 @@
           "name": "合成数据生成与井组划分",
           "role": "数据",
           "do": "固定种子生成多口虚拟井的钻压、转速、流量、岩层与合成观测钻速；按井标识分训练、验证、测试集。",
-          "effect": "获得可复现且井标识互不交叉的三个集合，界面展示各集合规模。",
-          "trap": "不能把同井相邻记录逐行打散到训练与测试；合成井不代表真实井的变化。"
+          "effect": "明确本例处理规模与资料分组：虚拟井数 18 口；数据记录 1080 条；训练 / 验证 / 测试 12 / 3 / 3 口井；模型输入 钻压、转速、排量、岩层；参数网格 1271 组；模型选择 验证井 MAE。"
         },
         {
           "name": "特征构造与回归训练",
           "role": "模型",
           "do": "先按固定尺度构造 WOB、RPM、Q 的一次、平方及交互项，加入岩层 one-hot 和岩层与参数交互；仅用训练集统计量标准化特征并拟合岭回归。",
-          "effect": "得到由参数与岩层到预测 ROP 的映射，单位为 m/h。",
-          "trap": "验证与测试数据只能复用训练得到的变换；未见岩层与超范围输入不能假装可靠。"
+          "effect": "保留特征构造与回归训练的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "模型选择与独立测试",
           "role": "评价",
           "do": "以验证井 MAE 选择正则强度，保留所选训练模型且不重新拟合；在独立测试井计算 MAE 与 R²，绘制合成观测对预测的散点图。",
-          "effect": "检查未参与训练的合成井上误差大小，以及预测偏差和离群点。",
-          "trap": "不能依据测试误差继续调参；测试集同源于合成生成器，不是现场验证。"
+          "effect": "保留模型选择与独立测试的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "约束参数网格搜索",
           "role": "优化",
           "do": "选择流量和岩层，调整钻压与转速上限；在演示采样范围和上限的交集内，逐点用冻结模型预测 WOB/RPM 网格。",
-          "effect": "热力图显示预测响应面，并标出当前点与网格内推荐点。",
-          "trap": "操作上限只在样本范围内变化，界面始终保留至少一个候选点；不能把这两个上限当作完整安全校核。"
+          "effect": "保留约束参数网格搜索的中间结果，供下一环节核对与比较。"
         },
         {
           "name": "推荐参数对比与应用",
           "role": "交互",
           "do": "在相同流量、岩层与模型下比较当前和推荐预测 ROP；点击应用推荐，将 WOB/RPM 更新到演示控件。",
-          "effect": "观察推荐参数、预测差值与热力图位置之间的对应关系。",
-          "trap": "预测增量不等于实测收益；点击仅改变页面状态，不代表工程执行或安全许可。"
+          "effect": "交付当前与推荐工况的预测钻速、参数位置和测试井误差；应用候选后可继续比较不同上限下的取舍。"
         }
       ],
       "metrics": {
-        "title": "模型误差与参数约束评价",
-        "html": "<div style=\"display:flex;flex-wrap:wrap;gap:16px;margin:16px 0\"><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>1. 数据：按井分开</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"1. 数据：按井分开\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><rect x=\"10\" y=\"30\" width=\"133\" height=\"30\" fill=\"#2f7d6b\"/><rect x=\"146\" y=\"30\" width=\"32\" height=\"30\" fill=\"#41699b\"/><rect x=\"181\" y=\"30\" width=\"32\" height=\"30\" fill=\"#b26a39\"/><text x=\"10\" y=\"22\">18 口虚拟井 / 1,080 条记录</text><text x=\"10\" y=\"86\">训练 12 井 · 验证 3 井 · 测试 3 井</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">同井样本留在同一集合。训练学规律、验证选模型、测试检查未见井误差。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>2. 模型：学习弯曲响应</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"2. 模型：学习弯曲响应\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><path d=\"M25 10V95H210\" fill=\"none\" stroke=\"#9ba3a9\"/><path d=\"M30 87Q125-25 205 42\" fill=\"none\" stroke=\"#2f7d6b\" stroke-width=\"3\"/><g fill=\"#41699b\"><circle cx=\"45\" cy=\"72\" r=\"4\"/><circle cx=\"75\" cy=\"48\" r=\"4\"/><circle cx=\"105\" cy=\"28\" r=\"4\"/><circle cx=\"135\" cy=\"23\" r=\"4\"/><circle cx=\"165\" cy=\"22\" r=\"4\"/><circle cx=\"192\" cy=\"36\" r=\"4\"/></g><text x=\"30\" y=\"117\">参数 → 非线性特征 → 预测钻速</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">平方项与交互项让回归描述非线性；标准化参数只从训练井估计。曲线是机制示意。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>3. 评价：预测对照观测</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"3. 评价：预测对照观测\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><path d=\"M25 10V95H210\" fill=\"none\" stroke=\"#9ba3a9\"/><path d=\"M30 90L200 15\" fill=\"none\" stroke=\"#9ba3a9\" stroke-dasharray=\"4 3\"/><g fill=\"#2f7d6b\"><circle cx=\"45\" cy=\"80\" r=\"4\"/><circle cx=\"65\" cy=\"78\" r=\"4\"/><circle cx=\"90\" cy=\"60\" r=\"4\"/><circle cx=\"115\" cy=\"49\" r=\"4\"/><circle cx=\"140\" cy=\"49\" r=\"4\"/><circle cx=\"170\" cy=\"24\" r=\"4\"/><circle cx=\"193\" cy=\"26\" r=\"4\"/></g><text x=\"30\" y=\"117\">越靠近对角线，误差越小</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">验证集从 5 个 λ 中选型；冻结模型后，用测试井计算 MAE、R² 并与均值基线比较。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>4. 寻优：筛掉越界组合</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"4. 寻优：筛掉越界组合\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><rect x=\"15\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"39\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"63\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"87\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"111\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"135\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"159\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"25\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"39\" y=\"25\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"63\" y=\"25\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"87\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"111\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"135\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"25\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"25\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"42\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"39\" y=\"42\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"63\" y=\"42\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"87\" y=\"42\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"111\" y=\"42\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"135\" y=\"42\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"42\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"42\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"39\" y=\"59\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"63\" y=\"59\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"87\" y=\"59\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"111\" y=\"59\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"135\" y=\"59\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"39\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"63\" y=\"76\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"87\" y=\"76\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"111\" y=\"76\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"135\" y=\"76\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"159\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><circle cx=\"75\" cy=\"67\" r=\"5\" fill=\"white\" stroke=\"#242b2e\" stroke-width=\"2\"/><path d=\"M147 27l6 6-6 6-6-6z\" fill=\"#41699b\"/><text x=\"15\" y=\"117\">圆：当前　菱形：推荐　灰：越界</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">固定岩层与排量，比较 1,271 组钻压 / 转速。只从满足上限的点中选预测最高者。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>5. 应用：比较同一模型</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"5. 应用：比较同一模型\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><text x=\"10\" y=\"25\">当前</text><rect x=\"55\" y=\"10\" width=\"85\" height=\"23\" fill=\"#9ba3a9\"/><text x=\"10\" y=\"65\">推荐</text><rect x=\"55\" y=\"50\" width=\"140\" height=\"23\" fill=\"#2f7d6b\"/><text x=\"10\" y=\"108\">预测对比示意 · 运行值由模型计算</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">应用推荐会更新当前参数，预测差值随之归零。收紧上限可能使推荐值低于越界的当前值。</figcaption></figure></div><p><b>评价对象</b>：测试井的合成观测 ROP 与模型预测 ROP。散点图横轴为合成观测值、纵轴为预测值，均为 m/h；y = x 是理想一致线，偏离表示误差，不是参数寻优曲线。</p><p><b>MAE</b> = Σ|预测值 − 合成观测值| / n，单位 m/h，越小表示本测试集平均绝对误差越小。<b>R²</b> = 1 − Σ(观测值 − 预测值)² / Σ(观测值 − 测试均值)²，无量纲，可能为负；观测值无方差时应显示不可定义，不能伪报满分。展示实际运行结果，不设置无来源的“工程达标线”。</p><p><b>推荐对比</b>：Δ预测 ROP = 推荐点预测值 − 当前点预测值；若展示相对增量，必须说明以当前预测值为分母，且分母须大于零。推荐需满足当前 WOB/RPM 上限和演示采样范围；当前点若越界应明确标识。热力图颜色表示预测钻速，不能表示安全等级。</p><p><b>切分边界</b>：训练井确定变换和系数，验证井选择模型，测试井只计算最终指标。井数、样本数、种子与切分应可核对；所有结果仅衡量同源合成数据上的拟合与泛化，无法验证真实工程效果。</p>"
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 970 150\" role=\"img\" aria-label=\"合成数据生成与井组划分 → 特征构造与回归训练 → 模型选择与独立测试 → 约束参数网格搜索 → 推荐参数对比与应用\" style=\"display:block;width:100%;min-width:970px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">合成数据生成与井组</text><text x=\"97\" y=\"103\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">划分</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 模型</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">特征构造与回归训练</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">模型选择与独立测试</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 优化</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">约束参数网格搜索</text><path d=\"M754 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"770\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"857\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">5 · 交互</text><text x=\"857\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">推荐参数对比与应用</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><div style=\"display:flex;flex-wrap:wrap;gap:16px;margin:16px 0\"><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>1. 数据：按井分开</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"1. 数据：按井分开\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><rect x=\"10\" y=\"30\" width=\"133\" height=\"30\" fill=\"#2f7d6b\"/><rect x=\"146\" y=\"30\" width=\"32\" height=\"30\" fill=\"#41699b\"/><rect x=\"181\" y=\"30\" width=\"32\" height=\"30\" fill=\"#b26a39\"/><text x=\"10\" y=\"22\">18 口虚拟井 / 1,080 条记录</text><text x=\"10\" y=\"86\">训练 12 井 · 验证 3 井 · 测试 3 井</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">同井样本留在同一集合。训练学规律、验证选模型、测试检查未见井误差。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>2. 模型：学习弯曲响应</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"2. 模型：学习弯曲响应\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><path d=\"M25 10V95H210\" fill=\"none\" stroke=\"#9ba3a9\"/><path d=\"M30 87Q125-25 205 42\" fill=\"none\" stroke=\"#2f7d6b\" stroke-width=\"3\"/><g fill=\"#41699b\"><circle cx=\"45\" cy=\"72\" r=\"4\"/><circle cx=\"75\" cy=\"48\" r=\"4\"/><circle cx=\"105\" cy=\"28\" r=\"4\"/><circle cx=\"135\" cy=\"23\" r=\"4\"/><circle cx=\"165\" cy=\"22\" r=\"4\"/><circle cx=\"192\" cy=\"36\" r=\"4\"/></g><text x=\"30\" y=\"117\">参数 → 非线性特征 → 预测钻速</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">平方项与交互项让回归描述非线性；标准化参数只从训练井估计。曲线是机制示意。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>3. 评价：预测对照观测</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"3. 评价：预测对照观测\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><path d=\"M25 10V95H210\" fill=\"none\" stroke=\"#9ba3a9\"/><path d=\"M30 90L200 15\" fill=\"none\" stroke=\"#9ba3a9\" stroke-dasharray=\"4 3\"/><g fill=\"#2f7d6b\"><circle cx=\"45\" cy=\"80\" r=\"4\"/><circle cx=\"65\" cy=\"78\" r=\"4\"/><circle cx=\"90\" cy=\"60\" r=\"4\"/><circle cx=\"115\" cy=\"49\" r=\"4\"/><circle cx=\"140\" cy=\"49\" r=\"4\"/><circle cx=\"170\" cy=\"24\" r=\"4\"/><circle cx=\"193\" cy=\"26\" r=\"4\"/></g><text x=\"30\" y=\"117\">越靠近对角线，误差越小</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">验证集从 5 个 λ 中选型；冻结模型后，用测试井计算 MAE、R² 并与均值基线比较。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>4. 寻优：筛掉越界组合</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"4. 寻优：筛掉越界组合\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><rect x=\"15\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"39\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"63\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"87\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"111\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"135\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"159\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"8\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"25\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"39\" y=\"25\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"63\" y=\"25\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"87\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"111\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"135\" y=\"25\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"25\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"25\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"42\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"39\" y=\"42\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"63\" y=\"42\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"87\" y=\"42\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"111\" y=\"42\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"135\" y=\"42\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"42\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"42\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"39\" y=\"59\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"63\" y=\"59\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"87\" y=\"59\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"111\" y=\"59\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"135\" y=\"59\" width=\"23\" height=\"16\" fill=\"#2f7d6b\"/><rect x=\"159\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"59\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"15\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"39\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e6f1ec\"/><rect x=\"63\" y=\"76\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"87\" y=\"76\" width=\"23\" height=\"16\" fill=\"#bdd9cf\"/><rect x=\"111\" y=\"76\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"135\" y=\"76\" width=\"23\" height=\"16\" fill=\"#7eb4a4\"/><rect x=\"159\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><rect x=\"183\" y=\"76\" width=\"23\" height=\"16\" fill=\"#e1e6e4\"/><circle cx=\"75\" cy=\"67\" r=\"5\" fill=\"white\" stroke=\"#242b2e\" stroke-width=\"2\"/><path d=\"M147 27l6 6-6 6-6-6z\" fill=\"#41699b\"/><text x=\"15\" y=\"117\">圆：当前　菱形：推荐　灰：越界</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">固定岩层与排量，比较 1,271 组钻压 / 转速。只从满足上限的点中选预测最高者。</figcaption></figure><figure style=\"flex:1 1 220px;margin:0;padding:16px;background:#f5f6f2;border-radius:6px\"><b>5. 应用：比较同一模型</b><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 120\" width=\"220\" role=\"img\" aria-label=\"5. 应用：比较同一模型\" style=\"display:block;width:100%;max-width:260px;height:auto;margin:12px auto\"><g font-family=\"system-ui,sans-serif\" font-size=\"13\" fill=\"#4d565b\"><text x=\"10\" y=\"25\">当前</text><rect x=\"55\" y=\"10\" width=\"85\" height=\"23\" fill=\"#9ba3a9\"/><text x=\"10\" y=\"65\">推荐</text><rect x=\"55\" y=\"50\" width=\"140\" height=\"23\" fill=\"#2f7d6b\"/><text x=\"10\" y=\"108\">预测对比示意 · 运行值由模型计算</text></g></svg><figcaption style=\"font-size:15px;color:#4d565b;line-height:1.7\">应用推荐会更新当前参数，预测差值随之归零。收紧上限可能使推荐值低于越界的当前值。</figcaption></figure></div><p><b>评价对象</b>：测试井的合成观测 ROP 与模型预测 ROP。散点图横轴为合成观测值、纵轴为预测值，均为 m/h；y = x 是理想一致线，偏离表示误差，不是参数寻优曲线。</p><p><b>MAE</b> = Σ|预测值 − 合成观测值| / n，单位 m/h，越小表示本测试集平均绝对误差越小。<b>R²</b> = 1 − Σ(观测值 − 预测值)² / Σ(观测值 − 测试均值)²，无量纲，可能为负；观测值无方差时应显示不可定义，不能伪报满分。展示实际运行结果，不设置无来源的“工程达标线”。</p><p><b>推荐对比</b>：Δ预测 ROP = 推荐点预测值 − 当前点预测值；若展示相对增量，必须说明以当前预测值为分母，且分母须大于零。推荐需满足当前 WOB/RPM 上限和演示采样范围；当前点若越界应明确标识。热力图颜色表示预测钻速，不能表示安全等级。</p><p><b>切分边界</b>：训练井确定变换和系数，验证井选择模型，测试井只计算最终指标。井数、样本数、种子与切分应可核对；所有结果仅衡量同源合成数据上的拟合与泛化，无法验证真实工程效果。</p><p><strong>成果交付：</strong>交付当前与推荐工况的预测钻速、参数位置和测试井误差；应用候选后可继续比较不同上限下的取舍。</p>"
       },
       "fails": [
         {
-          "name": "同井数据泄漏",
-          "why": "把同井相关记录分散到多个集合，模型可能利用相似背景得到过于乐观的测试结果。"
-        },
-        {
-          "name": "模型外推与遗漏变量",
-          "why": "超出样本覆盖或更换工具、岩层后预测可能失真；当前模型未显式描述扭矩、磨损、压力和振动。"
-        },
-        {
-          "name": "工程约束缺失",
-          "why": "仅限制 WOB/RPM 不能证明井控、携岩或井壁稳定满足要求。"
-        },
-        {
-          "name": "合成评价与现场验证差异",
-          "why": "合成标签与训练样本来自同一生成机制，预测差值和高评分均不构成真实提效证据。"
+          "name": "参数边界最优",
+          "why": "最优点可能贴近钻压或转速上限，应检查响应曲线和工况覆盖。"
         }
       ]
     },

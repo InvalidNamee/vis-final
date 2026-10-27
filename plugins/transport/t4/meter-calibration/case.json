@@ -1,0 +1,126 @@
+{
+  "id": "meter-calibration",
+  "sceneId": "t4",
+  "title": "油气计量智能校正",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "ts"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "交接计量中仪表结垢和零漂会累积系统偏差。用可靠参考表与待检表的同工况配对数据，稳健估计比例系数，展示少量异常点对校准的影响。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "中位比例稳健校正",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>交接计量中仪表结垢和零漂会累积系统偏差。用可靠参考表与待检表的同工况配对数据，稳健估计比例系数，展示少量异常点对校准的影响。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>油气计量智能校正业务对象示意</title><path d=\"M45 120H605\" stroke=\"#21796a\" stroke-width=\"15\"/><rect x=\"75\" y=\"72\" width=\"95\" height=\"75\" rx=\"8\" fill=\"#e7f0e7\" stroke=\"#667c75\" stroke-width=\"2\"/><circle cx=\"325\" cy=\"120\" r=\"28\" fill=\"white\" stroke=\"#667c75\" stroke-width=\"3\"/><path d=\"m311 104 30 16-30 16Z\" fill=\"#21796a\"/><rect x=\"495\" y=\"65\" width=\"95\" height=\"95\" rx=\"8\" fill=\"#e7f0e7\" stroke=\"#667c75\" stroke-width=\"2\"/><text x=\"70\" y=\"48\" font-size=\"17\">入口观测</text><text x=\"286\" y=\"48\" font-size=\"17\">泵与管段</text><text x=\"475\" y=\"48\" font-size=\"17\">出口与储罐</text><text x=\"180\" y=\"199\" font-size=\"17\">质量平衡 · 设备状态 · 测量可信度</text></svg></div><figcaption class=\"figcap\">油气计量智能校正涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "中位比例稳健校正",
+          "html": "<p>生成100组配对流量。仅用前N组参考/待检比值中位数估计系数，与普通均值系数比较；后40组固定评价原表和校正后MAE，校准样本最多60条，不与评价重叠。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"中位比例稳健校正默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>中位比例稳健校正默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">流量 / m³·h⁻¹</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">46</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">60.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">66</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">69.8</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">86</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">79.5</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">106</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">89.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">127</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">99.0</text><path d=\"M82.00 254.11 L98.36 258.67 L114.72 258.73 L131.08 254.00 L147.44 256.88 L163.79 255.32 L180.15 245.73 L196.51 249.15 L212.87 241.39 L229.23 243.53 L245.59 234.06 L261.95 230.76 L278.31 227.32 L294.67 223.27 L311.03 223.38 L327.38 210.02 L343.74 211.35 L360.10 207.12 L376.46 198.34 L392.82 190.61 L409.18 188.70 L425.54 183.98 L441.90 171.15 L458.26 163.29 L474.62 157.37 L490.97 151.09 L507.33 154.04 L523.69 142.44 L540.05 144.58 L556.41 135.29 L572.77 127.64 L589.13 125.95 L605.49 123.62 L621.85 111.36 L638.21 110.65 L654.56 110.36 L670.92 111.15 L687.28 107.34 L703.64 106.82 L720.00 95.24\" stroke=\"#52667d\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82.00 245.14 L98.36 246.79 L114.72 249.80 L131.08 243.13 L147.44 249.56 L163.79 245.86 L180.15 236.24 L196.51 238.63 L212.87 232.57 L229.23 234.27 L245.59 223.82 L261.95 217.94 L278.31 217.77 L294.67 208.80 L311.03 212.48 L327.38 195.24 L343.74 200.09 L360.10 193.81 L376.46 184.48 L392.82 178.81 L409.18 176.24 L425.54 167.20 L441.90 155.84 L458.26 148.33 L474.62 140.52 L490.97 135.57 L507.33 136.69 L523.69 126.78 L540.05 125.10 L556.41 115.91 L572.77 107.93 L589.13 109.51 L605.49 106.98 L621.85 93.72 L638.21 90.21 L654.56 91.44 L670.92 91.78 L687.28 88.66 L703.64 86.47 L720.00 74.76\" stroke=\"#b96b38\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82.00 254.89 L98.36 256.43 L114.72 259.24 L131.08 253.01 L147.44 259.02 L163.79 255.56 L180.15 246.57 L196.51 248.80 L212.87 243.14 L229.23 244.73 L245.59 234.96 L261.95 229.47 L278.31 229.31 L294.67 220.93 L311.03 224.37 L327.38 208.25 L343.74 212.79 L360.10 206.92 L376.46 198.20 L392.82 192.90 L409.18 190.50 L425.54 182.05 L441.90 171.44 L458.26 164.41 L474.62 157.11 L490.97 152.50 L507.33 153.54 L523.69 144.28 L540.05 142.71 L556.41 134.12 L572.77 126.66 L589.13 128.13 L605.49 125.78 L621.85 113.38 L638.21 110.10 L654.56 111.25 L670.92 111.57 L687.28 108.66 L703.64 106.61 L720.00 95.66\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">固定评价样本序号</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：参考流量 / 原表 / 稳健校正。稳健比例系数 0.93倍；校正前评价MAE 5.41m³/h；校正后评价MAE 0.45m³/h。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>参考表假定可靠、时间已对齐且误差主要为乘性。没有多相滑脱、温压及体积标准化；系数不作为真实贸易交接标定依据。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://www.nist.gov/pml/owm/nist-handbook-44-current-edition\" target=\"_blank\" rel=\"noopener noreferrer\">NIST：Handbook 44 计量设备要求</a>：NIST Handbook 44包含液体计量和质量流量计的技术要求，支持计量校核业务；本例中位比例系数并非法定标定或该手册规定方法。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "计量表比例漂移校准",
+      "lead": [
+        "计量人员需要利用参考表配对记录估计待检表比例偏差，并检查离群点对校准的影响。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "配对记录",
+          "100 组"
+        ],
+        [
+          "校准样本上限",
+          "60 组"
+        ],
+        [
+          "固定评价",
+          "后 40 组"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "工况资料整理",
+          "role": "数据",
+          "do": "统一参考表与待检表的流量单位和时间，分开校准段与固定评价段。",
+          "effect": "形成配对记录：100 组；校准样本上限：60 组；固定评价：后 40 组的处理任务。"
+        },
+        {
+          "name": "中位比例稳健校正",
+          "role": "计算",
+          "do": "生成100组配对流量。仅用前N组参考/待检比值中位数估计系数，与普通均值系数比较；后40组固定评价原表和校正后MAE，校准样本最多60条，不与评价重叠。",
+          "effect": "形成可与原始观测或备选方案逐项对照的油气计量智能校正结果。"
+        },
+        {
+          "name": "固定留出流量误差",
+          "role": "评价",
+          "do": "在固定后40组记录上分别计算原表、均值校正及中位比例校正的MAE。",
+          "effect": "把系数拟合结果与未参与校准的流量误差对照。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付稳健校准系数、均值对照和校准前后MAE；检查不同流量区间是否仍存在残差结构。",
+          "effect": "为计量表比例漂移校准提供可追溯的候选、误差或约束依据。",
+          "trap": "固定偏置或非线性误差无法仅靠一个比例系数消除。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"工况资料整理 → 中位比例稳健校正 → 固定留出流量误差 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">工况资料整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">中位比例稳健校正</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">固定留出流量误差</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>在固定后40组记录上分别计算原表、均值校正及中位比例校正的MAE。</p><p><strong>成果交付：</strong>交付稳健校准系数、均值对照和校准前后MAE；检查不同流量区间是否仍存在残差结构。</p>"
+      },
+      "fails": [
+        {
+          "name": "非比例漂移",
+          "why": "固定偏置或非线性误差无法仅靠一个比例系数消除。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "交接计量中仪表结垢和零漂会累积系统偏差。用可靠参考表与待检表的同工况配对数据，稳健估计比例系数，展示少量异常点对校准的影响。"
+    }
+  }
+}

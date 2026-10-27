@@ -1,0 +1,127 @@
+{
+  "id": "workover-plan",
+  "sceneId": "wo1",
+  "title": "修井作业方案智能推荐",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "kg",
+    "nlp"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "产水突升或机械故障发生后，工程师需要从井史中找到井况接近且工艺匹配的修井记录。演示将故障、深度和含水率组织为结构化证据，而非让文本模型直接下指令。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "加权案例检索",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>产水突升或机械故障发生后，工程师需要从井史中找到井况接近且工艺匹配的修井记录。演示将故障、深度和含水率组织为结构化证据，而非让文本模型直接下指令。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>修井作业方案智能推荐业务对象示意</title><rect x=\"225\" y=\"20\" width=\"76\" height=\"185\" fill=\"#e6ece5\" stroke=\"#667c75\" stroke-width=\"3\"/><path d=\"M245 20V170H281V20\" fill=\"white\" stroke=\"#21796a\" stroke-width=\"3\"/><path d=\"M246 115l16 15 17-15\" fill=\"none\" stroke=\"#b96b38\" stroke-width=\"6\"/><path d=\"M283 126H383\" stroke=\"#b96b38\" stroke-width=\"2\"/><text x=\"393\" y=\"131\" font-size=\"17\">故障井段与作业工具</text><text x=\"35\" y=\"60\" font-size=\"17\">井史与检测证据</text><path d=\"M166 68l65 34\" stroke=\"#21796a\" stroke-width=\"2\"/><text x=\"345\" y=\"195\" font-size=\"17\">诊断 ≠ 处置指令</text></svg></div><figcaption class=\"figcap\">修井作业方案智能推荐涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "加权案例检索",
+          "html": "<p>对24条合成修井记录计算加权距离：故障不匹配惩罚3，深度差除3000，含水差除75。按距离排序；推荐只引用匹配案例的工艺，显示检索证据路径。留一法在合成库中评估首选故障匹配率。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"加权案例检索默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>加权案例检索默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">相似分</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">18.8</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">1.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">36.6</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">2.8</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">54.5</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">4.5</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">72.3</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">6.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">90.1</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">8.0</text><path d=\"M82.00 74.76 L173.14 80.52 L264.29 126.47 L355.43 129.09 L446.57 152.35 L537.71 176.90 L628.86 259.08 L720.00 259.24\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">候选排名</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：候选相似分。候选案例 24.00条；留一故障匹配率 100.00%；首选相似分 85.23分。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>小型人工结构化案例库，不实现自动文本抽取、知识图谱学习或工艺安全审查。匹配分不是成功概率；不能把相似案例直接作为现场设计。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://glossary.slb.com/en/terms/f/fishing_tool\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：Fishing tool</a>：打捞工具按诊断、内捞、外捞、震击等功能分类；资料不支持本例相似度权重。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "故障井修井方案检索",
+      "lead": [
+        "作业工程师需要从井史中查找与当前深度、含水和故障类型相近的记录，形成修井方案讨论依据。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "井史案例",
+          "24 条"
+        ],
+        [
+          "检索条件",
+          "深度、含水、故障"
+        ],
+        [
+          "库内评价",
+          "留一故障匹配"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "井史条件整理",
+          "role": "数据",
+          "do": "核对当前故障编码、作业深度和含水率，整理可检索井史的工艺及故障标签。",
+          "effect": "形成井史案例：24 条；检索条件：深度、含水、故障；库内评价：留一故障匹配的处理任务。"
+        },
+        {
+          "name": "加权案例检索",
+          "role": "计算",
+          "do": "对24条合成修井记录计算加权距离：故障不匹配惩罚3，深度差除3000，含水差除75。按距离排序；推荐只引用匹配案例的工艺，显示检索证据路径。留一法在合成库中评估首选故障匹配率。",
+          "effect": "形成可与原始观测或备选方案逐项对照的修井作业方案智能推荐结果。"
+        },
+        {
+          "name": "留一检索匹配评价",
+          "role": "评价",
+          "do": "逐条暂时移出当前井次，用其余井史检索首选；统计首选故障类型与该井标签一致的比例。",
+          "effect": "分清案例相似度排序与故障类型匹配表现。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付相似井次、距离与对应工艺；逐条对照故障证据和适用井况，再形成方案论证清单。",
+          "effect": "为故障井修井方案检索提供可追溯的候选、误差或约束依据。",
+          "trap": "故障编码相近但成因不同的井次可能被排到前列，需要回查诊断证据。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"井史条件整理 → 加权案例检索 → 留一检索匹配评价 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">井史条件整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">加权案例检索</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">留一检索匹配评价</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>逐条暂时移出当前井次，用其余井史检索首选；统计首选故障类型与该井标签一致的比例。</p><p><strong>成果交付：</strong>交付相似井次、距离与对应工艺；逐条对照故障证据和适用井况，再形成方案论证清单。</p>"
+      },
+      "fails": [
+        {
+          "name": "故障标签混淆",
+          "why": "故障编码相近但成因不同的井次可能被排到前列，需要回查诊断证据。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "产水突升或机械故障发生后，工程师需要从井史中找到井况接近且工艺匹配的修井记录。演示将故障、深度和含水率组织为结构化证据，而非让文本模型直接下指令。"
+    }
+  }
+}

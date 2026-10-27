@@ -1,0 +1,127 @@
+{
+  "id": "steam-cycle",
+  "sceneId": "e4",
+  "title": "蒸汽吞吐注采参数优化",
+  "status": "ready",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "methods": [
+    "ts",
+    "opt"
+  ],
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "蒸汽吞吐同井交替注汽和生产，上一周期剩余热量会影响下一周期。演示对三周期注汽分配穷举，比较累计产油与油汽比，避免只追求单周期峰值。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "固定种子教学合成",
+          "desc": "不混用现场资料与合成数值"
+        },
+        {
+          "label": "实际方法",
+          "value": "多周期热量状态搜索",
+          "desc": "轻量本地计算"
+        },
+        {
+          "label": "输出边界",
+          "value": "教学解释与人工复核",
+          "desc": "不连接设备或在线模型"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "BUSINESS",
+          "title": "业务对象与观测关系",
+          "html": "<p>蒸汽吞吐同井交替注汽和生产，上一周期剩余热量会影响下一周期。演示对三周期注汽分配穷举，比较累计产油与油汽比，避免只追求单周期峰值。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>蒸汽吞吐注采参数优化业务对象示意</title><rect x=\"30\" y=\"95\" width=\"590\" height=\"110\" fill=\"#ece8d8\"/><path d=\"M145 22V151H457V22\" fill=\"none\" stroke=\"#21796a\" stroke-width=\"7\"/><path d=\"M250 120l-20-26m20 57-25 35m135-35 28-42m-28 42 25 34\" stroke=\"#b96b38\" stroke-width=\"3\"/><text x=\"47\" y=\"60\" font-size=\"17\">注入参数</text><text x=\"450\" y=\"60\" font-size=\"17\">产出或监测</text><text x=\"257\" y=\"193\" font-size=\"17\">储层 · 流体 · 响应</text></svg></div><figcaption class=\"figcap\">蒸汽吞吐注采参数优化涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "多周期热量状态搜索",
+          "html": "<p>热状态H下一周期=H×(1−损失)+注汽量×焖井换热系数；产油为饱和响应×周期衰减。每周期300–1200 t、100 t间隔，枚举总量不超预算的三元组，最大化累计教学产油。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"多周期热量状态搜索默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>多周期热量状态搜索默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">合成产油 / t</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">186</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">1.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">212</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">1.5</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">238</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">2.0</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">263</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">2.5</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">289</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">3.0</text><path d=\"M82.00 74.76 L401.00 87.59 L720.00 185.11\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82.00 259.24 L401.00 149.21 L720.00 140.07\" stroke=\"#b96b38\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">周期</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：优化计划周期产油 / 均分预算周期产油。可行周期计划 425.00种；累计教学产油 786.63t；累计油汽比 0.37t/t。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "模型适用范围与教学边界",
+          "html": "<p>热量和产油函数为合成低维状态代理，没有蒸汽品质、井筒热损失、采液、地层压力和真实历史拟合。油汽比仅可比较该教学函数。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+        },
+        {
+          "no": 4,
+          "en": "SOURCES",
+          "title": "专业依据与合成假设",
+          "html": "<p><a href=\"https://www.energy.gov/hgeo/enhanced-oil-recovery\" target=\"_blank\" rel=\"noopener noreferrer\">DOE：Enhanced oil recovery</a>：热采通过注入热量降低稠油黏度；支持业务关系，不支持状态系数和注汽范围。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "蒸汽吞吐周期注汽调配",
+      "lead": [
+        "热采人员需要在三周期预算内分配注汽量，比较热损失、焖井时间与累计产油响应。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "吞吐周期",
+          "3 周期"
+        ],
+        [
+          "单周期注汽",
+          "300—1200 t"
+        ],
+        [
+          "注汽步长",
+          "100 t"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "工况资料整理",
+          "role": "数据",
+          "do": "核对三周期总预算、热损失比例与焖井时间，构造逐周期热状态。",
+          "effect": "形成吞吐周期：3 周期；单周期注汽：300—1200 t；注汽步长：100 t的处理任务。"
+        },
+        {
+          "name": "多周期热量状态搜索",
+          "role": "计算",
+          "do": "热状态H下一周期=H×(1−损失)+注汽量×焖井换热系数；产油为饱和响应×周期衰减。每周期300–1200 t、100 t间隔，枚举总量不超预算的三元组，最大化累计教学产油。",
+          "effect": "形成可与原始观测或备选方案逐项对照的蒸汽吞吐注采参数优化结果。"
+        },
+        {
+          "name": "周期用汽与基线比较",
+          "role": "评价",
+          "do": "逐周期累计热状态、用汽量和产油响应，与等配基线同时列出实际用汽及剩余预算。",
+          "effect": "让时序效应与实际投入差异都能被核查。"
+        },
+        {
+          "name": "结果对照与交付",
+          "role": "评价",
+          "do": "交付各周期注汽量、热状态和累计响应；同时核对基线与候选的实际用汽和剩余预算。",
+          "effect": "为蒸汽吞吐周期注汽调配提供可追溯的候选、误差或约束依据。",
+          "trap": "热损失较大时前期投入难以保留到后期，应检查注汽时序而非只看总量。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"工况资料整理 → 多周期热量状态搜索 → 周期用汽与基线比较 → 结果对照与交付\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">工况资料整理</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 计算</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">多周期热量状态搜索</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 评价</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">周期用汽与基线比较</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">结果对照与交付</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>逐周期累计热状态、用汽量和产油响应，与等配基线同时列出实际用汽及剩余预算。</p><p><strong>成果交付：</strong>交付各周期注汽量、热状态和累计响应；同时核对基线与候选的实际用汽和剩余预算。</p>"
+      },
+      "fails": [
+        {
+          "name": "周期间热损失",
+          "why": "热损失较大时前期投入难以保留到后期，应检查注汽时序而非只看总量。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1400,
+      "intro": "蒸汽吞吐同井交替注汽和生产，上一周期剩余热量会影响下一周期。演示对三周期注汽分配穷举，比较累计产油与油汽比，避免只追求单周期峰值。"
+    }
+  }
+}
