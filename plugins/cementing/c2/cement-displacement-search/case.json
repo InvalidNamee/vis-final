@@ -1,0 +1,118 @@
+{
+  "id": "cement-displacement-search",
+  "sceneId": "c2",
+  "methods": [
+    "opt"
+  ],
+  "title": "浆体密度与排量约束搜索",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "注水泥时既要顶替泥浆形成连续水泥环，又要避免循环压力超过地层承受窗口。高排量可能改善顶替，却增加摩阻与ECD；密度增加又会改变静液柱。本例用明确的教学响应面同时画出这两种作用，在密度下界与ECD上界间比较候选，展示约束对推荐的决定作用。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子20261023，非现场实测"
+        },
+        {
+          "label": "实际方法",
+          "value": "ECD与顶替代理计算",
+          "desc": "浏览器计算，详见模型与流程"
+        },
+        {
+          "label": "工程边界",
+          "value": "辅助教学",
+          "desc": "不构成施工、设备控制或安全结论"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "注水泥参数优化业务背景",
+          "html": "<p>注水泥时既要顶替泥浆形成连续水泥环，又要避免循环压力超过地层承受窗口。高排量可能改善顶替，却增加摩阻与ECD；密度增加又会改变静液柱。本例用明确的教学响应面同时画出这两种作用，在密度下界与ECD上界间比较候选，展示约束对推荐的决定作用。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"排量响应与压力窗，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"排量响应与压力窗\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>排量响应与压力窗</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M75 265H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"270\" text-anchor=\"end\">-0.18</text><text x=\"75\" y=\"291\" text-anchor=\"middle\">0.5</text><path d=\"M75 211.25H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"216.25\" text-anchor=\"end\">0.46</text><text x=\"222.5\" y=\"291\" text-anchor=\"middle\">1.38</text><path d=\"M75 157.5H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"162.5\" text-anchor=\"end\">1.11</text><text x=\"370\" y=\"291\" text-anchor=\"middle\">2.25</text><path d=\"M75 103.75H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"108.75\" text-anchor=\"end\">1.75</text><text x=\"517.5\" y=\"291\" text-anchor=\"middle\">3.13</text><path d=\"M75 50H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"55\" text-anchor=\"end\">2.39</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">4</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"75,107.05805325185506 91.85714285714286,106.76311030741408 108.71428571428571,106.41454137307471 125.57142857142858,106.01234644883704 142.42857142857144,105.55652553470097 159.28571428571428,105.04707863066653 176.14285714285717,104.48400573673376 193,103.86730685290263 209.85714285714286,103.19698197917313 226.71428571428572,102.47303111554527 243.57142857142858,101.69545426201904 260.42857142857144,100.86425141859445 277.2857142857143,99.97942258527152 294.1428571428571,99.0409677620502 311,98.04888694893054 327.8571428571429,97.00318014591255 344.7142857142857,95.90384735299617 361.5714285714286,94.75088857018142 378.42857142857144,93.54430379746833 395.2857142857143,92.28409303485685 412.14285714285717,90.97025628234704 429,89.60279353993883 445.85714285714283,88.18170480763234 462.7142857142857,86.7069900854274 479.57142857142856,85.17864937332413 496.42857142857144,83.59668267132253 513.2857142857142,81.96108997942255 530.1428571428571,80.27187129762422 547,78.52902662592751 563.8571428571429,76.73255596433248 580.7142857142858,74.88245931283902 597.5714285714286,72.97873667144725 614.4285714285714,71.02138804015709 631.2857142857143,69.0104134189686 648.1428571428571,66.94581280788174 665,64.82758620689654\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"75,95.15978674315642 665,95.15978674315642\"/><circle cx=\"75\" cy=\"95.15978674315642\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"95.15978674315642\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text x=\"370\" y=\"324\" text-anchor=\"middle\">排量 / m³/min</text><text x=\"20\" y=\"156\" transform=\"rotate(-90 20 156)\" text-anchor=\"middle\">ECD / g/cm³</text></g></svg></div><figcaption>ECD曲线随排量向上弯曲；候选散点中顶替代理较高的点也可能越过压力上界。绿色区域只代表用户给定教学窗。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>当前密度ECD · 破裂边界；横轴：排量 / m³/min；纵轴：ECD / g/cm³。</p></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "浆体密度与排量约束搜索计算方法",
+          "html": "<p>指定环空间隙、居中度及两条当量密度边界。；枚举25种浆体密度和36种排量，不外推范围。；分别计算密度加平方摩阻项与饱和顶替响应。；过滤越界候选，再最大化顶替代理减排量惩罚。</p><p>教学经验响应面，不是标定水力学或实际顶替效率。ECD采用简化排量平方摩阻项；破裂当量密度与孔隙压力由用户指定。</p>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "评价边界与专业资料",
+          "html": "<p>可行组合数直接计数；推荐目标=顶替代理−0.015Q²。展示当前与推荐ECD，不预填真实顶替提升。</p><p>未计算真实非牛顿流变、温压密度、浆柱分段、窄边窜流或漏失起裂；0.03密度裕度完全是教学设定。无解时保留无可行结果。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://glossary.slb.com/en/terms/c/cementing\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：固井</a>：支持固井前根据井径、密度和流变设计水泥浆体积与性能，不支持本例效率公式或压力窗数字。</li><li><a href=\"https://glossary.slb.com/terms/c/centralizer\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：扶正器</a>：支持偏心导致泥浆通道与封隔问题，不支持本例挠曲系数或安放方案。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "固井浆体排量比选",
+      "lead": [
+        "施工设计人员需要在压力窗口内比较浆体密度和排量，兼顾顶替效果与排量代价。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "密度候选",
+          "25 种"
+        ],
+        [
+          "排量候选",
+          "36 种"
+        ],
+        [
+          "约束对象",
+          "ECD 压力窗"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "井况与压力窗定义",
+          "role": "数据",
+          "do": "指定环空间隙、居中度及两条当量密度边界。",
+          "effect": "明确本例处理规模与资料分组：密度候选 25 种；排量候选 36 种；约束对象 ECD 压力窗。"
+        },
+        {
+          "name": "候选浆排量枚举",
+          "role": "算法",
+          "do": "枚举25种浆体密度和36种排量，不外推范围。",
+          "effect": "保留候选浆排量枚举的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "ECD与顶替代理计算",
+          "role": "算法",
+          "do": "分别计算密度加平方摩阻项与饱和顶替响应。",
+          "effect": "保留ECD与顶替代理计算的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "可行方案目标排序",
+          "role": "评价",
+          "do": "过滤越界候选，再最大化顶替代理减排量惩罚。",
+          "effect": "交付可行密度排量组合、ECD与目标排序；核对最优点是否贴近压力窗边界。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"井况与压力窗定义 → 候选浆排量枚举 → ECD与顶替代理计算 → 可行方案目标排序\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">井况与压力窗定义</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">候选浆排量枚举</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">ECD与顶替代理计</text><text x=\"477\" y=\"103\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">算</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">可行方案目标排序</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>可行组合数直接计数；推荐目标=顶替代理−0.015Q²。展示当前与推荐ECD，不预填真实顶替提升。</p><p><strong>成果交付：</strong>交付可行密度排量组合、ECD与目标排序；核对最优点是否贴近压力窗边界。</p>"
+      },
+      "fails": [
+        {
+          "name": "压力窗收窄",
+          "why": "压力上下限接近时可行集合可能为空，需要重新核对井况与方案范围。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1500,
+      "intro": "ECD曲线随排量向上弯曲；候选散点中顶替代理较高的点也可能越过压力上界。绿色区域只代表用户给定教学窗。"
+    }
+  }
+}

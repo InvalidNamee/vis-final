@@ -1,0 +1,118 @@
+{
+  "id": "completion-tubing-loads",
+  "sceneId": "co3",
+  "methods": [
+    "opt"
+  ],
+  "title": "管柱热压载荷约束比较",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "温度变化引起热伸长，封隔器约束又会把伸长转成轴向载荷；压差和自重进一步改变管柱受力。逐工况计算有助于发现高温高压组合下的裕度不足。本例用可解释的简化机理直接计算候选壁厚，展示热载荷、压力活塞力和重量的组成，不以固定安全系数替代计算。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子20261023，非现场实测"
+        },
+        {
+          "label": "实际方法",
+          "value": "组合应力计算",
+          "desc": "浏览器计算，详见模型与流程"
+        },
+        {
+          "label": "工程边界",
+          "value": "辅助教学",
+          "desc": "不构成施工、设备控制或安全结论"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "完井管柱受力智能分析业务背景",
+          "html": "<p>温度变化引起热伸长，封隔器约束又会把伸长转成轴向载荷；压差和自重进一步改变管柱受力。逐工况计算有助于发现高温高压组合下的裕度不足。本例用可解释的简化机理直接计算候选壁厚，展示热载荷、压力活塞力和重量的组成，不以固定安全系数替代计算。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"壁厚与载荷裕度，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"壁厚与载荷裕度\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>壁厚与载荷裕度</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M75 265H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"270\" text-anchor=\"end\">-0.94</text><text x=\"75\" y=\"291\" text-anchor=\"middle\">4</text><path d=\"M75 211.25H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"216.25\" text-anchor=\"end\">2.47</text><text x=\"222.5\" y=\"291\" text-anchor=\"middle\">5.5</text><path d=\"M75 157.5H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"162.5\" text-anchor=\"end\">5.87</text><text x=\"370\" y=\"291\" text-anchor=\"middle\">7</text><path d=\"M75 103.75H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"108.75\" text-anchor=\"end\">9.28</text><text x=\"517.5\" y=\"291\" text-anchor=\"middle\">8.5</text><path d=\"M75 50H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"55\" text-anchor=\"end\">12.68</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">10</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"75,171.33517016038076 99.58333333333333,166.25976321336825 124.16666666666666,161.20034261262256 148.75,156.16301765092368 173.33333333333331,151.15388736548422 197.91666666666669,146.1790048643287 222.5,141.24434163745724 247.08333333333334,136.35575233805423 271.66666666666663,131.51894051610665 296.25,126.73942577209522 320.83333333333337,122.02251277228049 345.4166666666667,117.3732625303067 370,112.79646631359361 394.5833333333333,108.29662247881859 419.1666666666667,103.87791648051359 443.75,99.5442042324126 468.3333333333333,95.29899893474914 492.9166666666667,91.1454614142967 517.5,87.08639395951641 542.0833333333333,83.12423757251253 566.6666666666667,79.26107250413367 591.25,75.49862188971352 615.8333333333334,71.83825826155689 640.4166666666666,68.28101268089128 665,64.82758620689657\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"75,226.49686257215956 665,226.49686257215956\"/><circle cx=\"75\" cy=\"226.49686257215956\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"226.49686257215956\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text x=\"370\" y=\"324\" text-anchor=\"middle\">壁厚 / mm</text><text x=\"20\" y=\"156\" transform=\"rotate(-90 20 156)\" text-anchor=\"middle\">教学安全系数</text></g></svg></div><figcaption>载荷组成图突出热力可能与自重反向；壁厚—系数曲线显示尺寸改变对组合应力的影响。自由伸长与全约束热力分别报告。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>候选 · 教学要求；横轴：壁厚 / mm；纵轴：教学安全系数。</p></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "管柱热压载荷约束比较计算方法",
+          "html": "<p>固定73mm外径，输入长度、温升、压差、壁厚和屈服编码。；计算浮重、活塞力、全约束热力及自由热膨胀。；用薄壁环向与简化轴向组合应力求教学屈服比。；枚举4–10mm壁厚，选满足教学系数的最小质量候选。</p><p>直井73mm管外径；轴向重量+活塞−全约束热膨胀，薄壁环向应力和简化von Mises。忽略弯曲、摩阻、屈曲、接头、腐蚀、三轴/符号耦合，不构成管柱强度校核。</p>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "评价边界与专业资料",
+          "html": "<p>教学系数=屈服强度/简化组合应力；壁厚候选按质量递增比较。保留轴向拉压符号参与组合应力。不是商业管柱软件或经API认证的设计系数。</p><p>全约束热假设与自由伸长是两个极端参考，不同时发生。忽略屈曲、弯曲、连接、腐蚀、摩阻和真实封隔器响应，不能据此判定管柱现场安全。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/digital-solutions/tdas-tubular-design-software\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：TDAS管柱设计分析</a>：支持管柱设计需应力、位移与热分析，不支持本例简化公式已达到商用软件精度。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "完井管柱热压载荷校核",
+      "lead": [
+        "设计人员需要分解温度与压力造成的管柱载荷，比较不同壁厚的应力与质量。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "管柱外径",
+          "73 mm"
+        ],
+        [
+          "壁厚搜索",
+          "4—10 mm"
+        ],
+        [
+          "载荷分量",
+          "浮重、活塞力、热力"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "材料与工况定义",
+          "role": "数据",
+          "do": "固定73mm外径，输入长度、温升、压差、壁厚和屈服编码。",
+          "effect": "明确本例处理规模与资料分组：管柱外径 73 mm；壁厚搜索 4—10 mm；载荷分量 浮重、活塞力、热力。"
+        },
+        {
+          "name": "热压轴向载荷分解",
+          "role": "算法",
+          "do": "计算浮重、活塞力、全约束热力及自由热膨胀。",
+          "effect": "保留热压轴向载荷分解的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "组合应力计算",
+          "role": "算法",
+          "do": "用薄壁环向与简化轴向组合应力求教学屈服比。",
+          "effect": "保留组合应力计算的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "壁厚候选约束筛选",
+          "role": "评价",
+          "do": "枚举4–10mm壁厚，选满足教学系数的最小质量候选。",
+          "effect": "交付载荷分解、组合应力比与壁厚候选；核对高温差、高压差工况下的约束余量。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"材料与工况定义 → 热压轴向载荷分解 → 组合应力计算 → 壁厚候选约束筛选\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">材料与工况定义</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">热压轴向载荷分解</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">组合应力计算</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">壁厚候选约束筛选</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>教学系数=屈服强度/简化组合应力；壁厚候选按质量递增比较。保留轴向拉压符号参与组合应力。不是商业管柱软件或经API认证的设计系数。</p><p><strong>成果交付：</strong>交付载荷分解、组合应力比与壁厚候选；核对高温差、高压差工况下的约束余量。</p>"
+      },
+      "fails": [
+        {
+          "name": "热约束条件变化",
+          "why": "自由伸长与完全约束的热载荷差异较大，约束假设需与管柱结构对应。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1500,
+      "intro": "载荷组成图突出热力可能与自重反向；壁厚—系数曲线显示尺寸改变对组合应力的影响。自由伸长与全约束热力分别报告。"
+    }
+  }
+}

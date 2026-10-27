@@ -1,0 +1,119 @@
+{
+  "id": "completion-case-retrieval",
+  "sceneId": "co1",
+  "methods": [
+    "kg",
+    "opt"
+  ],
+  "title": "完井相似案例排序",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "裸眼、套管射孔、筛管和砾石充填对储层接触、防砂与投入有不同取舍。邻井案例能提供经验线索，但相似地质与工况比单纯高产排名更有意义。本例在合成案例库中检索相近储层，再按防砂偏好给方式排序，公开距离、支持案例数和评分组成。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子20261023，非现场实测"
+        },
+        {
+          "label": "实际方法",
+          "value": "方式表现加权汇总",
+          "desc": "浏览器计算，详见模型与流程"
+        },
+        {
+          "label": "工程边界",
+          "value": "辅助教学",
+          "desc": "不构成施工、设备控制或安全结论"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "完井方式智能优选业务背景",
+          "html": "<p>裸眼、套管射孔、筛管和砾石充填对储层接触、防砂与投入有不同取舍。邻井案例能提供经验线索，但相似地质与工况比单纯高产排名更有意义。本例在合成案例库中检索相近储层，再按防砂偏好给方式排序，公开距离、支持案例数和评分组成。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"方案成本与产能，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"方案成本与产能\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>方案成本与产能</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M75 265H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"270\" text-anchor=\"end\">-0.1</text><text x=\"75\" y=\"291\" text-anchor=\"middle\">20</text><path d=\"M75 211.25H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"216.25\" text-anchor=\"end\">0.26</text><text x=\"222.5\" y=\"291\" text-anchor=\"middle\">32.5</text><path d=\"M75 157.5H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"162.5\" text-anchor=\"end\">0.63</text><text x=\"370\" y=\"291\" text-anchor=\"middle\">45</text><path d=\"M75 103.74999999999997H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"108.74999999999997\" text-anchor=\"end\">0.99</text><text x=\"517.5\" y=\"291\" text-anchor=\"middle\">57.5</text><path d=\"M75 50H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"55\" text-anchor=\"end\">1.35</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">70</text><circle cx=\"75\" cy=\"64.82758620689654\" r=\"6\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"252\" cy=\"105.5701905886624\" r=\"6\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"405.4\" cy=\"117.87876805559895\" r=\"6\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"148.271723237664\" r=\"6\" fill=\"#2a82b1\" fill-opacity=\".8\"/><text x=\"370\" y=\"324\" text-anchor=\"middle\">成本 / 教学单位</text><text x=\"20\" y=\"156\" transform=\"rotate(-90 20 156)\" text-anchor=\"middle\">产能代理</text></g></svg></div><figcaption>产能与成本散点体现方式取舍；评分随出砂惩罚变化，说明推荐取决于明确偏好，不存在不附条件的通用最佳完井。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>裸眼 · 套管射孔 · 筛管 · 砾石充填；横轴：成本 / 教学单位；纵轴：产能代理。</p></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "完井相似案例排序计算方法",
+          "html": "<p>用预设尺度比较渗透率、出砂倾向与出水编码。；64案例中取16近邻，避免井号进入距离。；每种方式以倒距离权重汇总产能、出砂与成本代理。；显式评分权重排序，展示稀疏类别回退支持量。</p><p>64个虚拟案例。距离按预设物理尺度归一化，16近邻按倒距离加权；缺少某类时按相同三维距离回退该类最近2例，明细列出支持井号和回退标记。不训练神经网络，评分没有真实经济含义。</p>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "评价边界与专业资料",
+          "html": "<p>案例距离为三维归一化欧氏距离；评分=产能代理−出砂权重×出砂代理−0.006×成本。未定义准确率，不伪造推荐命中率。</p><p>这是结构化案例推理，不是已构建的现场知识图谱。合成完井方式表现不能支持真实工程选择，出水编码只参与相似度而非实际水锥模拟。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：完井系统</a>：支持裸眼、套管、防砂及智能完井的业务组成，不支持虚拟邻井评分。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "储层条件完井方式比选",
+      "lead": [
+        "完井设计人员需要检索类似储层案例，对照产能、出砂与成本选择待论证的完井方式。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "历史案例",
+          "64 条"
+        ],
+        [
+          "检索近邻",
+          "16 条"
+        ],
+        [
+          "储层特征",
+          "3 项"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "储层特征标准化",
+          "role": "数据",
+          "do": "用预设尺度比较渗透率、出砂倾向与出水编码。",
+          "effect": "明确本例处理规模与资料分组：历史案例 64 条；检索近邻 16 条；储层特征 3 项。"
+        },
+        {
+          "name": "相似虚拟案例检索",
+          "role": "算法",
+          "do": "64案例中取16近邻，避免井号进入距离。",
+          "effect": "保留相似虚拟案例检索的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "方式表现加权汇总",
+          "role": "算法",
+          "do": "每种方式以倒距离权重汇总产能、出砂与成本代理。",
+          "effect": "保留方式表现加权汇总的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "多目标候选排序",
+          "role": "评价",
+          "do": "显式评分权重排序，展示稀疏类别回退支持量。",
+          "effect": "交付方式排序、近邻编号与支持量；对支持案例较少的方式补查适用条件。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"储层特征标准化 → 相似虚拟案例检索 → 方式表现加权汇总 → 多目标候选排序\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">储层特征标准化</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">相似虚拟案例检索</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">方式表现加权汇总</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">多目标候选排序</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>案例距离为三维归一化欧氏距离；评分=产能代理−出砂权重×出砂代理−0.006×成本。未定义准确率，不伪造推荐命中率。</p><p><strong>成果交付：</strong>交付方式排序、近邻编号与支持量；对支持案例较少的方式补查适用条件。</p>"
+      },
+      "fails": [
+        {
+          "name": "相似案例稀疏",
+          "why": "某种方式只有少量支持案例时，加权表现容易受个别案例影响。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1500,
+      "intro": "产能与成本散点体现方式取舍；评分随出砂惩罚变化，说明推荐取决于明确偏好，不存在不附条件的通用最佳完井。"
+    }
+  }
+}

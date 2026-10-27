@@ -1,0 +1,118 @@
+{
+  "id": "perforation-charge-rules",
+  "sceneId": "p3",
+  "methods": [
+    "kg"
+  ],
+  "title": "射孔弹型约束检索",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "不同射孔弹设计在入口孔径、穿深和适用枪径上存在取舍，选型首先应检查井筒几何与适用环境。直接对所有型号评分会把不兼容候选排在前面。本例将规则过滤与偏好排序分开，逐型号列出温度、通径和壁厚的排除原因。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子20261023，非现场实测"
+        },
+        {
+          "label": "实际方法",
+          "value": "性能代理修正",
+          "desc": "浏览器计算，详见模型与流程"
+        },
+        {
+          "label": "工程边界",
+          "value": "辅助教学",
+          "desc": "不构成施工、设备控制或安全结论"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "射孔弹型智能选型业务背景",
+          "html": "<p>不同射孔弹设计在入口孔径、穿深和适用枪径上存在取舍，选型首先应检查井筒几何与适用环境。直接对所有型号评分会把不兼容候选排在前面。本例将规则过滤与偏好排序分开，逐型号列出温度、通径和壁厚的排除原因。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"孔径与穿深取舍，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"孔径与穿深取舍\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>孔径与穿深取舍</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M75 265H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"270\" text-anchor=\"end\">-0.04</text><text x=\"75\" y=\"291\" text-anchor=\"middle\">8</text><path d=\"M75 211.25H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"216.25\" text-anchor=\"end\">0.1</text><text x=\"222.5\" y=\"291\" text-anchor=\"middle\">10</text><path d=\"M75 157.5H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"162.5\" text-anchor=\"end\">0.23</text><text x=\"370\" y=\"291\" text-anchor=\"middle\">12</text><path d=\"M75 103.75H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"108.75\" text-anchor=\"end\">0.37</text><text x=\"517.5\" y=\"291\" text-anchor=\"middle\">14</text><path d=\"M75 50H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"55\" text-anchor=\"end\">0.5</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">16</text><circle cx=\"148.75\" cy=\"64.82758620689657\" r=\"6\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"158.92572944297083\" r=\"6\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"370\" cy=\"121.85676392572947\" r=\"6\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"222.5\" cy=\"107.59946949602124\" r=\"6\" fill=\"#2a82b1\" fill-opacity=\".8\"/><circle cx=\"75\" cy=\"147.51989389920425\" r=\"6\" fill=\"#a74040\" fill-opacity=\".8\"/><circle cx=\"517.5\" cy=\"87.63925729442974\" r=\"6\" fill=\"#68743a\" fill-opacity=\".8\"/><text x=\"370\" y=\"324\" text-anchor=\"middle\">入口孔径 / mm</text><text x=\"20\" y=\"156\" transform=\"rotate(-90 20 156)\" text-anchor=\"middle\">修正穿深代理 / m</text></g></svg></div><figcaption>孔径—穿深点图展示设计取舍，评分图同时标记规则通过者；偏好再高也不会使不满足通径的型号成为推荐。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>教学深穿A 排除 · 教学大孔B 排除 · 教学均匀C 可行 · 教学耐温D 可行 · 教学细枪E 排除 · 教学复合F 排除；横轴：入口孔径 / mm；纵轴：修正穿深代理 / m。</p></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "射孔弹型约束检索计算方法",
+          "html": "<p>提供六个明确标注教学名称的合成弹型编码。；按井温编码、枪径和套管壁厚能力检查，保留排除原因。；以强度编码对合成穿深作简单折减。；对可行者按孔径/穿深偏好与成本排序，空集不返回推荐。</p><p>结构化规则检索，不宣称构建了完整知识图谱或语义大模型。实际选型需厂家手册、API试验和井下应力校正；这里性能表是显式合成数据。</p>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "评价边界与专业资料",
+          "html": "<p>通过数是规则检查结果；评分为归一化孔径与穿深加权减成本。没有现场正确型号标签，因此不展示虚假准确率。</p><p>型号、温度能力、适用壁厚及性能全部虚构，不对应厂家产品。没有知识图谱推理或语义检索，不能用于射孔弹采购、装配或现场工艺选择。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：射孔枪系统</a>：支持枪弹匹配与质量测试重要性，不支持任何虚构弹型性能表。</li><li><a href=\"https://glossary.slb.com/Terms/e/entrance_hole.aspx\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：入口孔径</a>：支持入口孔径与穿深存在设计取舍，不支持虚构型号。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "井况约束射孔弹型选择",
+      "lead": [
+        "设计人员需要按温度、枪径和套管条件筛掉不适用弹型，再比较穿深、孔径与成本。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "弹型目录",
+          "6 种"
+        ],
+        [
+          "适用校核",
+          "温度、枪径、壁厚"
+        ],
+        [
+          "偏好指标",
+          "孔径、穿深、成本"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "虚构型号表构建",
+          "role": "数据",
+          "do": "提供六个明确标注教学名称的合成弹型编码。",
+          "effect": "明确本例处理规模与资料分组：弹型目录 6 种；适用校核 温度、枪径、壁厚；偏好指标 孔径、穿深、成本。"
+        },
+        {
+          "name": "适用规则逐项过滤",
+          "role": "算法",
+          "do": "按井温编码、枪径和套管壁厚能力检查，保留排除原因。",
+          "effect": "保留适用规则逐项过滤的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "性能代理修正",
+          "role": "算法",
+          "do": "以强度编码对合成穿深作简单折减。",
+          "effect": "保留性能代理修正的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "偏好排序与解释",
+          "role": "评价",
+          "do": "对可行者按孔径/穿深偏好与成本排序，空集不返回推荐。",
+          "effect": "交付可行型号排序与逐项排除原因；先核对适用条件，再讨论性能偏好。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"虚构型号表构建 → 适用规则逐项过滤 → 性能代理修正 → 偏好排序与解释\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">虚构型号表构建</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">适用规则逐项过滤</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">性能代理修正</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">偏好排序与解释</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>通过数是规则检查结果；评分为归一化孔径与穿深加权减成本。没有现场正确型号标签，因此不展示虚假准确率。</p><p><strong>成果交付：</strong>交付可行型号排序与逐项排除原因；先核对适用条件，再讨论性能偏好。</p>"
+      },
+      "fails": [
+        {
+          "name": "目录无可行型号",
+          "why": "多项尺寸和工况约束叠加可能排除全部型号，此时需要扩大备选目录。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1500,
+      "intro": "孔径—穿深点图展示设计取舍，评分图同时标记规则通过者；偏好再高也不会使不满足通径的型号成为推荐。"
+    }
+  }
+}

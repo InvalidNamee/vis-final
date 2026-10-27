@@ -1,0 +1,118 @@
+{
+  "id": "production-water-allocation",
+  "sceneId": "pr3",
+  "methods": [
+    "opt"
+  ],
+  "title": "分层注水边际收益调配",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "分层注水分配需要在有限水量与不同层段吸水能力之间权衡。已经高含水的优势通道继续增注，未必产生最大的增油响应。本例以三层边际递减的响应代理，在总量和层上限约束下分配小步水量，展示层间调整对整体目标的影响。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子20261023，非现场实测"
+        },
+        {
+          "label": "实际方法",
+          "value": "最大边际收益分配",
+          "desc": "浏览器计算，详见模型与流程"
+        },
+        {
+          "label": "工程边界",
+          "value": "辅助教学",
+          "desc": "不构成施工、设备控制或安全结论"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "智能注水调配业务背景",
+          "html": "<p>分层注水分配需要在有限水量与不同层段吸水能力之间权衡。已经高含水的优势通道继续增注，未必产生最大的增油响应。本例以三层边际递减的响应代理，在总量和层上限约束下分配小步水量，展示层间调整对整体目标的影响。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"分层配注量，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"分层配注量\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>分层配注量</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M75 265H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"270\" text-anchor=\"end\">-12.8</text><text x=\"75\" y=\"291\" text-anchor=\"middle\">1</text><path d=\"M75 211.25H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"216.25\" text-anchor=\"end\">33.6</text><text x=\"222.5\" y=\"291\" text-anchor=\"middle\">1.5</text><path d=\"M75 157.5H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"162.5\" text-anchor=\"end\">80</text><text x=\"370\" y=\"291\" text-anchor=\"middle\">2</text><path d=\"M75 103.75H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"108.75\" text-anchor=\"end\">126.4</text><text x=\"517.5\" y=\"291\" text-anchor=\"middle\">2.5</text><path d=\"M75 50H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"55\" text-anchor=\"end\">172.8</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">3</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"75,145.9159482758621 370,140.12392241379314 665,116.95581896551727\"/><circle cx=\"75\" cy=\"145.9159482758621\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"370\" cy=\"140.12392241379314\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"116.95581896551727\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"75,134.33189655172416 370,134.33189655172416 665,134.33189655172416\"/><circle cx=\"75\" cy=\"134.33189655172416\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"370\" cy=\"134.33189655172416\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"134.33189655172416\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><polyline fill=\"none\" stroke=\"#7659a8\" stroke-width=\"2.5\" points=\"75,111.16379310344828 370,64.82758620689657 665,87.99568965517244\"/><circle cx=\"75\" cy=\"111.16379310344828\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"370\" cy=\"64.82758620689657\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"87.99568965517244\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><text x=\"370\" y=\"324\" text-anchor=\"middle\">层号</text><text x=\"20\" y=\"156\" transform=\"rotate(-90 20 156)\" text-anchor=\"middle\">注水 / m³/d</text></g></svg></div><figcaption>分层配注与上限比较标出受限层；凹响应曲线显示继续增注的边际价值逐渐降低，因此最优不等于平均分配。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>优化 · 等配 · 吸水上限；横轴：层号；纵轴：注水 / m³/d。</p></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "分层注水边际收益调配计算方法",
+          "html": "<p>为三层定义吸水上限、含水编码和递减收益代理。；总量以5m³/d离散，预算不足、容量用满或最大边际收益不为正则停止。；每步选增配后目标增量最大的未满层，仅正收益时分配。；输出各层配注、未分配量与等配目标，同时展示上限。</p><p>三层无交叉耦合的凹注采响应代理；等配可能违反层吸水上限，单独展示。未模拟真实连通系数、压裂压力、滞后与地层压力；不得作为配注指令。</p>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "评价边界与专业资料",
+          "html": "<p>目标=Σ[增益×(1−含水)×70×(1−exp(−q/70))−0.0005q²]；在总量不超过预算、同一分层凹函数和等步长下，正边际贪心分配是离散最优；允许保留水量。</p><p>未模拟层间串流、注采滞后、压力或破裂；等配基线可能越过单层上限，不能当现场可行方案。所有收益是教学代理。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://www.slb.com/resource-library/case-study-with-navigation/di/enhancing-waterflooding-efficiency-through-integrated-workflows-and-advanced-analytics\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：注水监控与分析</a>：支持注采连通、配注与短期情景优化的业务背景；未复制其CRM模型或收益。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "多层注水量调配",
+      "lead": [
+        "注水管理人员需要在总量和分层吸水上限内分配水量，比较增配收益与等配方案。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "调配层数",
+          "3 层"
+        ],
+        [
+          "离散水量",
+          "5 m³/d"
+        ],
+        [
+          "约束条件",
+          "总预算、分层上限"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "层段凹响应定义",
+          "role": "数据",
+          "do": "为三层定义吸水上限、含水编码和递减收益代理。",
+          "effect": "明确本例处理规模与资料分组：调配层数 3 层；离散水量 5 m³/d；约束条件 总预算、分层上限。"
+        },
+        {
+          "name": "可分配预算离散",
+          "role": "算法",
+          "do": "总量以5m³/d离散，预算不足、容量用满或最大边际收益不为正则停止。",
+          "effect": "保留可分配预算离散的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "最大边际收益分配",
+          "role": "算法",
+          "do": "每步选增配后目标增量最大的未满层，仅正收益时分配。",
+          "effect": "保留最大边际收益分配的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "等配方案约束对照",
+          "role": "评价",
+          "do": "输出各层配注、未分配量与等配目标，同时展示上限。",
+          "effect": "交付分层配注、边际收益和剩余预算；检查停止分配的原因及等配对照。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"层段凹响应定义 → 可分配预算离散 → 最大边际收益分配 → 等配方案约束对照\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">层段凹响应定义</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">可分配预算离散</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">最大边际收益分配</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">等配方案约束对照</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>目标=Σ[增益×(1−含水)×70×(1−exp(−q/70))−0.0005q²]；在总量不超过预算、同一分层凹函数和等步长下，正边际贪心分配是离散最优；允许保留水量。</p><p><strong>成果交付：</strong>交付分层配注、边际收益和剩余预算；检查停止分配的原因及等配对照。</p>"
+      },
+      "fails": [
+        {
+          "name": "边际收益转负",
+          "why": "继续向高含水层加水可能降低目标，应检查未分配量而非强行用满预算。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1500,
+      "intro": "分层配注与上限比较标出受限层；凹响应曲线显示继续增注的边际价值逐渐降低，因此最优不等于平均分配。"
+    }
+  }
+}

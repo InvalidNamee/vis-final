@@ -1,0 +1,119 @@
+{
+  "id": "perforation-skin-inversion",
+  "sceneId": "p4",
+  "methods": [
+    "ts",
+    "opt"
+  ],
+  "title": "多级压差表皮反演",
+  "version": "1.0.0",
+  "updated": "2026-10-23",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "lede": "射孔效果通常需结合试井或产量压差资料解释。正表皮提示井筒附近流动受限，却可能来自损害、部分打开或射孔等多种原因。本例从多级压差—流量点反求教学产能指数与表皮，显示噪声带来的不确定性，再比较目标表皮情景的响应。",
+      "judge": [
+        {
+          "label": "数据来源",
+          "value": "教学合成",
+          "desc": "固定种子20261023，非现场实测"
+        },
+        {
+          "label": "实际方法",
+          "value": "表皮与区间反演",
+          "desc": "浏览器计算，详见模型与流程"
+        },
+        {
+          "label": "工程边界",
+          "value": "辅助教学",
+          "desc": "不构成施工、设备控制或安全结论"
+        }
+      ],
+      "sections": [
+        {
+          "no": 1,
+          "en": "PROBLEM",
+          "title": "射孔效果智能评估业务背景",
+          "html": "<p>射孔效果通常需结合试井或产量压差资料解释。正表皮提示井筒附近流动受限，却可能来自损害、部分打开或射孔等多种原因。本例从多级压差—流量点反求教学产能指数与表皮，显示噪声带来的不确定性，再比较目标表皮情景的响应。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"压差试验与拟合，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"压差试验与拟合\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>压差试验与拟合</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M75 265H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"270\" text-anchor=\"end\">-5.45</text><text x=\"75\" y=\"291\" text-anchor=\"middle\">2</text><path d=\"M75 211.25H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"216.25\" text-anchor=\"end\">14.31</text><text x=\"222.5\" y=\"291\" text-anchor=\"middle\">4.5</text><path d=\"M75 157.5H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"162.5\" text-anchor=\"end\">34.07</text><text x=\"370\" y=\"291\" text-anchor=\"middle\">7</text><path d=\"M75 103.75H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"108.75\" text-anchor=\"end\">53.83</text><text x=\"517.5\" y=\"291\" text-anchor=\"middle\">9.5</text><path d=\"M75 50H665\" stroke=\"#d8e1df\"/><text x=\"65\" y=\"55\" text-anchor=\"end\">73.59</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">12</text><circle cx=\"75\" cy=\"220.15751493721632\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"104.5\" cy=\"213.30793784060685\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"134\" cy=\"201.42363539676964\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"163.5\" cy=\"200.04794426949374\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"193\" cy=\"188.73884943471543\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"222.5\" cy=\"180.01442761737962\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"252\" cy=\"173.44757703957436\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"281.5\" cy=\"163.3689098812821\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"311\" cy=\"158.5589693009194\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"340.5\" cy=\"148.45703369163365\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"370\" cy=\"142.7776542487535\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"399.5\" cy=\"132.98954152752847\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"429\" cy=\"127.32606750911103\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"458.5\" cy=\"119.63664880319632\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"488\" cy=\"116.25424340452815\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"517.5\" cy=\"104.85786679432886\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"547\" cy=\"96.00289465513418\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"576.5\" cy=\"92.88879921429015\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"606\" cy=\"78.6376143004349\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"635.5\" cy=\"76.06647332314839\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><polyline fill=\"none\" stroke=\"#7659a8\" stroke-width=\"2.5\" points=\"75,219.31910205635498 665,65.0525433726126\"/><circle cx=\"75\" cy=\"219.31910205635498\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"65.0525433726126\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><text x=\"370\" y=\"324\" text-anchor=\"middle\">压差 / MPa</text><text x=\"20\" y=\"156\" transform=\"rotate(-90 20 156)\" text-anchor=\"middle\">流量 / m³/d</text></g></svg></div><figcaption>压差流量直线及留出残差揭示拟合程度；多个物理机制可产生同一斜率，所以拟合好不能直接证明补孔一定有效。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>拟合样本 · 留出点 · 反演直线；横轴：压差 / MPa；纵轴：流量 / m³/d。</p></figure>"
+        },
+        {
+          "no": 2,
+          "en": "METHOD",
+          "title": "多级压差表皮反演计算方法",
+          "html": "<p>生成21个教学压差点，前14拟合、后7留出。；通过原点最小二乘拟合q=JΔp。；用已知教学kh与固定几何项7反求表皮，以残差平方和/(n−1)估计零截距回归方差，近似传播斜率误差。；固定比较压差展示当前与目标表皮情景产量，不做现场补孔决策。</p><p>21个虚拟多级压差点，前14拟合、后7评价。拟合q=JΔp，再用J=kh/(7+s)反演；kh项含单位换算的教学缩放。地层损害、部分打开和射孔均能影响表皮，反演不能唯一归因射孔。</p>"
+        },
+        {
+          "no": 3,
+          "en": "LIMITS",
+          "title": "评价边界与专业资料",
+          "html": "<p>表皮=kh/J−7；测试MAE只在留出点计算。近似1.96区间假定kh精确、独立同方差残差，未覆盖地质参数误差。</p><p>简化稳态线性关系忽略多相流、非达西、压力恢复和层间贡献；测试是同一虚拟井的压差点，不能称跨井泛化。表皮不能唯一归因射孔。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://glossary.slb.com/terms/s/skin\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：表皮</a>：支持表皮为产能效率无量纲因子及正负含义，不支持表皮可唯一归因射孔。</li><li><a href=\"https://www.slb.com/-/media/files/oilfield-review/p54-69\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：射孔策略</a>：支持孔密相位穿深、损害带及表皮的定性联系，不支持教学代理系数或收益。</li></ul>"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "案例流程",
+      "title": "压差产量表皮反演",
+      "lead": [
+        "试井评价人员需要从多级压差与产量关系估计表皮，量化反演误差并比较目标表皮情景。 本例使用教学合成资料，案例规模与处理口径如下。"
+      ],
+      "stats": [
+        [
+          "压差样本",
+          "21 点"
+        ],
+        [
+          "拟合 / 留出",
+          "14 / 7 点"
+        ],
+        [
+          "拟合关系",
+          "q = JΔp"
+        ]
+      ],
+      "steps": [
+        {
+          "name": "多级压差样本构造",
+          "role": "数据",
+          "do": "生成21个教学压差点，前14拟合、后7留出。",
+          "effect": "明确本例处理规模与资料分组：压差样本 21 点；拟合 / 留出 14 / 7 点；拟合关系 q = JΔp。"
+        },
+        {
+          "name": "产能指数最小二乘",
+          "role": "算法",
+          "do": "通过原点最小二乘拟合q=JΔp。",
+          "effect": "保留产能指数最小二乘的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "表皮与区间反演",
+          "role": "算法",
+          "do": "用已知教学kh与固定几何项7反求表皮，以残差平方和/(n−1)估计零截距回归方差，近似传播斜率误差。",
+          "effect": "保留表皮与区间反演的中间结果，供下一环节核对与比较。"
+        },
+        {
+          "name": "目标表皮情景比较",
+          "role": "评价",
+          "do": "固定比较压差展示当前与目标表皮情景产量，不做现场补孔决策。",
+          "effect": "交付产能指数、表皮区间与留出残差；检查压差增大时是否出现系统非线性。"
+        }
+      ],
+      "metrics": {
+        "title": "流程产出与评价口径",
+        "html": "<figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"案例业务流程，窄屏可横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 150\" role=\"img\" aria-label=\"多级压差样本构造 → 产能指数最小二乘 → 表皮与区间反演 → 目标表皮情景比较\" style=\"display:block;width:100%;min-width:780px;max-width:1000px;margin:auto;font-family:system-ui,sans-serif\"><title>案例业务流程</title><rect x=\"10\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"97\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">1 · 数据</text><text x=\"97\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">多级压差样本构造</text><path d=\"M184 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"200\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"287\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">2 · 算法</text><text x=\"287\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">产能指数最小二乘</text><path d=\"M374 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"390\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e4f1eb\"/><text x=\"477\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">3 · 算法</text><text x=\"477\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">表皮与区间反演</text><path d=\"M564 76h16m-5-5 5 5-5 5\" stroke=\"#47695b\" fill=\"none\"/><rect x=\"580\" y=\"20\" width=\"174\" height=\"110\" rx=\"9\" fill=\"#e9edf7\"/><text x=\"667\" y=\"50\" text-anchor=\"middle\" font-size=\"16\" fill=\"#47695b\">4 · 评价</text><text x=\"667\" y=\"80\" text-anchor=\"middle\" font-size=\"16\" fill=\"#243e35\">目标表皮情景比较</text></svg></div><figcaption>每个环节对应下方的业务输入、计算操作及结果用途。</figcaption></figure><p>表皮=kh/J−7；测试MAE只在留出点计算。近似1.96区间假定kh精确、独立同方差残差，未覆盖地质参数误差。</p><p><strong>成果交付：</strong>交付产能指数、表皮区间与留出残差；检查压差增大时是否出现系统非线性。</p>"
+      },
+      "fails": [
+        {
+          "name": "非线性产能关系",
+          "why": "多相流或非达西效应会破坏过原点线性关系，使表皮反演偏移。"
+        }
+      ]
+    },
+    "demo": {
+      "mode": "page",
+      "html": "demo/index.html",
+      "js": "demo/demo.js",
+      "label": "案例演示",
+      "height": 1500,
+      "intro": "压差流量直线及留出残差揭示拟合程度；多个物理机制可产生同一斜率，所以拟合好不能直接证明补孔一定有效。"
+    }
+  }
+}
