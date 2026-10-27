@@ -10,6 +10,11 @@ c.window=c;vm.createContext(c);
 for(const file of ['src/content/atlas.js','src/runtime/registry.js','src/runtime/kit.js','src/runtime/case-demo-host.js','src/services/packages.js','src/compat/admin.js'])vm.runInContext(read(file).replace(/^import .*fflate.*;\r?\n/,'').replace(/\nexport \{\};\s*$/,''),c,{filename:file});
 for(const [name,keys] of Object.entries(spec.globalAPIs))for(const key of keys)assert(key in c[name],name+'.'+key+' missing');
 for(const key of ['saveMethod','deleteMethod','saveScene','deleteScene','isUserScene','reindex'])assert.equal(typeof c.ATLAS[key],'function','management API '+key);
+// The replaced original demo remains a real compatibility fixture, not a site default.
+for(const file of ['tests/fixtures/legacy-welllog/welllog-layer.case.js','tests/fixtures/legacy-welllog/welllog-layer.demo.js'])vm.runInContext(read(file),c,{filename:file});
+assert.equal(c.Cases.get('welllog-layer').sceneId,'w1');
+assert.equal(typeof c.WelllogLayerDemo,'function');
+assert.equal(c.Cases.validate(c.Cases.get('welllog-layer')).filter(r=>r.level==='error').length,0);
 assert.equal(c.CaseDemoHost.resolveMode({files:[{name:'demo/index.html'}],demo:{mode:'auto'}}),'page');
 assert.equal(c.CaseDemoHost.resolveMode({files:[{name:'demo/demo.js'}],demo:{mode:'auto'}}),'module');
 assert.equal(c.CaseDemoHost.resolveMode({files:[],demo:{mode:'builtin'}}),'builtin');
