@@ -5,6 +5,8 @@ import {NButton,NTag,useDialog,useMessage} from 'naive-ui';
 import {useContentStore} from '../stores/content';
 import {useSessionStore} from '../stores/session';
 import {changePassword} from '../services/management';
+import PageHead from '../components/layout/PageHead.vue';
+import Crumb from '../components/layout/Crumb.vue';
 const route=useRoute(),router=useRouter(),content=useContentStore(),session=useSessionStore(),dialog=useDialog(),message=useMessage();
 const user=ref(''),password=ref(''),passwordModal=ref(false),newPassword=ref(''),search=ref(''),editing=ref(false),model=ref<any>({});
 const section=computed(()=>String(route.params.section||'overview'));
@@ -41,17 +43,28 @@ watch(()=>[route.query.edit,section.value,content.cases],()=>{if(route.query.edi
 function updatePassword(){const r=changePassword(newPassword.value);if(!r.ok)message.error(r.error||'修改失败');else{newPassword.value='';passwordModal.value=false;message.success('密码已更新');}}
 </script>
 <template>
- <section class="atlas-section">
-  <n-card v-if="!session.authenticated" title="管理员登录" style="max-width:460px;margin:32px auto">
-   <n-alert type="info" style="margin-bottom:20px">本地教学管理。初始账号 admin / admin123，已有账号继续有效。</n-alert>
-   <n-form @submit.prevent="signIn"><n-form-item label="账号"><n-input v-model:value="user" placeholder="管理员账号" autocomplete="username"/></n-form-item><n-form-item label="密码"><n-input v-model:value="password" type="password" placeholder="管理员密码" autocomplete="current-password" @keydown.enter.prevent="signIn"/></n-form-item><n-button type="primary" block @click="signIn">登录</n-button></n-form>
-  </n-card>
-  <template v-else><n-space justify="space-between" align="center"><h1>{{title}}</h1><n-space><n-button @click="passwordModal=true">修改密码</n-button><n-button @click="session.logout();router.push('/')">退出管理</n-button></n-space></n-space>
-   <n-menu mode="horizontal" :value="section" :options="options" @update:value="navigate" style="margin:20px 0"/>
-   <n-grid v-if="section==='overview'" cols="1 600:3" :x-gap="16" :y-gap="16"><n-gi><n-card><n-statistic label="案例" :value="content.cases.length"/></n-card></n-gi><n-gi><n-card><n-statistic label="业务场景" :value="content.atlas.allScenes.length"/></n-card></n-gi><n-gi><n-card><n-statistic label="智能方法" :value="Object.keys(content.atlas.methods).length"/></n-card></n-gi></n-grid>
-   <template v-else><n-space style="margin:20px 0"><n-input v-model:value="search" placeholder="搜索管理条目" clearable/><n-button v-if="section!=='cases'" type="primary" @click="edit()">新增条目</n-button><n-button v-else data-import>添加案例</n-button></n-space><n-data-table :columns="columns" :data="rows" :row-key="(r:any)=>r.id||r.key" :pagination="{pageSize:10}" :scroll-x="760"/></template>
+ <div class="page"><div class="wrap">
+  <Crumb :items="[['/','总览'],['','内容管理']]"/>
+  <template v-if="!session.authenticated">
+   <PageHead idx="ADMIN" title="内容管理登录" blurb="本地教学管理，数据保存在当前浏览器。"/>
+   <n-card class="adm-login" title="管理员登录">
+    <n-alert type="info" style="margin-bottom:16px">初始账号 admin / admin123，已有账号继续有效。</n-alert>
+    <n-form @submit.prevent="signIn"><n-form-item label="账号"><n-input v-model:value="user" placeholder="管理员账号" autocomplete="username"/></n-form-item><n-form-item label="密码"><n-input v-model:value="password" type="password" placeholder="管理员密码" autocomplete="current-password" @keydown.enter.prevent="signIn"/></n-form-item><n-button type="primary" block @click="signIn">登录</n-button></n-form>
+   </n-card>
   </template>
- </section>
+  <template v-else>
+   <PageHead idx="ADMIN" :title="title" blurb="案例元数据、智能方法与业务场景的本地管理；修改以浏览器覆盖层叠加在源数据上。">
+    <template #actions><n-button size="small" @click="passwordModal=true">修改密码</n-button><n-button size="small" @click="session.logout();router.push('/')">退出管理</n-button></template>
+   </PageHead>
+   <n-menu class="adm-menu" mode="horizontal" :value="section" :options="options" @update:value="navigate"/>
+   <div v-if="section==='overview'" class="adm-stats">
+    <router-link to="/admin/cases"><div class="n">{{ content.cases.length }}</div><div class="l">案例</div></router-link>
+    <router-link to="/admin/scenes"><div class="n">{{ content.atlas.allScenes.length }}</div><div class="l">业务场景</div></router-link>
+    <router-link to="/admin/methods"><div class="n">{{ Object.keys(content.atlas.methods).length }}</div><div class="l">智能方法</div></router-link>
+   </div>
+   <template v-else><div class="adm-tools"><n-input v-model:value="search" placeholder="搜索管理条目" clearable/><n-button v-if="section!=='cases'" type="primary" @click="edit()">新增条目</n-button><n-button v-else type="primary" data-import>添加案例</n-button></div><n-data-table size="small" :columns="columns" :data="rows" :row-key="(r:any)=>r.id||r.key" :pagination="{pageSize:10}" :scroll-x="760"/></template>
+  </template>
+ </div></div>
  <n-modal v-model:show="editing" preset="card" title="管理条目编辑" style="width:min(650px,94vw)"><n-form :model="model">
   <template v-if="section==='cases'"><n-form-item label="案例名称"><n-input v-model:value="model.title" :maxlength="40" placeholder="案例名称"/></n-form-item><n-form-item label="所属场景"><n-select v-model:value="model.sceneId" :options="sceneOptions" filterable/></n-form-item><n-form-item label="版本"><n-input v-model:value="model.version"/></n-form-item><n-form-item label="更新日期"><n-input v-model:value="model.updated"/></n-form-item></template>
   <template v-else><n-form-item :label="section==='methods'?'方法 ID':'场景 ID'"><n-input v-if="section==='methods'" v-model:value="model.key"/><n-input v-else v-model:value="model.id"/></n-form-item><n-form-item label="名称"><n-input v-model:value="model.name" placeholder="条目名称"/></n-form-item></template>

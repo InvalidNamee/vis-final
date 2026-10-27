@@ -102,3 +102,38 @@ test('production fallback, missing assets, and responsive layout',async({page,re
     await page.screenshot({path:`output/playwright/rop-${viewport.width}.png`});
   }
 });
+test('home dashboard: glance, chain, matrix and method panel',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');await expect(page.locator('main h1')).toBeVisible();
+  const stats=await page.evaluate(()=>window.Cases.stats());
+  await expect(page.locator('[data-glance="registered"]')).toContainText(String(stats.registered));
+  await expect(page.locator('[data-glance="demo"]')).toContainText(String(stats.withDemo));
+  await expect(page.locator('[data-glance="covered"]')).toContainText(String(stats.coveredScenes));
+  await expect(page.locator('.chain .step')).toHaveCount(13);
+  await expect(page.locator('table.matrix tbody tr')).toHaveCount(13);
+  await expect(page.locator('table.matrix tfoot tr')).toHaveCount(1);
+  await expect(page.locator('.methods .mcard')).toHaveCount(5);
+  await expect(page.getByRole('heading',{level:2})).toContainText(['作业环节链条','智能方法索引','方法与环节分布矩阵','系统分层结构']);
+  const cell=page.locator('table.matrix tbody tr').first().locator('td:not(.zero):not(.sum) a').first();
+  const href=await cell.getAttribute('href');expect(href).toMatch(/\/stage\/[^?]+\?m=\w+/);
+  await cell.click();await expect(page).toHaveURL(new RegExp(href!.replace('?','\\?')+'$'));
+  await expect(page.locator('.filters .chip.on[data-m]')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+test('stage pager, method grouping and wide/narrow overflow',async({page})=>{
+  await page.goto('/stage/drilling');
+  const next=page.locator('.pager a.next');await expect(next).toBeVisible();await next.click();
+  await expect(page).not.toHaveURL(/\/stage\/drilling$/);await expect(page.locator('main h1')).toContainText('环节的可智能化场景');
+  await page.goto('/method/cv');await expect(page.locator('main h1')).toContainText('在石油勘探开发中的可应用场景');
+  const groups=page.locator('.method-group');expect(await groups.count()).toBeGreaterThan(1);
+  const total=await page.evaluate(()=>(window as any).ATLAS.index.byMethod.cv.length);
+  await expect(page.locator('.method-group .atlas-scene-card')).toHaveCount(total);
+  for(const width of [320,390,768,1440]){
+    await page.setViewportSize({width,height:900});
+    for(const route of ['/','/chain','/stage/drilling','/method/cv','/cases','/admin','/scene/d1?tab=flow']){
+      await page.goto(route);await expect(page.locator('main h1').first()).toBeVisible();
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth),`${width}px ${route}`).toBeLessThanOrEqual(width+1);
+    }
+  }
+});

@@ -1,0 +1,74 @@
+/* 动效与可视化状态：入场、生长、路由切换、热力矩阵、十字高亮。
+   tokens.css 的 prefers-reduced-motion 规则会把动画与过渡压到 0。 */
+
+/* ---------------- 视口入场（vReveal） ---------------- */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease,ease) var(--rd,0ms),transform .5s cubic-bezier(.2,.7,.2,1) var(--rd,0ms)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------------- 比例条生长（StackBar） ---------------- */
+.grow-bar{display:flex}
+.grow-bar i{display:block;height:100%;transform-origin:left center;animation:bar-grow .7s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--gi,0) * 70ms + 180ms)}
+@keyframes bar-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* ---------------- 路由切换 ---------------- */
+.page-enter-active{animation:rise .32s cubic-bezier(.2,.7,.2,1) both}
+.page-leave-active{transition:opacity .12s ease}
+.page-leave-to{opacity:0}
+
+/* ---------------- 列表过渡（TransitionGroup name="list"） ---------------- */
+.list-enter-active{transition:opacity .24s ease,transform .24s cubic-bezier(.2,.7,.2,1)}
+.list-leave-active{transition:opacity .14s ease;position:absolute;left:0;right:0}
+.list-enter-from{opacity:0;transform:translateY(6px)}
+.list-leave-to{opacity:0}
+.list-move{transition:transform .26s cubic-bezier(.2,.7,.2,1)}
+.scenes{position:relative}
+
+/* ---------------- 链条：依次点亮 + 联动 ---------------- */
+.chain>li{list-style:none;min-width:0}
+ol.chain{margin:0;padding-left:0}
+.chain>li .step::before{animation:node-on .5s ease both;animation-delay:calc(var(--si,0) * 55ms + 120ms)}
+@keyframes node-on{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.25);opacity:1;border-color:var(--jade)}100%{transform:scale(1)}}
+.chain>li{animation:rise .45s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--si,0) * 40ms)}
+.step.on,.step:focus-visible{background:var(--card);border-color:var(--line);box-shadow:var(--sh-2);transform:translateY(-2px);outline:none}
+.step.on::before,.step:focus-visible::before{background:var(--jade);border-color:var(--jade);box-shadow:0 0 0 4px rgba(47,125,107,.13)}
+.step:focus-visible{box-shadow:0 0 0 2px var(--jade),var(--sh-2)}
+
+/* ---------------- 方法面板 ---------------- */
+.mcard .cnt{display:flex;align-items:baseline;gap:4px}
+.mcard .go{margin-left:auto;font-family:var(--mono);color:var(--ink-4);transition:transform .18s,color .18s}
+.mcard:hover .go,.mcard:focus-visible .go{transform:translateX(3px);color:var(--mc,var(--jade))}
+
+/* ---------------- 热力矩阵 ---------------- */
+table.matrix.heat td[data-l="1"]{background:rgba(47,125,107,.06)}
+table.matrix.heat td[data-l="2"]{background:rgba(47,125,107,.13)}
+table.matrix.heat td[data-l="3"]{background:rgba(47,125,107,.22)}
+table.matrix.heat td[data-l="4"]{background:rgba(47,125,107,.34)}
+table.matrix.heat td[data-l="5"]{background:rgba(47,125,107,.48)}
+table.matrix.heat td[data-l="4"] a,table.matrix.heat td[data-l="5"] a{color:var(--jade-d);font-weight:600}
+table.matrix.heat td{transition:background .16s,box-shadow .16s}
+table.matrix.heat td.sum a{color:var(--ink);font-weight:600}
+/* 十字高亮：行（tr.x）与列（.x） */
+table.matrix.heat tbody tr.x th{color:var(--jade-d);background:var(--jade-l)}
+table.matrix.heat tbody tr.x td,table.matrix.heat td.x{box-shadow:inset 0 0 0 999px rgba(178,106,57,.07)}
+table.matrix.heat thead th.x,table.matrix.heat tfoot td.x{color:var(--jade-d);background:var(--jade-l)}
+table.matrix.heat td a:hover,table.matrix.heat td a:focus-visible{color:#fff;background:var(--jade);font-weight:600;outline:none}
+table.matrix.heat tbody tr{animation:rise .4s cubic-bezier(.2,.7,.2,1) both}
+.heat-legend .k i{border:1px solid var(--line)}
+.heat-legend i[data-l="1"]{background:rgba(47,125,107,.06)}
+.heat-legend i[data-l="2"]{background:rgba(47,125,107,.13)}
+.heat-legend i[data-l="3"]{background:rgba(47,125,107,.22)}
+.heat-legend i[data-l="4"]{background:rgba(47,125,107,.34)}
+.heat-legend i[data-l="5"]{background:rgba(47,125,107,.48)}
+.heat-legend .k{gap:2px}
+.heat-legend .sep{color:var(--line-3)}
+
+/* ---------------- 案例面板切换 ---------------- */
+.panel-fade-enter-active{animation:rise .26s cubic-bezier(.2,.7,.2,1) both}
+
+/* ---------------- 环节抽屉 ---------------- */
+.stage-drawer{display:flex;flex-direction:column;gap:1px}
+.stage-drawer a{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;font-size:13px;color:var(--ink-2);transition:background .15s,color .15s}
+.stage-drawer a:hover{background:rgba(47,125,107,.07);color:var(--ink)}
+.stage-drawer a.on{background:var(--jade-l);color:var(--jade-d);font-weight:600}
+.stage-drawer .i{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+.stage-drawer .n{font-family:var(--mono);font-size:11px;color:var(--ink-4)}

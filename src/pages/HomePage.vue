@@ -1,28 +1,64 @@
-<script setup>
-import { computed, inject, ref } from 'vue';
-import { contentKey } from '../state';
-import SceneCard from '../components/SceneCard.vue';
-const state = inject(contentKey), search = ref('');
-const atlas = computed(() => state.atlas.value);
-const stats = computed(() => { state.atlas.value; state.cases.value; return state.host.Cases.stats(); });
-const results = computed(() => atlas.value.allScenes.filter(s => `${s.name} ${s.intro} ${s.point} ${s.stageName}`.toLowerCase().includes(search.value.trim().toLowerCase())));
-const drilling = computed(() => atlas.value.index.byStage.drilling);
-const selectedStageId = ref('drilling');
-const selectedStage = computed(() => atlas.value.index.byStage[selectedStageId.value] || drilling.value);
-const coverage = computed(() => atlas.value.allScenes.filter(s => state.host.Cases.byScene(s.id)).length);
-const ready = stage => stage.scenes.filter(s => state.host.Cases.byScene(s.id)).length;
+<script setup lang="ts">
+import {computed,ref} from 'vue';
+import {useAtlas} from '../composables/useAtlas';
+import {vReveal} from '../composables/useReveal';
+import SectionHead from '../components/layout/SectionHead.vue';
+import SceneRow from '../components/common/SceneRow.vue';
+import GlanceSpec from '../components/home/GlanceSpec.vue';
+import StageChain from '../components/home/StageChain.vue';
+import MethodPanel from '../components/home/MethodPanel.vue';
+import StageMethodMatrix from '../components/home/StageMethodMatrix.vue';
+import SystemLayers from '../components/home/SystemLayers.vue';
+const {atlas,caseStats}=useAtlas();
+const search=ref(''),hoverStage=ref('');
+const q=computed(()=>search.value.trim().toLowerCase());
+const results=computed(()=>q.value?atlas.value.allScenes.filter((s:any)=>`${s.name} ${s.intro} ${s.point} ${s.stageName}`.toLowerCase().includes(q.value)):[]);
+const firstDemo=computed(()=>atlas.value.allScenes.find((s:any)=>s.id==='d1')?.id||atlas.value.allScenes[0]?.id);
 </script>
 
-<template>
-  <section class="atlas-hero">
-    <div><span class="atlas-eyebrow">PETROLEUM INTELLIGENCE ATLAS</span><h1>石油勘探开发的<br><em>智能化可能性地图</em></h1><p>从石油业务出发，连接作业场景、智能方法与可运行案例。按环节浏览，按问题检索，在交互实验中理解方法与边界。</p><div class="atlas-actions"><router-link class="atlas-button primary" to="/stage/drilling">浏览钻井案例 <span>↗</span></router-link><router-link class="atlas-button" to="/cases">案例库</router-link></div></div>
-    <aside class="atlas-overview"><span class="atlas-eyebrow">案例覆盖</span><h2>全作业链教学案例</h2><p>合成数据 · 本地计算 · 原案例包协议</p><div class="atlas-large-number">{{ coverage }}<small> / {{ atlas.allScenes.length }}</small></div><div class="atlas-progress"><i :style="{width: `${coverage / Math.max(1,atlas.allScenes.length) * 100}%`}"></i></div><div class="atlas-overview-stats"><span><b>{{ atlas.stages.length }}</b>作业环节</span><span><b>{{ atlas.allScenes.length }}</b>业务场景</span><span><b>{{ stats.withDemo }}</b>可运行演示</span></div></aside>
-  </section>
-  <section class="atlas-section">
-    <div class="atlas-section-heading"><div><span class="atlas-eyebrow">SCENE EXPLORER</span><h2>业务场景检索</h2></div><label class="atlas-search"><span class="sr-only">搜索场景</span><n-input v-model:value="search" placeholder="搜索业务名称、参数或智能化方法…" clearable/></label></div>
-    <div v-if="search.trim()" class="atlas-scene-grid"><SceneCard v-for="scene in results" :key="scene.id" :scene="scene"/><p v-if="!results.length" class="atlas-empty">没有匹配的场景，可尝试其他关键词。</p></div>
-    <template v-else><div class="atlas-section-caption atlas-spotlight"><h3>环节案例</h3><n-select aria-label="案例所属环节" v-model:value="selectedStageId" :options="atlas.stages.map(s=>({label:s.name,value:s.id}))" style="width:180px"/><router-link :to="`/stage/${selectedStage?.id}`">{{ selectedStage?.name }}全部场景 →</router-link></div><div class="atlas-scene-grid"><SceneCard v-for="scene in selectedStage?.scenes || []" :key="scene.id" :scene="scene"/></div></template>
-  </section>
-  <section class="atlas-section"><div class="atlas-section-heading"><div><span class="atlas-eyebrow">OPERATIONS</span><h2>石油作业环节</h2></div><span class="atlas-muted">覆盖勘探、建井、生产与加工</span></div><div class="atlas-stage-grid"><router-link v-for="stage in atlas.stages" :key="stage.id" :to="`/stage/${stage.id}`" class="atlas-stage-card"><span class="atlas-code">{{ String(stage.idx).padStart(2, '0') }} / {{ stage.en }}</span><h3>{{ stage.name }}<span>→</span></h3><p>{{ stage.blurb }}</p><div><span>{{ stage.scenes.length }} 个场景</span><span>{{ ready(stage) }} 已接入</span></div></router-link></div></section>
-  <section class="atlas-section"><div class="atlas-section-heading"><div><span class="atlas-eyebrow">METHODS</span><h2>智能方法索引</h2></div></div><div class="atlas-method-grid"><router-link v-for="(method,key) in atlas.methods" :key="key" :to="`/method/${key}`"><span class="atlas-code">{{ method.abbr }}</span><h3>{{ method.name }}</h3><p>{{ method.desc }}</p><b>{{ (atlas.index.byMethod[key] || []).length }} 个适配场景 →</b></router-link></div></section>
-</template>
+<template><div class="page home">
+  <section class="hero"><div class="wrap"><div class="hero-grid">
+    <div class="hero-main">
+      <div class="hero-top rise d1">
+        <span class="hero-badge">{{ atlas.meta.version }} · {{ atlas.allScenes.length }} 个候选场景</span>
+        <span class="hero-badge alt">案例系统 · {{ caseStats.registered }} 个已接入</span>
+      </div>
+      <h1 class="rise d2">石油勘探开发的<em>智能化</em><br>可能性地图</h1>
+      <p class="hero-lead rise d3">把整条作业链拆成 {{ atlas.allScenes.length }} 个候选场景，逐个说明哪一步适合引入算法、需要准备什么数据、难点在哪里。每个场景配有专业背景、案例流程和可在浏览器中运行的教学演示。</p>
+      <div class="hero-note rise d3"><p><b>场景元数据、案例内容与可运行演示三者分离。</b>新增案例只需提交一个案例包，导航、检索与统计会自动接入。</p></div>
+      <label class="hero-search rise d4"><span class="sr-only">搜索场景</span><n-input v-model:value="search" placeholder="搜索业务名称、参数或智能化方法…" clearable round><template #prefix><span class="mono hs-k">SEARCH</span></template></n-input></label>
+      <div class="hero-acts rise d5">
+        <router-link class="btn primary" to="/chain">浏览完整作业链 <span class="ar">→</span></router-link>
+        <router-link class="btn" :to="`/scene/${firstDemo}?tab=demo`">打开一个可运行演示</router-link>
+      </div>
+    </div>
+    <GlanceSpec class="rise d3"/>
+  </div></div></section>
+
+  <section v-if="q" class="section tight"><div class="wrap">
+    <div class="sub-head"><span class="kicker">SEARCH</span><h2>场景检索结果</h2><p>“{{ search.trim() }}” 匹配 {{ results.length }} 个场景，检索范围包括名称、业务背景、介入点与所属环节。</p></div>
+    <TransitionGroup tag="div" name="list" class="scenes"><SceneRow v-for="s in results" :key="s.id" :scene="s" show-stage/></TransitionGroup>
+    <div v-if="!results.length" class="empty"><b>没有匹配的场景</b>可换用环节名、方法名或更短的关键词。</div>
+  </div></section>
+
+  <section class="section" v-reveal><div class="wrap">
+    <SectionHead num="01" kicker="BY STAGE" title="作业环节链条" sub="沿作业链从上游到下游排列，节点下方色条表示该环节的方法构成；悬停时下方矩阵同步高亮对应行。"><router-link class="btn sm ghost" to="/chain">完整链条 →</router-link></SectionHead>
+    <StageChain :active="hoverStage" @hover="hoverStage=$event"/>
+  </div></section>
+
+  <section class="section" v-reveal><div class="wrap">
+    <SectionHead num="02" kicker="BY METHOD" title="智能方法索引" sub="从已有技术方向反查跨环节的适用场景，进入后按环节分组列出。"/>
+    <MethodPanel/>
+  </div></section>
+
+  <section class="section" v-reveal><div class="wrap">
+    <SectionHead num="03" kicker="MATRIX" title="方法与环节分布矩阵" sub="格内数字为该环节中使用该方法的场景数，颜色越深场景越多，空白处是尚未覆盖的组合。点击格子带筛选条件进入环节页。"/>
+    <StageMethodMatrix :active="hoverStage" @hover="hoverStage=$event"/>
+  </div></section>
+
+  <section class="section" v-reveal><div class="wrap">
+    <SectionHead num="04" kicker="SYSTEM" clay title="系统分层结构" sub="新增案例只涉及第二层的一个文件夹，外壳与数据层无需改动。"><router-link class="btn primary sm" to="/guide">接入指南 →</router-link></SectionHead>
+    <SystemLayers/>
+    <div class="sys-acts"><router-link class="btn" to="/cases">案例库与校验结果 →</router-link><button class="btn ghost" type="button" data-import>＋ 添加案例</button></div>
+  </div></section>
+</div></template>

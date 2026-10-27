@@ -1,0 +1,12 @@
+/* Naive UI 局部修正：颜色和尺寸主要由 src/theme.ts 的 themeOverrides 控制 */
+.n-button{flex-shrink:0}
+.n-input .n-input__input-el,.n-input .n-input__textarea-el{font-family:var(--sans)}
+.n-tabs.scene-tabs .n-tabs-tab{padding:10px 4px;font-size:16px}
+.n-tabs.scene-tabs .n-tabs-tab .tab-no{font-size:12px}
+.n-tabs.scene-tabs .n-tabs-nav{border-bottom:1px solid var(--line-2)}
+.n-pagination .n-pagination-size-picker{min-width:110px}
+.n-pagination{flex-wrap:wrap;row-gap:8px}
+.n-data-table{--n-th-font-weight:500}
+.n-card{box-shadow:var(--sh-1)}
+.n-drawer .n-drawer-header__main{font-size:14px;font-weight:650}
+.n-menu.n-menu--horizontal{line-height:40px}
