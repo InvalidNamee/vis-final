@@ -11,42 +11,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "射孔效果通常需结合试井或产量压差资料解释。正表皮提示井筒附近流动受限，却可能来自损害、部分打开或射孔等多种原因。本例从多级压差—流量点反求教学产能指数与表皮，显示噪声带来的不确定性，再比较目标表皮情景的响应。",
+      "lede": "射孔后评价需要把多级压差与流量记录转成可比较的近井流动指标。AI评估流程以最小二乘反演作为可解释基线，自动估计产能指数与表皮，向试井和射孔工程师交付拟合曲线、误差区间及目标表皮情景对照。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，非现场实测"
+          "label": "任务类型",
+          "value": "产能参数反演",
+          "desc": "AI流程以压差流量回归估计产能指数与表皮",
+          "html": "<span style=\"color:var(--c-ts)\">产能参数反演</span>"
         },
         {
-          "label": "实际方法",
-          "value": "表皮与区间反演",
-          "desc": "浏览器计算，详见模型与流程"
+          "label": "数据门槛",
+          "value": "15—25 组测试",
+          "desc": "稳定压差、流量与已知渗流能力kh"
         },
         {
-          "label": "工程边界",
-          "value": "辅助教学",
-          "desc": "不构成施工、设备控制或安全结论"
+          "label": "收益",
+          "value": "29.18 → 0.86 m³/d",
+          "desc": "同7个留出点流量MAE，训练均值基线对照压差拟合",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">29.18 → 0.86 m³/d</b>"
+        },
+        {
+          "label": "难度",
+          "value": "中",
+          "desc": "稳定测试点筛选与kh误差决定反演可信程度",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
           "en": "PROBLEM",
-          "title": "射孔效果智能评估业务背景",
-          "html": "<p>射孔效果通常需结合试井或产量压差资料解释。正表皮提示井筒附近流动受限，却可能来自损害、部分打开或射孔等多种原因。本例从多级压差—流量点反求教学产能指数与表皮，显示噪声带来的不确定性，再比较目标表皮情景的响应。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"压差试验与拟合，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"压差试验与拟合\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>压差试验与拟合</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-5.45</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">2</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">14.31</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">4.5</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">34.07</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">7</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">53.83</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">9.5</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">73.59</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">12</text><circle cx=\"124\" cy=\"220.15751493721632\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"151.05\" cy=\"213.30793784060685\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"178.1\" cy=\"201.42363539676964\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"205.15\" cy=\"200.04794426949374\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"232.2\" cy=\"188.73884943471543\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"259.25\" cy=\"180.01442761737962\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"286.3\" cy=\"173.44757703957436\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"313.35\" cy=\"163.3689098812821\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"340.4\" cy=\"158.5589693009194\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"367.45\" cy=\"148.45703369163365\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"394.5\" cy=\"142.7776542487535\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"421.55\" cy=\"132.98954152752847\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"448.6\" cy=\"127.32606750911103\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"475.65\" cy=\"119.63664880319632\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"502.7\" cy=\"116.25424340452815\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"529.75\" cy=\"104.85786679432886\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"556.8\" cy=\"96.00289465513418\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"583.85\" cy=\"92.88879921429015\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"610.9\" cy=\"78.6376143004349\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"637.95\" cy=\"76.06647332314839\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><polyline fill=\"none\" stroke=\"#7659a8\" stroke-width=\"2.5\" points=\"124,219.31910205635498 665,65.0525433726126\"/><circle cx=\"124\" cy=\"219.31910205635498\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"65.0525433726126\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">压差 / MPa</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">流量 / m³/d</text></g></svg></div><figcaption>压差流量直线及留出残差揭示拟合程度；多个物理机制可产生同一斜率，所以拟合好不能直接证明补孔一定有效。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>拟合样本 · 留出点 · 反演直线；横轴：压差 / MPa；纵轴：流量 / m³/d。</p></figure>"
+          "title": "射孔效果评估业务问题",
+          "html": "<p>试井资料有限，多数井只有生产数据；人工判断低效射孔段缺乏定量依据。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"压差试验与拟合\"><title>压差试验与拟合</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-5.45</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">2</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">14.31</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">4.5</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">34.07</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">7</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">53.83</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">9.5</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">73.59</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">12</text><circle cx=\"124\" cy=\"220.15751493721632\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"151.05\" cy=\"213.30793784060685\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"178.1\" cy=\"201.42363539676964\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"205.15\" cy=\"200.04794426949374\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"232.2\" cy=\"188.73884943471543\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"259.25\" cy=\"180.01442761737962\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"286.3\" cy=\"173.44757703957436\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"313.35\" cy=\"163.3689098812821\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"340.4\" cy=\"158.5589693009194\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"367.45\" cy=\"148.45703369163365\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"394.5\" cy=\"142.7776542487535\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"421.55\" cy=\"132.98954152752847\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"448.6\" cy=\"127.32606750911103\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"475.65\" cy=\"119.63664880319632\" r=\"3\" fill=\"#267d70\" fill-opacity=\".8\"/><circle cx=\"502.7\" cy=\"116.25424340452815\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"529.75\" cy=\"104.85786679432886\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"556.8\" cy=\"96.00289465513418\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"583.85\" cy=\"92.88879921429015\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"610.9\" cy=\"78.6376143004349\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"637.95\" cy=\"76.06647332314839\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><polyline fill=\"none\" stroke=\"#7659a8\" stroke-width=\"2.5\" points=\"124,219.31910205635498 665,65.0525433726126\"/><circle cx=\"124\" cy=\"219.31910205635498\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"65.0525433726126\" r=\"3\" fill=\"#7659a8\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">压差 / MPa</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">流量 / m³/d</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>压差流量直线及留出残差揭示拟合程度；多个物理机制可产生同一斜率，所以拟合好不能直接证明补孔一定有效。图中是初始参数的固定种子教学计算，交互演示可重新计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "多级压差表皮反演计算方法",
-          "html": "<p>生成21个教学压差点，前14拟合、后7留出。；通过原点最小二乘拟合q=JΔp。；用已知教学kh与固定几何项7反求表皮，以残差平方和/(n−1)估计零截距回归方差，近似传播斜率误差。；固定比较压差展示当前与目标表皮情景产量，不做现场补孔决策。</p><p>21个虚拟多级压差点，前14拟合、后7评价。拟合q=JΔp，再用J=kh/(7+s)反演；kh项含单位换算的教学缩放。地层损害、部分打开和射孔均能影响表皮，反演不能唯一归因射孔。</p>"
+          "en": "INTERVENTION",
+          "title": "压差流量拟合与表皮反演",
+          "html": "<p>射孔效果评价需要把不同压差下的流量放到同一尺度比较，识别近井流动阻力的变化。AI评估流程采用统计反演作为可解释基线，用通过原点的最小二乘拟合产能指数，再结合给定渗流能力kh与几何项反求表皮。算法同时计算残差和斜率误差传播，使工程师看到参数估计以及测量波动带来的变化范围。</p><p>拟合样本 · 留出点 · 反演直线；横轴：压差 / MPa；纵轴：流量 / m³/d。</p><p>一次计算交付产能指数、表皮估计及近似区间、留出点误差和逐点残差，减少手工拟合后再换算表皮的重复工作。模型还在同一比较压差下列出当前估计产量与目标表皮情景产量，帮助工程师讨论流动阻力变化的影响。拟合曲线与残差明细共同保留证据，便于核对哪些测试点推动了参数估计变化。</p><p><b>默认教学计算用前14个压差点的流量均值29.73立方米/日作为固定预测基线，在后7个留出点上的流量MAE为29.18立方米/日。以压差拟合产能指数后，同7个点的流量MAE降至0.86立方米/日，减少约97.1%。</b></p>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "评价边界与专业资料",
-          "html": "<p>表皮=kh/J−7；测试MAE只在留出点计算。近似1.96区间假定kh精确、独立同方差残差，未覆盖地质参数误差。</p><p>简化稳态线性关系忽略多相流、非达西、压力恢复和层间贡献；测试是同一虚拟井的压差点，不能称跨井泛化。表皮不能唯一归因射孔。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://glossary.slb.com/terms/s/skin\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：表皮</a>：支持表皮为产能效率无量纲因子及正负含义，不支持表皮可唯一归因射孔。</li><li><a href=\"https://www.slb.com/-/media/files/oilfield-review/p54-69\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：射孔策略</a>：支持孔密相位穿深、损害带及表皮的定性联系，不支持教学代理系数或收益。</li></ul>"
+          "en": "DATA",
+          "title": "稳定测试点与渗流参数",
+          "html": "<p style=\"margin-bottom:14px\">试点取得15—25组多级稳定测试点，整理对应压差、流量、稳定时段与测试编号，并配套可追溯的kh估计。反演直接拟合连续观测，无需人工表皮分类标签，关键是同组压差与流量来自一致工况。本例使用21个教学压差点，前14点拟合、后7点评价，以给定kh和固定几何项展示参数反演流程。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">生产数据</span><span class=\"cl-s\">产量、压力、含水</span></span><span class=\"cl-n\">单井 1000—10000 点</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">射孔记录</span><span class=\"cl-s\">层段、孔密、相位</span></span><span class=\"cl-n\">作为输入</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">试井解释</span><span class=\"cl-s\">表皮系数</span></span><span class=\"cl-n\">少量真值</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">稳定压差、流量与已知渗流能力kh</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://glossary.slb.com/terms/s/skin\">SLB：表皮<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://www.slb.com/-/media/files/oilfield-review/p54-69\">SLB：射孔策略<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "测试稳定性与表皮归因",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">稳定测试点筛选与kh误差决定反演可信程度</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>主要障碍是压差点尚未稳定、流量波动或kh估计偏差都会改变反演表皮，数据整理应先筛选稳定测试时段并核对压差基准。表皮反映综合近井流动阻力，地层损害、部分打开和射孔因素都可能贡献。工程复核需要结合完井与试井资料辨认原因，并检查高压差点残差是否系统变化，以判断线性关系的适用程度。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/ts\">反演<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/ts\">生产数据分析<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/ts\">不确定性量化<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

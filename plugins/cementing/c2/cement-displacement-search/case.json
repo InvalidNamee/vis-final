@@ -10,42 +10,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "注水泥时既要顶替泥浆形成连续水泥环，又要避免循环压力超过地层承受窗口。高排量可能改善顶替，却增加摩阻与ECD；密度增加又会改变静液柱。本例用明确的教学响应面同时画出这两种作用，在密度下界与ECD上界间比较候选，展示约束对推荐的决定作用。",
+      "lede": "注水泥设计需要同时选择浆体密度和排量，兼顾泥浆顶替与地层压力窗口。AI优化流程中的约束搜索自动比较900组参数，向固井设计人员交付可行组合、推荐密度排量及对应ECD。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，非现场实测"
+          "label": "任务类型",
+          "value": "约束参数搜索",
+          "desc": "AI流程以响应面计算顶替表现并筛选密度与排量",
+          "html": "<span style=\"color:var(--c-opt)\">约束参数搜索</span>"
         },
         {
-          "label": "实际方法",
-          "value": "ECD与顶替代理计算",
-          "desc": "浏览器计算，详见模型与流程"
+          "label": "数据门槛",
+          "value": "10—20 组工况",
+          "desc": "压力窗、环空间隙、居中度及循环记录"
         },
         {
-          "label": "工程边界",
-          "value": "辅助教学",
-          "desc": "不构成施工、设备控制或安全结论"
+          "label": "收益",
+          "value": "900 → 386 组",
+          "desc": "密度与排量组合经压力窗口约束筛出386组",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">900 → 386 组</b>"
+        },
+        {
+          "label": "难度",
+          "value": "中",
+          "desc": "压力窗口与摩阻响应的标定决定可行范围",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
           "en": "PROBLEM",
-          "title": "注水泥参数优化业务背景",
-          "html": "<p>注水泥时既要顶替泥浆形成连续水泥环，又要避免循环压力超过地层承受窗口。高排量可能改善顶替，却增加摩阻与ECD；密度增加又会改变静液柱。本例用明确的教学响应面同时画出这两种作用，在密度下界与ECD上界间比较候选，展示约束对推荐的决定作用。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"排量响应与压力窗，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"排量响应与压力窗\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>排量响应与压力窗</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-0.18</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">0.5</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">0.46</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">1.38</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">1.11</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">2.25</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">1.75</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">3.13</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">2.39</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">4</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,107.05805325185506 139.45714285714286,106.76311030741408 154.9142857142857,106.41454137307471 170.37142857142857,106.01234644883704 185.82857142857142,105.55652553470097 201.28571428571428,105.04707863066653 216.74285714285713,104.48400573673376 232.2,103.86730685290263 247.65714285714284,103.19698197917313 263.1142857142857,102.47303111554527 278.57142857142856,101.69545426201904 294.02857142857147,100.86425141859445 309.48571428571427,99.97942258527152 324.9428571428572,99.0409677620502 340.4,98.04888694893054 355.8571428571429,97.00318014591255 371.3142857142857,95.90384735299617 386.7714285714286,94.75088857018142 402.2285714285714,93.54430379746833 417.68571428571425,92.28409303485685 433.14285714285717,90.97025628234704 448.6,89.60279353993883 464.0571428571429,88.18170480763234 479.5142857142857,86.7069900854274 494.97142857142853,85.17864937332413 510.42857142857144,83.59668267132253 525.8857142857144,81.96108997942255 541.3428571428572,80.27187129762422 556.8,78.52902662592751 572.2571428571428,76.73255596433248 587.7142857142858,74.88245931283902 603.1714285714286,72.97873667144725 618.6285714285714,71.02138804015709 634.0857142857143,69.0104134189686 649.5428571428571,66.94581280788174 665,64.82758620689654\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,95.15978674315642 665,95.15978674315642\"/><circle cx=\"124\" cy=\"95.15978674315642\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"95.15978674315642\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">排量 / m³/min</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">ECD / g/cm³</text></g></svg></div><figcaption>ECD曲线随排量向上弯曲；候选散点中顶替代理较高的点也可能越过压力上界。绿色区域只代表用户给定教学窗。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>当前密度ECD · 破裂边界；横轴：排量 / m³/min；纵轴：ECD / g/cm³。</p></figure>"
+          "title": "注水泥参数优化业务问题",
+          "html": "<p>设计多沿用邻井经验，遇到窄密度窗口（孔隙压力与破裂压力接近）时容易漏失或留窜槽。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"排量响应与压力窗\"><title>排量响应与压力窗</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-0.18</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">0.5</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">0.46</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">1.38</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">1.11</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">2.25</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">1.75</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">3.13</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">2.39</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">4</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,107.05805325185506 139.45714285714286,106.76311030741408 154.9142857142857,106.41454137307471 170.37142857142857,106.01234644883704 185.82857142857142,105.55652553470097 201.28571428571428,105.04707863066653 216.74285714285713,104.48400573673376 232.2,103.86730685290263 247.65714285714284,103.19698197917313 263.1142857142857,102.47303111554527 278.57142857142856,101.69545426201904 294.02857142857147,100.86425141859445 309.48571428571427,99.97942258527152 324.9428571428572,99.0409677620502 340.4,98.04888694893054 355.8571428571429,97.00318014591255 371.3142857142857,95.90384735299617 386.7714285714286,94.75088857018142 402.2285714285714,93.54430379746833 417.68571428571425,92.28409303485685 433.14285714285717,90.97025628234704 448.6,89.60279353993883 464.0571428571429,88.18170480763234 479.5142857142857,86.7069900854274 494.97142857142853,85.17864937332413 510.42857142857144,83.59668267132253 525.8857142857144,81.96108997942255 541.3428571428572,80.27187129762422 556.8,78.52902662592751 572.2571428571428,76.73255596433248 587.7142857142858,74.88245931283902 603.1714285714286,72.97873667144725 618.6285714285714,71.02138804015709 634.0857142857143,69.0104134189686 649.5428571428571,66.94581280788174 665,64.82758620689654\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,95.15978674315642 665,95.15978674315642\"/><circle cx=\"124\" cy=\"95.15978674315642\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"95.15978674315642\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">排量 / m³/min</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">ECD / g/cm³</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>ECD曲线随排量向上弯曲；候选散点中顶替代理较高的点也可能越过压力上界。绿色区域只代表用户给定教学窗。图中是初始参数的固定种子教学计算，交互演示可重新计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "浆体密度与排量约束搜索计算方法",
-          "html": "<p>指定环空间隙、居中度及两条当量密度边界。；枚举25种浆体密度和36种排量，不外推范围。；分别计算密度加平方摩阻项与饱和顶替响应。；过滤越界候选，再最大化顶替代理减排量惩罚。</p><p>教学经验响应面，不是标定水力学或实际顶替效率。ECD采用简化排量平方摩阻项；破裂当量密度与孔隙压力由用户指定。</p>"
+          "en": "INTERVENTION",
+          "title": "密度排量搜索与压力约束",
+          "html": "<p>注水泥排量增加会改变泥浆顶替表现，同时抬高环空摩阻与当量循环密度，浆体密度又影响静液柱压力。AI方案筛选在这里采用可解释的响应面与网格搜索作为约束计算环节，逐一评价25种密度与36种排量。算法保留满足密度下界和ECD上界的组合，再按顶替代理与排量代价排序，让参数取舍有明确依据。</p><p>当前密度ECD · 破裂边界；横轴：排量 / m³/min；纵轴：ECD / g/cm³。</p><p>一次计算覆盖900组密度排量组合，交付每组ECD、顶替代理、约束通过状态和排序结果，减少设计人员逐点试算与重复核对压力窗的工作。当前方案与推荐方案可在同一响应曲线上比较，便于解释排量增加的收益与压力代价。若给定窗口内无可行组合，结果会直接呈现参数与边界的冲突，供设计人员调整方案。</p><p><b>默认教学搜索比较25档密度与36档排量，共900组参数，其中386组同时满足密度下界和ECD上界。排序首位为密度1.725克/立方厘米、排量1.9立方米/分钟，对应ECD为1.841克/立方厘米。</b></p>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "评价边界与专业资料",
-          "html": "<p>可行组合数直接计数；推荐目标=顶替代理−0.015Q²。展示当前与推荐ECD，不预填真实顶替提升。</p><p>未计算真实非牛顿流变、温压密度、浆柱分段、窄边窜流或漏失起裂；0.03密度裕度完全是教学设定。无解时保留无可行结果。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://glossary.slb.com/en/terms/c/cementing\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：固井</a>：支持固井前根据井径、密度和流变设计水泥浆体积与性能，不支持本例效率公式或压力窗数字。</li><li><a href=\"https://glossary.slb.com/terms/c/centralizer\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：扶正器</a>：支持偏心导致泥浆通道与封隔问题，不支持本例挠曲系数或安放方案。</li></ul>"
+          "en": "DATA",
+          "title": "井况参数与响应面标定",
+          "html": "<p style=\"margin-bottom:14px\">试点准备10—20组覆盖目标井段压力窗的循环工况，整理孔隙与破裂当量密度、环空间隙、套管居中度及密度排量记录。排量变化时的压力响应可用于核对摩阻项，顶替评价资料可用于校准响应面。该方法以工程约束和连续响应为输入，无需人工优劣分类标签；本例使用明确给定的教学经验响应面演示搜索。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">井况数据</span><span class=\"cl-s\">井径、温度、压力窗口</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">施工记录</span><span class=\"cl-s\">密度、排量、返高</span></span><span class=\"cl-n\">数百井次</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">施工结果</span><span class=\"cl-s\">CBL 评价与漏失情况</span></span><span class=\"cl-n\">作为标签</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">压力窗、环空间隙、居中度及循环记录</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://glossary.slb.com/en/terms/c/cementing\">SLB：固井<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://glossary.slb.com/terms/c/centralizer\">SLB：扶正器<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "压力窗口与流动响应差异",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">压力窗口与摩阻响应的标定决定可行范围</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>主要难点是压力窗口较窄时，摩阻项的小幅变化就会使候选方案跨过边界；环空间隙和居中度也会改变顶替表现。项目应优先核对压力资料的深度基准与密度单位，并用循环记录检查不同排量下的压力变化。搜索目标中的顶替收益与排量惩罚还需结合施工偏好设定，避免仅凭单项顶替代理选择高排量方案。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">代理模型<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">约束优化<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">水力计算耦合<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

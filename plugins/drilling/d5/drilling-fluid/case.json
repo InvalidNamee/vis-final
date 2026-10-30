@@ -12,53 +12,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "钻井液流变性能影响流动阻力和岩屑输送，处理剂作用又随温度和固相状态改变。小试记录可用于建立轻量代理模型，比较性能窗口内的加剂方案，减少只凭单一性能调节的盲目性。",
+      "lede": "钻井液处理剂会同时改变塑性黏度和动切力，逐个试配容易忽略两项性能之间的牵制。AI 从批次小试学习加剂响应，批量筛选同时落入目标窗口的配方，并按加剂成本排序，帮助泥浆工程师缩小复试范围。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子，可导出核查"
+          "label": "任务类型",
+          "value": "双输出回归与配方优化",
+          "desc": "同时预测塑性黏度 PV 和动切力 YP",
+          "html": "<span style=\"color:var(--c-ts)\">双输出回归与配方优化</span>"
         },
         {
-          "label": "方法类型",
-          "value": "双输出回归与配方搜索",
-          "desc": "纯前端轻量计算"
+          "label": "数据门槛",
+          "value": " 20—30 批小试",
+          "desc": "配方、温度、固相与流变仪结果"
         },
         {
-          "label": "输出用途",
-          "value": "教学比较",
-          "desc": "不连接设备与现场系统"
+          "label": "收益",
+          "value": "2.51 → 0.38",
+          "desc": "独立测试批次 PV 的 MAE，mPa·s",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">2.51 → 0.38</b>"
         },
         {
-          "label": "评价边界",
-          "value": "合成任务",
-          "desc": "不声称真实工程收益"
+          "label": "难度",
+          "value": "中",
+          "desc": "批次、温度与加剂时序影响流变响应",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
-          "en": "BUSINESS",
-          "title": "钻井液流变性能与处理剂",
-          "html": "<p>本例使用 Bingham 近似：剪切应力 τ=YP+PV×剪切速率。PV 为塑性黏度，表示屈服后的斜率；YP 为动切力，对应截距。PV 用 mPa·s、YP 用 Pa。实际钻井液可能需要幂律或 Herschel–Bulkley 模型，本例不将 Bingham 近似作为通用规律。</p><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"钻井液流变性能与处理剂\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">循环状态与小试</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">温度 / 固相 / 剂量</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">PV 与 YP</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">黏度斜率 / 屈服截距</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">目标性能窗口</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">相对成本最小配方</text></svg></div><figcaption class=\"figcap\">业务关系示意，不是测量结果。窄屏可在图内横向滚动。</figcaption></figure>"
+          "en": "PROBLEM",
+          "title": "钻井液性能调控业务问题",
+          "html": "<p>测量间隔长（每班 1—2 次），性能变化滞后于井下实际；处理剂加量靠经验，常出现&quot;过调&quot;再&quot;回调&quot;的振荡。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"钻井液流变性能与处理剂\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">循环状态与小试</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">温度 / 固相 / 剂量</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">PV 与 YP</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">黏度斜率 / 屈服截距</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">目标性能窗口</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">相对成本最小配方</text></svg></div><div class=\"figcap\"><b>图 1</b><span>业务关系示意，不是测量结果。窄屏可在图内横向滚动。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "双输出回归与配方搜索",
-          "html": "<p>使用温度、固相、两类处理剂和处理剂交互项，分别训练预测 PV、YP 的岭回归；验证批次选择正则强度。固定循环状态时搜索 961 个剂量组合，先判断两项性能是否均在目标窗口，再按人为设定的相对加剂成本排序。无解时保留无解结果，避免给出不满足目标的配方。</p>"
+          "en": "INTERVENTION",
+          "title": "流变预测与配方筛选",
+          "html": "<p>塑性黏度 PV 反映屈服后流动阻力，动切力 YP 反映启动流动所需的应力。AI 以温度、固相和两类处理剂用量为输入，分别回归预测 PV 与 YP，再搜索同时满足两项上下限的加量组合。本例用岭回归学习加剂与交互项，把性能预测接到配方比较这一具体工作上。</p><p>收益是把大量配方的逐次试凑压缩成少量候选复试。演示在固定温度与固相条件下比较 961 组加剂组合，筛出同时满足 PV、YP 目标的配方，再按相对成本给出推荐。泥浆工程师可查看可行区、推荐加量和两项预测值，优先复试邻近目标且用量较低的组合。</p><p><b>默认演示中，塑性黏度 PV 的测试 MAE 从均值基线 2.51 降至 0.38 mPa·s；动切力 YP 的 MAE 从 3.20 降至 0.30 Pa。模型进一步筛选 961 组配方，使复试聚焦双性能目标窗口内的组合。</b></p>"
         },
         {
           "no": 3,
           "en": "DATA",
-          "title": "数据准备与评价切分",
-          "html": "<p>种子 20261026，18 批、每批 10 条，共 180 条教学小试。前 12 批训练，3 批验证，3 批测试，各批互斥。温度 30–110 °C、固相 2–8%、两剂 0–3 归一化单位均为教学范围。现场应关联配方、批次、测量温度、流变仪读数和处理剂加量时序；本例只处理静态小试记录，没有模拟循环时延。</p>"
+          "title": "批次小试与性能标签",
+          "html": "<p style=\"margin-bottom:14px\">试点准备 20—30 批小试，每批记录基浆配方、处理剂、加量、温度、固相、搅拌及静置时间，并关联流变仪读数。按批次保留独立的验证资料，避免同一基浆样品同时参与拟合和评价。演示提供 18 批、180 条合成记录，按 12 批训练、3 批验证、3 批测试划分。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">钻井液性能测量</span><span class=\"cl-s\">密度、黏度、滤失、含砂</span></span><span class=\"cl-n\">每班 1—2 次，样本稀疏</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">循环与返出参数</span><span class=\"cl-s\">流量、温度、压力</span></span><span class=\"cl-n\">高频</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">处理剂加量记录</span><span class=\"cl-s\">类型、加量、时间</span></span><span class=\"cl-n\">作为动作标签</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">配方、温度、固相与流变仪结果</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://glossary.slb.com/en/terms/b/bingham_plastic_model\">SLB：Bingham plastic model<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://glossary.slb.com/en/terms/r/rheological_property\">SLB：rheological property<span class=\"ar\">↗</span></a></div>"
         },
         {
           "no": 4,
-          "en": "LIMITS",
-          "title": "模型适用范围与工程约束",
-          "html": "<p>没有预测密度、滤失、ECD 或化学相容性，不能称全性能闭环调控。归一化剂量和成本不对应现场浓度或金额；点击应用是替换假想配方，不是向已有体系连续加药。训练与测试共用人工响应机制，高评分不能证明真实配方优化收益。</p><p>专业资料与方法来源：</p><ul><li><a href=\"https://glossary.slb.com/en/terms/b/bingham_plastic_model\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：Bingham plastic model</a>：支持两参数流变模型及 PV/YP 含义，不支持本例加剂响应系数和窗口。</li><li><a href=\"https://glossary.slb.com/en/terms/r/rheological_property\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：rheological property</a>：支持多种流变模型及测量背景，不应将 Bingham 模型用于所有钻井液。</li></ul>"
+          "en": "DIFFICULTY",
+          "title": "批次差异与循环时延",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">批次、温度与加剂时序影响流变响应</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>落地难度中，主要障碍是同一加量在不同基浆、温度和混合时间下得到不同响应。数据记录应把批次与加剂时序补齐，复试时检查两项性能是否同时达标。后续可将配方候选与密度、滤失和循环条件联合比较，使性能窗口和实际处理要求保持一致。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/ts\">多源融合<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/ts\">软测量<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/ts\">推荐系统<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

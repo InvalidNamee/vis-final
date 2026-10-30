@@ -11,48 +11,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "压裂排量与支撑剂量同时影响裂缝延伸和施工压力。对紧砂岩单段，在教学成本和压力约束内比较不同组合，帮助解释产能代理值与可行域的区别。",
+      "lede": "压裂设计需要同时比较排量、砂量、施工压力和费用，手动调整参数容易漏掉可行组合。AI辅助优化流程用约束网格搜索自动筛选排量与砂量，向压裂工程师交付预算和压力范围内的候选组合、参数响应曲线及比选表。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "固定种子教学合成",
-          "desc": "不混用现场资料与合成数值"
+          "label": "任务类型",
+          "value": "约束参数搜索",
+          "desc": "在预算与压力上限内比较排量、砂量组合",
+          "html": "<span style=\"color:var(--c-opt)\">约束参数搜索</span>"
         },
         {
-          "label": "实际方法",
-          "value": "压裂约束网格搜索",
-          "desc": "轻量本地计算"
+          "label": "数据门槛",
+          "value": "30—50 段",
+          "desc": "排量、砂量、压力、应力差、费用及产后响应"
         },
         {
-          "label": "输出边界",
-          "value": "教学解释与人工复核",
-          "desc": "不连接设备或在线模型"
+          "label": "收益",
+          "value": "425 → 326 组",
+          "desc": "排量砂量组合：约束筛选前候选数 → 可行候选数",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">425 → 326 组</b>"
+        },
+        {
+          "label": "难度",
+          "value": "高",
+          "desc": "压力与产能响应关系受应力、摩阻和储层差异影响",
+          "html": "<span class=\"dtag\" data-d=\"高\">难度 高</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
-          "en": "BUSINESS",
-          "title": "业务对象与观测关系",
-          "html": "<p>压裂排量与支撑剂量同时影响裂缝延伸和施工压力。对紧砂岩单段，在教学成本和压力约束内比较不同组合，帮助解释产能代理值与可行域的区别。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\" style=\"display:block;width:100%;min-width:560px;max-width:760px;margin:auto;font-family:system-ui,sans-serif\"><title>压裂参数智能优化业务对象示意</title><rect x=\"30\" y=\"95\" width=\"590\" height=\"110\" fill=\"#ece8d8\"/><path d=\"M145 22V151H457V22\" fill=\"none\" stroke=\"#21796a\" stroke-width=\"7\"/><path d=\"M250 120l-20-26m20 57-25 35m135-35 28-42m-28 42 25 34\" stroke=\"#b96b38\" stroke-width=\"3\"/><text x=\"47\" y=\"60\" font-size=\"17\">注入参数</text><text x=\"450\" y=\"60\" font-size=\"17\">产出或监测</text><text x=\"257\" y=\"193\" font-size=\"17\">储层 · 流体 · 响应</text></svg></div><figcaption class=\"figcap\">压裂参数智能优化涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</figcaption></figure>"
+          "en": "PROBLEM",
+          "title": "压裂参数优化业务问题",
+          "html": "<p>参数组合爆炸，现场多按邻井经验套用；不同井的应力与天然裂缝差异大，套用方案常失效。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 650 235\" role=\"img\"><title>压裂参数智能优化业务对象示意</title><rect x=\"30\" y=\"95\" width=\"590\" height=\"110\" fill=\"#ece8d8\"/><path d=\"M145 22V151H457V22\" fill=\"none\" stroke=\"#21796a\" stroke-width=\"7\"/><path d=\"M250 120l-20-26m20 57-25 35m135-35 28-42m-28 42 25 34\" stroke=\"#b96b38\" stroke-width=\"3\"/><text x=\"47\" y=\"60\" font-size=\"17\">注入参数</text><text x=\"450\" y=\"60\" font-size=\"17\">产出或监测</text><text x=\"257\" y=\"193\" font-size=\"17\">储层 · 流体 · 响应</text></svg></div><div class=\"figcap\"><b>图 1</b><span>压裂参数智能优化涉及的业务对象示意；图中关系不是现场工艺设计。窄屏可在图内滚动。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "压裂约束网格搜索",
-          "html": "<p>枚举排量2–8 m³/min和砂量20–100 t。简化压力=25+2.4排量+0.055砂量+0.8应力差；响应代理为饱和增长乘应力抑制项。仅在教学成本及压力可行域内最大化代理值。</p><figure class=\"figure\"><div style=\"overflow:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"压裂约束网格搜索默认合成计算图\" style=\"display:block;width:100%;min-width:620px;max-width:850px;margin:auto;font-family:system-ui,sans-serif\"><title>压裂约束网格搜索默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">合成响应 / 分</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">31.0</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">2.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">39.1</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">3.4</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">47.2</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">4.9</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">55.4</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">6.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">63.5</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">7.8</text><path d=\"M82.00 237.22 L109.74 216.97 L137.48 198.34 L165.22 181.20 L192.96 165.43 L220.70 150.92 L248.43 137.57 L276.17 125.29 L303.91 119.18 L331.65 108.93 L359.39 105.62 L387.13 97.09 L414.87 89.23 L442.61 89.28 L470.35 82.76 L498.09 85.14 L525.83 79.73 L553.57 74.76 L581.30 79.91 L609.04 86.79 L636.78 109.35 L664.52 139.24 L692.26 178.20 L720.00 259.24\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">排量 / m³·min⁻¹</text></svg></div><figcaption class=\"figcap\">默认教学参数的实际计算：各排量可行最优响应。枚举组合 425.00组；可行组合 326.00组；最优响应代理 61.29分。图示由同包model.js计算，交互演示可改变参数重算。</figcaption></figure>"
+          "en": "INTERVENTION",
+          "title": "压裂参数与约束搜索",
+          "html": "<p>排量和支撑剂量共同影响裂缝延伸、压力及成本，设计人员需要在设备和预算条件内寻找值得讨论的组合。本例将网格搜索作为AI辅助优化流程的约束计算环节，逐组计算费用、压力和响应代理，先筛出满足上限的组合，再按响应排序。每个推荐都可回查对应的排量、砂量及约束余量，便于工程师比较取舍。</p><p>系统自动比较25档排量和17档砂量共425组组合，交付可行集合、排名靠前的参数表以及各排量下的最佳响应曲线，减少逐个改参数后手工检查预算和压力的步骤。工程师能沿曲线看到加大排量后收益与可行空间的变化，也能回看某组参数被排除的上限条件，为方案评审准备一致的计算依据。</p><p><b>默认教学计算检查25档排量与17档砂量构成的425组候选，经成本65单位和压力50 MPa双约束筛选，保留326组可行候选，供同口径比选。</b></p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 360\" role=\"img\" aria-label=\"压裂约束网格搜索默认合成计算图\"><title>压裂约束网格搜索默认合成计算图</title><text x=\"82\" y=\"27\" font-size=\"16\" fill=\"#355a4b\">合成响应 / 分</text><path d=\"M82 274H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"279\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">31.0</text><text x=\"82\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">2.0</text><path d=\"M82 220.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"225.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">39.1</text><text x=\"241.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">3.4</text><path d=\"M82 167H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"172\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">47.2</text><text x=\"401\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">4.9</text><path d=\"M82 113.5H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"118.5\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">55.4</text><text x=\"560.5\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">6.3</text><path d=\"M82 60H720\" stroke=\"#dbe5dc\"/><text x=\"71\" y=\"65\" font-size=\"15\" text-anchor=\"end\" fill=\"#476457\">63.5</text><text x=\"720\" y=\"302\" text-anchor=\"middle\" font-size=\"15\" fill=\"#476457\">7.8</text><path d=\"M82.00 237.22 L109.74 216.97 L137.48 198.34 L165.22 181.20 L192.96 165.43 L220.70 150.92 L248.43 137.57 L276.17 125.29 L303.91 119.18 L331.65 108.93 L359.39 105.62 L387.13 97.09 L414.87 89.23 L442.61 89.28 L470.35 82.76 L498.09 85.14 L525.83 79.73 L553.57 74.76 L581.30 79.91 L609.04 86.79 L636.78 109.35 L664.52 139.24 L692.26 178.20 L720.00 259.24\" stroke=\"#21796a\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M82 50V274H720\" fill=\"none\" stroke=\"#789b8b\"/><text x=\"400\" y=\"337\" text-anchor=\"middle\" font-size=\"16\" fill=\"#355a4b\">排量 / m³·min⁻¹</text></svg></div><div class=\"figcap\"><b>图 2</b><span>默认教学参数的实际计算：各排量可行最优响应。枚举组合 425.00组；可行组合 326.00组；最优响应代理 61.29分。图示由同包model.js计算，交互演示可改变参数重算。</span></div>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "模型适用范围与教学边界",
-          "html": "<p>这是显式教学响应函数的穷举，不是现场压裂模拟、训练神经代理或贝叶斯优化。未建模层间应力、缝高失控、砂堵与近井摩阻。响应分不可当真实产量。</p><p>全部样本、噪声、控制范围、权重和响应系数为教学合成设定。演示的推荐、误差与指标均由当前数据和参数计算，不能称为实测收益。</p>"
+          "en": "DATA",
+          "title": "施工段记录与响应标签",
+          "html": "<p style=\"margin-bottom:14px\">试点整理30—50个可比压裂段，保留排量、砂量、施工压力、应力差、费用及产后响应，并统一产后评价时段。排量和砂量属于可调参数，压力与成本表提供约束，产后响应用于校准目标关系。本例采用显式教学响应函数枚举候选，资料筹备应优先覆盖不同应力与施工强度，补齐参数组合的观测范围。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">地质与岩石力学</span><span class=\"cl-s\">应力剖面、脆性指数、天然裂缝</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">压裂施工曲线</span><span class=\"cl-s\">排量、压力、砂比</span></span><span class=\"cl-n\">数千段</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">压后产能</span><span class=\"cl-s\">测试产量、EUR</span></span><span class=\"cl-n\">作为目标</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">排量、砂量、压力、应力差、费用及产后响应</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://www.energy.gov/hgeo/hydraulic-fracturing-technology\">DOE：Hydraulic fracturing technology<span class=\"ar\">↗</span></a></div>"
         },
         {
           "no": 4,
-          "en": "SOURCES",
-          "title": "专业依据与合成假设",
-          "html": "<p><a href=\"https://www.energy.gov/hgeo/hydraulic-fracturing-technology\" target=\"_blank\" rel=\"noopener noreferrer\">DOE：Hydraulic fracturing technology</a>：压裂将水、砂和添加剂注入低渗地层以改善流动，支持参数业务背景，不支持响应系数。</p><p>资料只支持上述业务事实与方法动机，不支持本例数值。具体生成、切分、算法和限制见本包研究依据及可读的model.js。</p>"
+          "en": "DIFFICULTY",
+          "title": "应力差异与响应校准",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"高\">难度 高</span><span class=\"small muted\">压力与产能响应关系受应力、摩阻和储层差异影响</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on hi\"></i></div><p>主要难点是应力条件、近井摩阻和储层差异会同时影响压力与产后效果，简单提高排量或砂量不一定带来相同响应。筹备时应按储层与施工条件整理可比段，核对压力和费用口径，再校准参数到响应的关系。显式搜索便于检查约束和敏感性，后续引入AI响应模型时仍需保留各候选的输入条件与约束计算证据。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">代理模型<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">贝叶斯优化<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">多目标优化<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

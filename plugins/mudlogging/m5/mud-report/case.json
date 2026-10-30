@@ -10,47 +10,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "录井日报需把井深、岩性、气测和异常记录归档，自动草稿应保留字段来源供审核。",
+      "lede": "录井日报整理需要把原始文本中的井号、井深、岩性、总烃和井段转入统一字段。AI 报告流程以显式规则完成信息抽取并拼成草稿，向录井人员交付五项字段、原文证据和缺项清单，减少重复抄录。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，无现场数据"
+          "label": "任务类型",
+          "value": "信息抽取与草稿生成",
+          "desc": "抽取五类录井字段并保留原文位置",
+          "html": "<span style=\"color:var(--c-nlp)\">信息抽取与草稿生成</span>"
         },
         {
-          "label": "输入对象",
-          "value": "录井记录文本与结构化字段",
-          "desc": "量纲和数据含义见演示图轴"
+          "label": "数据门槛",
+          "value": " 100—300 份",
+          "desc": "历史记录、五字段标注及原文证据"
         },
         {
-          "label": "轻量方法",
-          "value": "规则抽取与可追溯模板",
-          "desc": "实际前端计算，不调用在线模型"
+          "label": "收益",
+          "value": "5 → 0 项",
+          "desc": "默认5项目标字段：整理前待结构化数 → 抽取后缺项数",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">5 → 0 项</b>"
         },
         {
-          "label": "使用边界",
-          "value": "辅助复核",
-          "desc": "合成精度不能代表现场能力"
+          "label": "难度",
+          "value": "中",
+          "desc": "字段别名、单位与多次记录的写法不统一",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
-          "en": "BUSINESS",
-          "title": "业务观测与解释对象",
-          "html": "<p>录井日报需把井深、岩性、气测和异常记录归档，自动草稿应保留字段来源供审核。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"字段证据覆盖，窄屏可滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 350\" role=\"img\" aria-label=\"字段证据覆盖\" style=\"width:100%;max-width:820px;min-width:700px;display:block;margin:auto;background:#f6faf9;border-radius:8px\"><g font-family=\"system-ui,sans-serif\" fill=\"#274746\"><path d=\"M112 258H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"263\" text-anchor=\"end\" font-size=\"15\">1.0</text><text class=\"plot-x-tick\" x=\"112\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">0.0</text><path d=\"M112 205.5H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"210.5\" text-anchor=\"end\" font-size=\"15\">1.3</text><text class=\"plot-x-tick\" x=\"251.5\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">1.0</text><path d=\"M112 153H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"158\" text-anchor=\"end\" font-size=\"15\">1.5</text><text class=\"plot-x-tick\" x=\"391\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">2.0</text><path d=\"M112 100.5H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"105.5\" text-anchor=\"end\" font-size=\"15\">1.8</text><text class=\"plot-x-tick\" x=\"530.5\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">3.0</text><path d=\"M112 48H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"53\" text-anchor=\"end\" font-size=\"15\">2.0</text><text class=\"plot-x-tick\" x=\"670\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">4.0</text><path d=\"M112.00 258.00 L251.50 258.00 L391.00 258.00 L530.50 258.00 L670.00 258.00 \" stroke=\"#087f76\" fill=\"none\" stroke-width=\"2\"/><text x=\"112\" y=\"22\" font-size=\"15\" fill=\"#087f76\">字段证据</text><text class=\"plot-x-label\" x=\"391\" y=\"315\" text-anchor=\"middle\" font-size=\"16\">字段编码（井号/井深/岩性/总烃/井段）</text><text class=\"plot-y-label\" x=\"24\" y=\"153\" transform=\"rotate(-90 24 153)\" text-anchor=\"middle\" font-size=\"15\">已定位证据=1</text></g></svg></div><figcaption>图为默认参数下实际生成的合成输入或预测关系；完整交互及误差由“案例演示”实时计算。</figcaption></figure><p>默认教学录井文本含井号、井深m、岩性、总烃%、井段m共5个目标字段；用户可直接改写文本、删除字段，数据不离开浏览器。</p>"
+          "en": "PROBLEM",
+          "title": "录井报告生成业务问题",
+          "html": "<p>一份报告需 4—8 小时，需在多套数据表之间反复对照；不同工程师的行文与结论口径不一致，审核返工多。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 350\" role=\"img\" aria-label=\"字段证据覆盖\"><g font-family=\"system-ui,sans-serif\" fill=\"#274746\"><path d=\"M112 258H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"263\" text-anchor=\"end\" font-size=\"15\">1.0</text><text class=\"plot-x-tick\" x=\"112\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">0.0</text><path d=\"M112 205.5H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"210.5\" text-anchor=\"end\" font-size=\"15\">1.3</text><text class=\"plot-x-tick\" x=\"251.5\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">1.0</text><path d=\"M112 153H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"158\" text-anchor=\"end\" font-size=\"15\">1.5</text><text class=\"plot-x-tick\" x=\"391\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">2.0</text><path d=\"M112 100.5H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"105.5\" text-anchor=\"end\" font-size=\"15\">1.8</text><text class=\"plot-x-tick\" x=\"530.5\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">3.0</text><path d=\"M112 48H670\" stroke=\"#d6e4e2\"/><text class=\"plot-y-tick\" x=\"100\" y=\"53\" text-anchor=\"end\" font-size=\"15\">2.0</text><text class=\"plot-x-tick\" x=\"670\" y=\"282\" text-anchor=\"middle\" font-size=\"15\">4.0</text><path d=\"M112.00 258.00 L251.50 258.00 L391.00 258.00 L530.50 258.00 L670.00 258.00 \" stroke=\"#087f76\" fill=\"none\" stroke-width=\"2\"/><text x=\"112\" y=\"22\" font-size=\"15\" fill=\"#087f76\">字段证据</text><text class=\"plot-x-label\" x=\"391\" y=\"315\" text-anchor=\"middle\" font-size=\"16\">字段编码（井号/井深/岩性/总烃/井段）</text><text class=\"plot-y-label\" x=\"24\" y=\"153\" transform=\"rotate(-90 24 153)\" text-anchor=\"middle\" font-size=\"15\">已定位证据=1</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>图为默认参数下实际生成的合成输入或预测关系；完整交互及误差由“案例演示”实时计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "规则抽取与可追溯模板",
-          "html": "<p>五条显式正则定位“字段名：值”，保留原文证据和字符起始位置。模板仅拼接已提取字段，缺失标“待核实”。不自动编写含油层结论。</p><p>字段覆盖率=找到原文证据字段数/5；它衡量完整性，不是正确率。若原文数值错误，规则不会识别专业真实性。</p><p>只识别规定字段名与m/%写法，不处理任意表格、OCR或自然语言同义改写；不是生成式大模型。</p>"
+          "en": "INTERVENTION",
+          "title": "录井信息抽取与AI报告基线",
+          "html": "<p>日报整理常要从录井文本反复抄录井号、井深、岩性、总烃和井段，容易出现漏项和来源难查。AI 报告流程在本例中采用显式正则与字段模板作为可解释基线，定位字段名后的值，同时保留匹配原文和字符位置。已提取内容自动组成草稿，缺项进入待核实清单，录井人员可逐项对照证据完成归档前校核。</p><p>系统一次整理五类字段，输出字段值、原文片段、字符起始位置与模板草稿，并汇总待核实项数和字段覆盖率。录井人员由逐字段查找、抄录和拼接转为检查证据、补齐缺项与确认记录归属。收益落在结构化整理和缺项检查两项重复工作上；修改或删除原文内容后，对照表与草稿同步更新，便于直接定位需要补录的位置。</p><p><b>默认教学演示把井号、井深、岩性、总烃和井段5项目标字段作为待整理集合。规则抽取将默认68字符记录中的5项全部转为结构化条目，尚待整理项由5项减至0项，并为每项保留原文证据和字符位置。</b></p>"
         },
         {
           "no": 3,
-          "en": "SOURCE",
-          "title": "专业资料与合成假设",
-          "html": "<p><a href=\"https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging\" target=\"_blank\" rel=\"noopener noreferrer\">The Defining Series: Mud Logging</a> — SLB / Oilfield Review，2015-11-11。</p><p>SLB泥浆录井文章展示岩性、井深、气测等记录构成，支持报告字段选择；本例模板不是行业报告规范。</p><p>数据、阈值、系数均为教学合成假设，资料不证明本例精度或收益。</p>"
+          "en": "DATA",
+          "title": "历史录井记录与字段标注",
+          "html": "<p style=\"margin-bottom:14px\">试点收集100—300份历史录井文本，覆盖不同班组、井段和填写习惯，人工标注五类目标字段的值、单位及原文位置，并记录缺项与重复记录。需统一井深和井段的米单位、总烃百分号表达及井号写法，形成字段样例表。本例提供可编辑记录，采用字段名加冒号的写法，便于检查抽取内容与原文证据的对应关系。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">结构化录井数据</span><span class=\"cl-s\">分层、显示、工况记录</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">历史报告文本</span><span class=\"cl-s\">同区块 100—300 份</span></span><span class=\"cl-n\">标注要素与段落对应关系</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">报告模板与规范</span><span class=\"cl-s\">企业标准</span></span><span class=\"cl-n\">作为生成约束</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">历史记录、五字段标注及原文证据</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging\">The Defining Series: Mud Logging<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "字段写法与记录归属差异",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">字段别名、单位与多次记录的写法不统一</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>主要障碍是班组使用不同字段别名、单位及分隔方式，同一文本还可能包含多口井或多个时段的重复字段。试点应建立字段词表和单位规范，收录缺项、重复及不规范记录，明确每组信息所属井号和井段。本例规则按规定名称定位首个匹配，因此复核应优先检查重复出现与归属不清的内容，逐步完善可追溯的录井资料口径。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/nlp\">信息抽取<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/nlp\">模板化生成<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/nlp\">检索增强生成<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

@@ -11,53 +11,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "定向钻井需要根据随钻测点调整后续井段，使井眼接近目标并限制过度弯曲。这个实验将地层响应辨识与滚动约束搜索连接起来，比较当前状态下控制轨迹和零指令轨迹的终点距离。",
+      "lede": "定向钻井需要持续修正井眼与靶点的偏差，同时控制井斜和曲率。AI 从工具指令与测斜反馈中辨识响应，滚动比较后续动作，为定向工程师交付当前方案、预测轨迹及曲率检查结果。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子，可导出核查"
-        },
-        {
-          "label": "方法类型",
+          "label": "任务类型",
           "value": "响应辨识与滚动优化",
-          "desc": "纯前端轻量计算"
+          "desc": "用测斜反馈更新后续导向动作",
+          "html": "<span style=\"color:var(--c-opt)\">响应辨识与滚动优化</span>"
         },
         {
-          "label": "输出用途",
-          "value": "教学比较",
-          "desc": "不连接设备与现场系统"
+          "label": "数据门槛",
+          "value": " 20—30 口井",
+          "desc": "MWD 测点、工具指令及地层记录"
         },
         {
-          "label": "评价边界",
-          "value": "合成任务",
-          "desc": "不声称真实工程收益"
+          "label": "收益",
+          "value": "49.1 → 40.7 m",
+          "desc": "默认相同扰动下，零指令与控制轨迹终点距靶",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">49.1 → 40.7 m</b>"
+        },
+        {
+          "label": "难度",
+          "value": "高",
+          "desc": "工具响应、地层扰动与测量时延耦合",
+          "html": "<span class=\"dtag\" data-d=\"高\">难度 高</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
-          "en": "BUSINESS",
-          "title": "定向井轨迹与曲率约束",
-          "html": "<p>井斜表示井眼相对铅垂方向的夹角；测深沿井眼累积，垂深沿竖直方向量取。轨迹弯曲过急会影响工具通过并增加摩阻。固定方位的二维模型可用相邻 30 m 段的井斜差表示曲率，真实三维狗腿度还要计入方位变化。</p><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"定向井轨迹与曲率约束\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">随钻测点</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">水平 / 垂深 / 井斜</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">工具与地层响应</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">动作改变后续井斜</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">靶点与曲率</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">位置目标 + 操作约束</text></svg></div><figcaption class=\"figcap\">业务关系示意，不是测量结果。窄屏可在图内横向滚动。</figcaption></figure>"
+          "en": "PROBLEM",
+          "title": "井眼轨迹控制业务问题",
+          "html": "<p>调整依赖个人经验，轨迹波动大；滑动钻进效率低，频繁纠偏增加摩阻与卡钻风险。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"定向井轨迹与曲率约束\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">随钻测点</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">水平 / 垂深 / 井斜</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">工具与地层响应</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">动作改变后续井斜</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">靶点与曲率</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">位置目标 + 操作约束</text></svg></div><div class=\"figcap\"><b>图 1</b><span>业务关系示意，不是测量结果。窄屏可在图内横向滚动。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "响应辨识与滚动优化",
-          "html": "<p>用独立合成校准数据拟合指令到井斜增量的线性响应。在每个测点枚举未来三段指令，排除预测井斜及曲率超限序列，对靶点距离、末端井斜和动作平滑性加权评分，只执行最优序列第一步。新测点反馈后重新规划。这是二维有限动作滚动优化，不是三维自动导向软件。</p>"
+          "en": "INTERVENTION",
+          "title": "轨迹响应与滚动优化",
+          "html": "<p>井斜、测深和垂深描述井眼位置，工具指令决定后续造斜或降斜趋势。AI 在这里承担响应学习与动作比较：先拟合指令到井斜增量的关系，再枚举未来三段动作，综合距靶偏差、末端井斜与动作变化评分。新测点到达后重新规划，使方案随实际轨迹更新。</p><p>收益是把单步纠偏变成对后续路径的联合比较。演示在每个测点计算三段动作，剔除预测井斜或曲率超限的序列，只执行优选序列的第一步。工程师可对照候选轨迹与零指令基线，查看终点距靶、沿途曲率和动作变化，把多项要求放在同一张轨迹结果中判断。</p><p><b>默认演示在相同造斜扰动下，600 m 测深终点距靶从零指令基线的 49.1 m 缩小至滚动控制的 40.7 m。每个测点比较 729 组三段动作，并随测斜反馈更新下一步。</b></p>"
         },
         {
           "no": 3,
           "en": "DATA",
-          "title": "数据准备与评价切分",
-          "html": "<p>24 条合成校准记录用于估计动作增益和自然漂移；控制模拟共 20 段，每段 30 m。靶点固定垂深 500 m，水平位置可调。未建模扰动只施加到模拟井眼，不偷偷传给规划模型。实际应用需要 MWD 测点、工具性能、地层响应和井眼约束，并对测量时延建模。</p>"
+          "title": "测斜数据与工具响应",
+          "html": "<p style=\"margin-bottom:14px\">试点准备 20—30 口使用同类工具的井，按测深关联 MWD 井斜、方位、工具指令、地层和测量时间。需要保留指令生效的区间与反馈时延，便于区分工具响应和地层自然漂移。演示用 24 条合成校准记录辨识响应，再对 20 个、每段 30 m 的固定方位井段计算轨迹。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">随钻测量轨迹</span><span class=\"cl-s\">每 10—30 m 一个测点</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">工具面与滑动记录</span><span class=\"cl-s\">按立柱记录</span></span><span class=\"cl-n\">作为控制输入</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">地层倾角与岩性</span><span class=\"cl-s\">邻井与随钻伽马</span></span><span class=\"cl-n\">作为扰动因素</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">MWD 测点、工具指令及地层记录</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://www.slb.com/resource-library/oilfield-review/defining-series/defining-directional-drilling\">SLB：Directional Drilling Practices<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://glossary.slb.com/terms/d/dogleg\">SLB：dogleg<span class=\"ar\">↗</span></a></div>"
         },
         {
           "no": 4,
-          "en": "LIMITS",
-          "title": "模型适用范围与工程约束",
-          "html": "<p>轨迹采用测段平均井斜积分，不实现完整最小曲率法、三维方位与工具面控制、避碰或摩阻计算。预测可行不保证实际可行：扰动可能使真实模拟曲率超限，页面单独报告。无可行序列时停止模拟，不能强行输出动作。固定测深终点距离不是中靶率或最优性证明。</p><p>专业资料与方法来源：</p><ul><li><a href=\"https://www.slb.com/resource-library/oilfield-review/defining-series/defining-directional-drilling\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：Directional Drilling Practices</a>：支持定向钻井、地层响应与工具能力约束背景，不支持本例简化模型与权重。</li><li><a href=\"https://glossary.slb.com/terms/d/dogleg\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：dogleg</a>：支持狗腿及曲率变化的工程影响；本例固定方位二维曲率是简化情况。</li></ul>"
+          "en": "DIFFICULTY",
+          "title": "响应漂移与测量时延",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"高\">难度 高</span><span class=\"small muted\">工具响应、地层扰动与测量时延耦合</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on hi\"></i></div><p>落地难度高，工具磨损、岩层变化与测斜时延会让同一指令产生不同响应。数据建模应按工具和地层区分响应，并把最新测点用于误差修正；动作评价还要结合三维井眼、避碰、摩阻和工具通过能力。试点宜选择连续测量完整的井段，逐段核对预测偏差与实际曲率。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">模型预测控制<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">系统辨识<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">模仿学习<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

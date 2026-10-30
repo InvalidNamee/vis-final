@@ -10,42 +10,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "智能完井通过分段阀门限制高含水层贡献，但关小一段会改变井筒内其他层的压降与贡献。固定全开无法体现水处理能力约束。本例以三段简化模拟器枚举阀门开度，滚动执行近期目标较好的动作，观察分段控制对累计油水的影响。",
+      "lede": "分段智能完井需要限制高含水层贡献，同时兼顾总产油与水处理能力。AI控制流程中的滚动优化每天比较125种阀门组合、预测两天油水响应，向生产工程师交付分段开度方案和累计油水对照。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，非现场实测"
+          "label": "任务类型",
+          "value": "分段滚动优化",
+          "desc": "AI流程用两天前瞻搜索三段阀门开度",
+          "html": "<span style=\"color:var(--c-opt)\">分段滚动优化</span>"
         },
         {
-          "label": "实际方法",
-          "value": "油水与切换目标计算",
-          "desc": "浏览器计算，详见模型与流程"
+          "label": "数据门槛",
+          "value": "14—30 天记录",
+          "desc": "三段液量、含水、开度及水处理上限"
         },
         {
-          "label": "工程边界",
-          "value": "辅助教学",
-          "desc": "不构成施工、设备控制或安全结论"
+          "label": "收益",
+          "value": "20 → 0 天",
+          "desc": "21天同模拟器对照，产水超65立方米每日的天数",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">20 → 0 天</b>"
+        },
+        {
+          "label": "难度",
+          "value": "高",
+          "desc": "分段含水变化与共享井筒干扰需要动态标定",
+          "html": "<span class=\"dtag\" data-d=\"高\">难度 高</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
           "en": "PROBLEM",
-          "title": "智能完井滑套控制策略业务背景",
-          "html": "<p>智能完井通过分段阀门限制高含水层贡献，但关小一段会改变井筒内其他层的压降与贡献。固定全开无法体现水处理能力约束。本例以三段简化模拟器枚举阀门开度，滚动执行近期目标较好的动作，观察分段控制对累计油水的影响。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"滚动控制与全开油率，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"滚动控制与全开油率\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>滚动控制与全开油率</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-6.78</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">1</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">17.81</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">6</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">42.4</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">11</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">66.99</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">16</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">91.58</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">21</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,104.04475322985411 151.05,107.01226879821547 178.1,109.97978436657687 205.15,112.94729993493823 232.2,115.9148155032996 259.25,118.88233107166096 286.3,121.84984664002235 313.35,124.81736220838371 340.4,127.78487777674508 367.45,130.75239334510644 394.5,140.35798781569764 421.55,163.2567188829388 448.6,164.7093488814374 475.65,166.16197887993596 502.7,167.61460887843452 529.75,169.06723887693312 556.8,170.51986887543165 583.85,171.97249887393025 610.9,173.42512887242884 637.95,174.8777588709274 665,176.33038886942597\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,64.82758620689657 151.05,69.77944046844502 178.1,74.7312947299935 205.15,79.68314899154194 232.2,84.63500325309042 259.25,89.58685751463887 286.3,94.53871177618734 313.35,99.49056603773582 340.4,104.4424202992843 367.45,109.39427456083274 394.5,114.34612882238119 421.55,119.2979830839297 448.6,124.24983734547811 475.65,129.2016916070266 502.7,134.15354586857507 529.75,139.10540013012354 556.8,144.057254391672 583.85,149.00910865322044 610.9,153.9609629147689 637.95,158.9128171763174 665,163.86467143786584\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">模拟天数</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">油率代理 / m³/d</text></g></svg></div><figcaption>开度时序显示高含水段被逐渐节流；与全开油率曲线比较必须同时查看累计水和水处理超限，避免只比较油量。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>滚动控制 · 全开基线；横轴：模拟天数；纵轴：油率代理 / m³/d。</p></figure>"
+          "title": "完井滑套控制策略业务问题",
+          "html": "<p>现场多按经验设定固定开度，或长期全开；分段间的相互干扰使&quot;局部最优&quot;不等于&quot;整体最优&quot;。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"滚动控制与全开油率\"><title>滚动控制与全开油率</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-6.78</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">1</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">17.81</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">6</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">42.4</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">11</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">66.99</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">16</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">91.58</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">21</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,104.04475322985411 151.05,107.01226879821547 178.1,109.97978436657687 205.15,112.94729993493823 232.2,115.9148155032996 259.25,118.88233107166096 286.3,121.84984664002235 313.35,124.81736220838371 340.4,127.78487777674508 367.45,130.75239334510644 394.5,140.35798781569764 421.55,163.2567188829388 448.6,164.7093488814374 475.65,166.16197887993596 502.7,167.61460887843452 529.75,169.06723887693312 556.8,170.51986887543165 583.85,171.97249887393025 610.9,173.42512887242884 637.95,174.8777588709274 665,176.33038886942597\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,64.82758620689657 151.05,69.77944046844502 178.1,74.7312947299935 205.15,79.68314899154194 232.2,84.63500325309042 259.25,89.58685751463887 286.3,94.53871177618734 313.35,99.49056603773582 340.4,104.4424202992843 367.45,109.39427456083274 394.5,114.34612882238119 421.55,119.2979830839297 448.6,124.24983734547811 475.65,129.2016916070266 502.7,134.15354586857507 529.75,139.10540013012354 556.8,144.057254391672 583.85,149.00910865322044 610.9,153.9609629147689 637.95,158.9128171763174 665,163.86467143786584\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">模拟天数</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">油率代理 / m³/d</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>开度时序显示高含水段被逐渐节流；与全开油率曲线比较必须同时查看累计水和水处理超限，避免只比较油量。图中是初始参数的固定种子教学计算，交互演示可重新计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "分段滑套滚动控制计算方法",
-          "html": "<p>定义三段液量能力、初始含水和井筒共享干扰。；枚举每段0/25/50/75/100%开度，预测两天固定动作。；过滤两天水量上限，最大化两天油−水惩罚−切换成本。；只执行首日动作并更新含水，次日重算；无可行动作时全关。</p><p>三段简化井筒干扰与含水递增响应；125种开度组合，固定开度两步前瞻。全开基线可能超水处理约束，比较为同一教学模拟器结果。无可行动作时全关，动作切换代价进入目标。</p>"
+          "en": "INTERVENTION",
+          "title": "分段阀门与滚动决策",
+          "html": "<p>高含水层的开度会影响产水量，也会通过共享井筒改变其他层的贡献，分段控制需要一起比较三个阀门。AI控制流程采用两天固定动作前瞻的滚动优化，每段设置五档开度，共评价125种组合。算法筛除预测水量超限的动作，比较产油、水量惩罚与切换代价；每天采用首日动作后更新状态，再重算下一天方案。</p><p>滚动控制 · 全开基线；横轴：模拟天数；纵轴：油率代理 / m³/d。</p><p>系统每天自动评价125种开度组合，交付三段逐日策略、油率曲线、累计油水量及水上限超限天数，减少人工逐组合试配的工作。生产工程师可检查高含水段何时收小开度，以及动作切换代价对策略的影响。优化与全开情景在相同模拟器内对照，同时保留各自水量约束状态，便于结合水处理负荷评估方案。</p><p><b>默认21天教学模拟中，全开基线有20天产水超过65立方米/日，滚动控制为0天，累计水由1802.98降至510.19立方米。两种策略的累计油代理分别为1305.02和1025.47立方米，展示控水与产油的取舍。</b></p>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "评价边界与专业资料",
-          "html": "<p>累计油水是逐天模拟值求和；超限天数逐日计数。该两步固定动作搜索是滚动优化，不是强化学习，也不是完整多步动作树MPC。</p><p>无真实储层网格、压力守恒或水锥模型；含水递增为教学状态方程。全开基线可能不满足水处理约束，不能称优化方案实现现场增产。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://www.slb.com/resource-library/technical-paper/co/spe-164147\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：智能完井监控论文摘要</a>：支持多分支分段监控与阀门控制水油贡献。仅使用公开摘要，未声称复现其设备或模型。</li></ul>"
+          "en": "DATA",
+          "title": "分层油水与阀门历史",
+          "html": "<p style=\"margin-bottom:14px\">试点整理14—30天的连续记录，覆盖三段液量能力、分段含水、阀门开度、全井油水量及水处理能力，重点保留开度切换前后的响应。滚动搜索依赖可更新的状态与响应模型，无需人工最优动作标签。本例使用三段教学模拟器描述含水递增及共享井筒干扰，默认比较21天内的优化与全开情景。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">储层与完井数据</span><span class=\"cl-s\">分段渗透率、含水饱和度</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">生产与滑套状态</span><span class=\"cl-s\">分段产量、开度、压力</span></span><span class=\"cl-n\">高频</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">储层模拟器</span><span class=\"cl-s\">用于生成训练环境</span></span><span class=\"cl-n\">机理模型</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">三段液量、含水、开度及水处理上限</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://www.slb.com/resource-library/technical-paper/co/spe-164147\">SLB：智能完井监控论文摘要<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "分段干扰与状态更新",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"高\">难度 高</span><span class=\"small muted\">分段含水变化与共享井筒干扰需要动态标定</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on hi\"></i></div><p>难度主要来自分段液量和含水会随开度与生产时间变化，而共享井筒又使三个阀门相互影响。项目需要对齐分层监测、阀门动作和全井计量时刻，用切换前后的数据核对响应。切换代价过低容易造成频繁动作，过高又可能错过控水时机；应结合状态更新与两天水量约束共同检查策略稳定性。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">强化学习<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">储层数值模拟<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">策略安全约束<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

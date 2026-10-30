@@ -10,42 +10,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "施工前的漏失复核需要同时考虑压力窗口、流动压耗与裂缝发育。漏失记录通常不平衡，简单报告准确率容易掩盖漏判。本例训练带正则的逻辑回归，用可调阈值展示召回与误报的变化，并比较当前井况下各排量的风险分数。",
+      "lede": "固井施工筹备需要识别窄压力窗、较高排量和裂缝发育共同造成的漏失风险。AI通过带正则的逻辑回归学习井次记录，向固井工程师交付风险分数、阈值内候选排量及漏判误报对照。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，非现场实测"
+          "label": "任务类型",
+          "value": "漏失风险分类",
+          "desc": "逻辑回归学习压力窗、排量与裂缝指示的共同作用",
+          "html": "<span style=\"color:var(--c-opt)\">漏失风险分类</span>"
         },
         {
-          "label": "实际方法",
-          "value": "留井分数评价",
-          "desc": "浏览器计算，详见模型与流程"
+          "label": "数据门槛",
+          "value": "100—200 井次",
+          "desc": "三项井况字段与漏失／未漏失记录"
         },
         {
-          "label": "工程边界",
-          "value": "辅助教学",
-          "desc": "不构成施工、设备控制或安全结论"
+          "label": "收益",
+          "value": "0.238 → 0.233",
+          "desc": "留井Brier误差（无量纲），漏失率常数对照模型",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">0.238 → 0.233</b>"
+        },
+        {
+          "label": "难度",
+          "value": "中",
+          "desc": "漏失样本偏少，事件记录与工况时点难对齐",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
           "en": "PROBLEM",
-          "title": "固井漏失风险预测业务背景",
-          "html": "<p>施工前的漏失复核需要同时考虑压力窗口、流动压耗与裂缝发育。漏失记录通常不平衡，简单报告准确率容易掩盖漏判。本例训练带正则的逻辑回归，用可调阈值展示召回与误报的变化，并比较当前井况下各排量的风险分数。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"排量与漏失分数，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"排量与漏失分数\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>排量与漏失分数</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-4</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">0.5</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">10.5</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">1.38</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">25</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">2.25</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">39.5</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">3.13</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">54</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">4</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,111.60658505196116 139.45714285714286,111.76764118575835 154.9142857142857,111.9286216097878 170.37142857142857,112.08952610017684 185.82857142857142,112.2503544335255 201.28571428571428,112.41110638690765 216.74285714285713,112.57178173787204 232.2,112.73238026444307 247.65714285714284,112.89290174512243 263.1142857142857,113.05334595888934 278.57142857142856,113.21371268520218 294.02857142857147,113.37400170399911 309.48571428571427,113.53421279569946 324.9428571428572,113.6943457412041 340.4,113.85440032189732 355.8571428571429,114.01437631964683 371.3142857142857,114.17427351680547 386.7714285714286,114.33409169621197 402.2285714285714,114.49383064119169 417.68571428571425,114.65349013555789 433.14285714285717,114.81306996361249 448.6,114.97256991014709 464.0571428571429,115.1319897604439 479.5142857142857,115.2913293002768 494.97142857142853,115.45058831591183 510.42857142857144,115.60976659410869 525.8857142857144,115.76886392212123 541.3428571428572,115.92788008769864 556.8,116.08681487908615 572.2571428571428,116.24566808502598 587.7142857142858,116.4044394947583 603.1714285714286,116.56312889802209 618.6285714285714,116.72173608505594 634.0857142857143,116.88026084659901 649.5428571428571,117.03870297389184 665,117.19706225867725\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,64.82758620689654 665,64.82758620689654\"/><circle cx=\"124\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">排量 / m³/min</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">分数 / %</text></g></svg></div><figcaption>排量响应显示分数与阈值交点；测试井的标签与预测分数并列，便于辨认高分误报与低分漏报。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>当前井况 · 教学阈值；横轴：排量 / m³/min；纵轴：分数 / %。</p></figure>"
+          "title": "固井漏失风险预测业务问题",
+          "html": "<p>风险判断依赖工程师对地层压力窗口与浆柱当量密度的估算，窄窗口井判断误差常在 0.05 g/cm³ 量级，足以决定漏与不漏。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"排量与漏失分数\"><title>排量与漏失分数</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-4</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">0.5</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">10.5</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">1.38</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">25</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">2.25</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">39.5</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">3.13</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">54</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">4</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,111.60658505196116 139.45714285714286,111.76764118575835 154.9142857142857,111.9286216097878 170.37142857142857,112.08952610017684 185.82857142857142,112.2503544335255 201.28571428571428,112.41110638690765 216.74285714285713,112.57178173787204 232.2,112.73238026444307 247.65714285714284,112.89290174512243 263.1142857142857,113.05334595888934 278.57142857142856,113.21371268520218 294.02857142857147,113.37400170399911 309.48571428571427,113.53421279569946 324.9428571428572,113.6943457412041 340.4,113.85440032189732 355.8571428571429,114.01437631964683 371.3142857142857,114.17427351680547 386.7714285714286,114.33409169621197 402.2285714285714,114.49383064119169 417.68571428571425,114.65349013555789 433.14285714285717,114.81306996361249 448.6,114.97256991014709 464.0571428571429,115.1319897604439 479.5142857142857,115.2913293002768 494.97142857142853,115.45058831591183 510.42857142857144,115.60976659410869 525.8857142857144,115.76886392212123 541.3428571428572,115.92788008769864 556.8,116.08681487908615 572.2571428571428,116.24566808502598 587.7142857142858,116.4044394947583 603.1714285714286,116.56312889802209 618.6285714285714,116.72173608505594 634.0857142857143,116.88026084659901 649.5428571428571,117.03870297389184 665,117.19706225867725\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,64.82758620689654 665,64.82758620689654\"/><circle cx=\"124\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"64.82758620689654\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">排量 / m³/min</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">分数 / %</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>排量响应显示分数与阈值交点；测试井的标签与预测分数并列，便于辨认高分误报与低分漏报。图中是初始参数的固定种子教学计算，交互演示可重新计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "漏失风险逻辑回归计算方法",
-          "html": "<p>36虚拟井次整井划分24训练、12测试。；训练集梯度下降拟合截距与三项特征；L2强度固定。；按测试标签计算Brier、召回率与正常井误报率。；枚举排量并保留低于当前阈值的候选，不修改模型。</p><p>36虚拟井次，前24训练、后12测试；逻辑回归全批梯度+L2。标签由带随机性的合成概率生成，风险阈值不参与拟合。小样本指标仅展示权衡。</p>"
+          "en": "INTERVENTION",
+          "title": "漏失风险学习与排量筛选",
+          "html": "<p>漏失复核需要把地层承压条件与施工排量放在一起判断，单独查看某个字段容易遗漏组合效应。AI采用逻辑回归，将压力窗宽、排量和裂缝指示共同映射为风险分数，通过带L2正则的拟合学习各项影响。固定当前井况后，模型对不同排量重复评分，选出低于指定分数阈值的候选，供施工筹备讨论。</p><p>当前井况 · 教学阈值；横轴：排量 / m³/min；纵轴：分数 / %。</p><p>模型一次比较0.5—4.0立方米每分钟范围内的36档排量，交付当前风险分数、排量响应曲线和阈值内最大候选排量，减少逐档重复试算。测试明细把事件标签与预测分数并列，工程师可直接查看漏判与误报。调整阈值时，召回率、误报率和Brier分数分别反映事件检出、额外复核负担及评分偏差。</p><p><b>默认教学训练集24井次中有5次漏失，常数基线将所有井次的漏失概率固定为5/24；在12个留出井次上的Brier误差为0.238。逻辑回归对同一评价集逐井评分，Brier误差降至0.233，减少约2.1%。</b></p>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "评价边界与专业资料",
-          "html": "<p>Brier=平均(预测分数−0/1标签)²；召回率=TP/(TP+FN)，误报率=FP/(FP+TN)，分母为零显示不可定义。</p><p>小样本合成概率未经现场校准，不是工程漏失概率；模型没有学习真实地层破裂力学。阈值探索不相当于获得新独立测试。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://glossary.slb.com/en/terms/c/cementing\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：固井</a>：支持固井前根据井径、密度和流变设计水泥浆体积与性能，不支持本例效率公式或压力窗数字。</li><li><a href=\"https://scikit-learn.org/stable/common_pitfalls.html\" target=\"_blank\" rel=\"noopener noreferrer\">scikit-learn：数据泄漏</a>：支持仅以训练样本拟合模型和预处理、保留测试的原则。</li></ul>"
+          "en": "DATA",
+          "title": "井次工况与漏失事件标签",
+          "html": "<p style=\"margin-bottom:14px\">试点汇集100—200井次的施工记录，保留压力窗宽、实际排量、裂缝指示，以及对应时段漏失或未漏失标签。应区分施工前已知条件与漏失后处置记录，保证模型使用的是预测时可取得的信息。本例以36个教学虚拟井次展示流程，24井次拟合、12井次评价；现场筹备还应检查漏失样本是否覆盖主要井况。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">井况与地层压力</span><span class=\"cl-s\">孔隙压力、破裂压力、井径</span></span><span class=\"cl-n\">单区块 200—1000 井次</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">浆柱设计</span><span class=\"cl-s\">密度、浆柱结构</span></span><span class=\"cl-n\">作为输入特征</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">漏失记录</span><span class=\"cl-s\">是否漏失、漏失量</span></span><span class=\"cl-n\">作为标签</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">三项井况字段与漏失／未漏失记录</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://glossary.slb.com/en/terms/c/cementing\">SLB：固井<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://scikit-learn.org/stable/common_pitfalls.html\">scikit-learn：数据泄漏<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "事件稀缺与风险阈值取舍",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">漏失样本偏少，事件记录与工况时点难对齐</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>主要障碍是漏失事件往往少于正常施工记录，而且裂缝描述、漏失起点与排量采样时刻可能不一致。数据整理应先明确事件定义，按井次核对工况与标签，避免把处置后的低排量误作漏失原因。阈值由复核资源和漏判代价共同决定，应结合留井结果比较不同阈值下新增的误报与检出的漏失井次。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">分类模型<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">不均衡学习<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">特征归因<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

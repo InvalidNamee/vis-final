@@ -10,42 +10,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "温度变化引起热伸长，封隔器约束又会把伸长转成轴向载荷；压差和自重进一步改变管柱受力。逐工况计算有助于发现高温高压组合下的裕度不足。本例用可解释的简化机理直接计算候选壁厚，展示热载荷、压力活塞力和重量的组成，不以固定安全系数替代计算。",
+      "lede": "完井管柱在温升、内外压差和自重共同作用下，需要比较不同壁厚的载荷裕度。AI辅助选型流程中的机理计算自动扫描25档壁厚，向管柱设计人员交付载荷组成、应力曲线与满足给定系数的最小质量候选。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，非现场实测"
+          "label": "任务类型",
+          "value": "机理约束选型",
+          "desc": "AI流程以热压载荷计算筛选管柱壁厚",
+          "html": "<span style=\"color:var(--c-opt)\">机理约束选型</span>"
         },
         {
-          "label": "实际方法",
-          "value": "组合应力计算",
-          "desc": "浏览器计算，详见模型与流程"
+          "label": "数据门槛",
+          "value": "1—3 口井",
+          "desc": "长度、温升、压差、尺寸和材料强度"
         },
         {
-          "label": "工程边界",
-          "value": "辅助教学",
-          "desc": "不构成施工、设备控制或安全结论"
+          "label": "收益",
+          "value": "19.83 → 13.61 t",
+          "desc": "同2千米管柱质量，6毫米壁厚对照4毫米候选",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">19.83 → 13.61 t</b>"
+        },
+        {
+          "label": "难度",
+          "value": "中",
+          "desc": "温度约束状态与轴向拉压符号容易混淆",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
           "en": "PROBLEM",
-          "title": "完井管柱受力智能分析业务背景",
-          "html": "<p>温度变化引起热伸长，封隔器约束又会把伸长转成轴向载荷；压差和自重进一步改变管柱受力。逐工况计算有助于发现高温高压组合下的裕度不足。本例用可解释的简化机理直接计算候选壁厚，展示热载荷、压力活塞力和重量的组成，不以固定安全系数替代计算。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"壁厚与载荷裕度，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"壁厚与载荷裕度\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>壁厚与载荷裕度</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-0.94</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">4</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">2.47</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">5.5</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">5.87</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">7</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">9.28</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">8.5</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">12.68</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">10</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,171.33517016038076 146.54166666666666,166.25976321336825 169.08333333333334,161.20034261262256 191.625,156.16301765092368 214.16666666666669,151.15388736548422 236.70833333333331,146.1790048643287 259.25,141.24434163745724 281.79166666666663,136.35575233805423 304.33333333333337,131.51894051610665 326.875,126.73942577209522 349.41666666666663,122.02251277228049 371.95833333333337,117.3732625303067 394.5,112.79646631359361 417.0416666666667,108.29662247881859 439.5833333333333,103.87791648051359 462.125,99.5442042324126 484.6666666666667,95.29899893474914 507.2083333333333,91.1454614142967 529.75,87.08639395951641 552.2916666666667,83.12423757251253 574.8333333333333,79.26107250413367 597.375,75.49862188971352 619.9166666666667,71.83825826155689 642.4583333333334,68.28101268089128 665,64.82758620689657\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,226.49686257215956 665,226.49686257215956\"/><circle cx=\"124\" cy=\"226.49686257215956\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"226.49686257215956\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">壁厚 / mm</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">教学安全系数</text></g></svg></div><figcaption>载荷组成图突出热力可能与自重反向；壁厚—系数曲线显示尺寸改变对组合应力的影响。自由伸长与全约束热力分别报告。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>候选 · 教学要求；横轴：壁厚 / mm；纵轴：教学安全系数。</p></figure>"
+          "title": "完井管柱受力分析业务问题",
+          "html": "<p>受力分析靠商用软件逐工况计算，工况组合多、参数不确定，工程师多按最保守工况设计，材料浪费。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"壁厚与载荷裕度\"><title>壁厚与载荷裕度</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-0.94</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">4</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">2.47</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">5.5</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">5.87</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">7</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">9.28</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">8.5</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">12.68</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">10</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,171.33517016038076 146.54166666666666,166.25976321336825 169.08333333333334,161.20034261262256 191.625,156.16301765092368 214.16666666666669,151.15388736548422 236.70833333333331,146.1790048643287 259.25,141.24434163745724 281.79166666666663,136.35575233805423 304.33333333333337,131.51894051610665 326.875,126.73942577209522 349.41666666666663,122.02251277228049 371.95833333333337,117.3732625303067 394.5,112.79646631359361 417.0416666666667,108.29662247881859 439.5833333333333,103.87791648051359 462.125,99.5442042324126 484.6666666666667,95.29899893474914 507.2083333333333,91.1454614142967 529.75,87.08639395951641 552.2916666666667,83.12423757251253 574.8333333333333,79.26107250413367 597.375,75.49862188971352 619.9166666666667,71.83825826155689 642.4583333333334,68.28101268089128 665,64.82758620689657\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,226.49686257215956 665,226.49686257215956\"/><circle cx=\"124\" cy=\"226.49686257215956\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><circle cx=\"665\" cy=\"226.49686257215956\" r=\"3\" fill=\"#b5692b\" fill-opacity=\".8\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">壁厚 / mm</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">教学安全系数</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>载荷组成图突出热力可能与自重反向；壁厚—系数曲线显示尺寸改变对组合应力的影响。自由伸长与全约束热力分别报告。图中是初始参数的固定种子教学计算，交互演示可重新计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "管柱热压载荷约束比较计算方法",
-          "html": "<p>固定73mm外径，输入长度、温升、压差、壁厚和屈服编码。；计算浮重、活塞力、全约束热力及自由热膨胀。；用薄壁环向与简化轴向组合应力求教学屈服比。；枚举4–10mm壁厚，选满足教学系数的最小质量候选。</p><p>直井73mm管外径；轴向重量+活塞−全约束热膨胀，薄壁环向应力和简化von Mises。忽略弯曲、摩阻、屈曲、接头、腐蚀、三轴/符号耦合，不构成管柱强度校核。</p>"
+          "en": "INTERVENTION",
+          "title": "热压载荷与壁厚筛选",
+          "html": "<p>完井管柱温升产生伸长趋势，封隔器等轴向约束会把热变形转为载荷，压差活塞力与自重又改变轴向合力。AI辅助选型流程在这里使用可解释的机理计算作为约束环节，逐档计算不同壁厚下的重量、热力、压力力与组合应力。算法据给定系数筛选可行候选，再按质量比较，为壁厚选择提供计算依据。</p><p>候选 · 教学要求；横轴：壁厚 / mm；纵轴：教学安全系数。</p><p>模型同时交付当前壁厚的轴向载荷分解、组合应力、屈服强度比、自由热伸长，以及25档壁厚的质量和约束通过状态。设计人员可直接查看重量、活塞力与热力分别占多大作用，定位满足给定系数的最小质量候选。批量比较减少逐规格重复代入公式的工作，也使温升或压差调整后的选型变化便于追溯。</p><p><b>默认教学计算比较25档壁厚，满足1.5系数下限的最小质量候选为4毫米；与当前6毫米壁厚相比，2千米管柱质量由19.83吨降至13.61吨，减少31.3%。候选的教学安全系数为4.99，当前方案为7.52。</b></p>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "评价边界与专业资料",
-          "html": "<p>教学系数=屈服强度/简化组合应力；壁厚候选按质量递增比较。保留轴向拉压符号参与组合应力。不是商业管柱软件或经API认证的设计系数。</p><p>全约束热假设与自由伸长是两个极端参考，不同时发生。忽略屈曲、弯曲、连接、腐蚀、摩阻和真实封隔器响应，不能据此判定管柱现场安全。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/digital-solutions/tdas-tubular-design-software\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：TDAS管柱设计分析</a>：支持管柱设计需应力、位移与热分析，不支持本例简化公式已达到商用软件精度。</li></ul>"
+          "en": "DATA",
+          "title": "管柱规格与温压工况",
+          "html": "<p style=\"margin-bottom:14px\">试点准备1—3口井的管柱方案，整理长度、外径、壁厚、材料屈服强度、目标温升与内外压差，并明确轴向约束状态。此类计算依赖尺寸、材料与工况输入，无需人工最佳壁厚标签。本例固定外径73毫米，在4—10毫米范围按0.25毫米间隔比较25档壁厚，以直井自重、活塞力和全约束热力展示主要受力关系。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">管柱结构与材料</span><span class=\"cl-s\">钢级、壁厚、下深</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">工况参数</span><span class=\"cl-s\">温度、压力、产量变化</span></span><span class=\"cl-n\">可批量仿真生成</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">失效案例</span><span class=\"cl-s\">断脱、泄漏记录</span></span><span class=\"cl-n\">少量真实标签</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">长度、温升、压差、尺寸和材料强度</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/digital-solutions/tdas-tubular-design-software\">SLB：TDAS管柱设计分析<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "约束状态与载荷符号",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">温度约束状态与轴向拉压符号容易混淆</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>主要难点是自由热伸长和全约束热载荷对应不同边界状态，项目需要先明确封隔器与管柱的实际约束，再选择相应计算情景。轴向合力还可能随温升从拉伸转为压缩，应保留符号参与组合应力计算。复核时要同时核对温压基准、材料强度与质量变化，识别究竟是哪项载荷控制了候选壁厚范围。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">代理模型<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">敏感性分析<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">可靠性评估<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

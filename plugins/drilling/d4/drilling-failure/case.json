@@ -11,53 +11,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "钻柱承担旋转与载荷传递，反复交变载荷可能导致疲劳。服役小时相同并不意味着退化状态相同；用历史退化指标估计趋势与剩余寿命，有助于把后续作业时长与检查计划联系起来。",
+      "lede": "钻具的服役时长相同，承受的载荷与退化速度可能不同。AI 利用连续状态观测估计退化趋势，将当前状态与计划作业时长对照，为工具管理人员列出需要优先探伤或复测的钻具。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子，可导出核查"
+          "label": "任务类型",
+          "value": "退化趋势与寿命估计",
+          "desc": "从状态序列估计到达复核阈值的剩余时间",
+          "html": "<span style=\"color:var(--c-ts)\">退化趋势与寿命估计</span>"
         },
         {
-          "label": "方法类型",
-          "value": "退化趋势与寿命外推",
-          "desc": "纯前端轻量计算"
+          "label": "数据门槛",
+          "value": " 50—100 件钻具",
+          "desc": "服役、载荷、探伤与检修履历"
         },
         {
-          "label": "输出用途",
-          "value": "教学比较",
-          "desc": "不连接设备与现场系统"
+          "label": "收益",
+          "value": "0.0086 → 0.0037",
+          "desc": "第 20—70 小时，原始观测与趋势估计的退化指标 MAE",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">0.0086 → 0.0037</b>"
         },
         {
-          "label": "评价边界",
-          "value": "合成任务",
-          "desc": "不声称真实工程收益"
+          "label": "难度",
+          "value": "中",
+          "desc": "失效样本少，载荷变化会改变退化速度",
+          "html": "<span class=\"dtag\" data-d=\"中\">难度 中</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
-          "en": "BUSINESS",
-          "title": "载荷历史与钻具退化",
-          "html": "<p>钻柱包括钻杆、底部钻具组合及其他驱动钻头的工具。扭转波动与振动可能影响连接和钻头。真实疲劳评价依赖应力、几何、材料、腐蚀和检查记录；本例用人为损伤指标说明载荷历史与剩余寿命关系，绝不从单一振动值推导真实断裂时刻。</p><figure class=\"figure\"><div style=\"overflow-x:auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"载荷历史与钻具退化\" style=\"width:100%;min-width:560px;max-width:640px;display:block;margin:auto\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">服役载荷</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">交变弯曲 / 扭转载荷</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">退化代理量</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">已标定传感器假设</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">剩余寿命</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">趋势到阈值的距离</text></svg></div><figcaption class=\"figcap\">业务关系示意，不是测量结果。窄屏可在图内横向滚动。</figcaption></figure>"
+          "en": "PROBLEM",
+          "title": "钻具失效预测业务问题",
+          "html": "<p>钻具寿命按进尺或纯钻时间粗放估算，无法区分不同工况下的损伤差异；振动超标时往往已接近失效。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 118\" role=\"img\" aria-label=\"载荷历史与钻具退化\"><rect x=\"18\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"105\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">服役载荷</text><text x=\"105\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">交变弯曲 / 扭转载荷</text><path d=\"M194 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"208\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"295\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">退化代理量</text><text x=\"295\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">已标定传感器假设</text><path d=\"M384 59h12m-5-5 5 5-5 5\" fill=\"none\" stroke=\"var(--jade,#2f7d6b)\" stroke-width=\"2\"/><rect x=\"398\" y=\"18\" width=\"174\" height=\"82\" rx=\"8\" fill=\"var(--jade-l,#e6f1ec)\" stroke=\"var(--line-2,#ddd7c8)\"/><text x=\"485\" y=\"50\" text-anchor=\"middle\" font-size=\"18\" fill=\"var(--ink,#242b2e)\">剩余寿命</text><text x=\"485\" y=\"79\" text-anchor=\"middle\" font-size=\"15\" fill=\"var(--ink-2,#4d565b)\">趋势到阈值的距离</text></svg></div><div class=\"figcap\"><b>图 1</b><span>业务关系示意，不是测量结果。窄屏可在图内横向滚动。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "退化趋势与寿命外推",
-          "html": "<p>隐藏合成损伤随载荷倍率的三次方累积，传感器代理量叠加噪声。估计器看不到隐藏损伤或未来值，只在近期观测窗口最小二乘拟合直线，外推到教学阈值 1。窗口长度体现平滑与响应滞后的折中，寿命敏感性范围说明噪声怎样改变外推结果。实现不是经过钻具试验标定的疲劳定律。</p>"
+          "en": "INTERVENTION",
+          "title": "钻具退化与趋势预测",
+          "html": "<p>钻具承受的扭转载荷与振动随作业积累，工具管理需要同时考虑当前状态和后续任务。AI 将传感器状态代理量整理成退化序列，本例用近期观测窗口的线性回归估计增长速度，再外推到指定复核阈值。输出包含趋势、预计触线时间与噪声敏感范围，便于识别退化加快的工具。</p><p>收益在于为检查计划提供时间顺序：把预计触线时间与下一段作业时长并排展示，优先安排趋势加快、剩余窗口较短或估计波动较大的钻具复测。演示可比较不同载荷和窗口下的预测变化。工具管理员由逐件翻阅状态记录转为核对重点对象，并把复测结果反馈到履历中。</p><p><b>默认载荷倍率 1.3，在第 20—70 小时的相同 51 个观测时点，原始传感器代理量的退化指标 MAE 为 0.0086，16 点局部趋势估计降至 0.0037，均以合成隐藏损伤作评价参照。估计仅使用各时点已观测历史，平滑后的当前状态进一步用于触线时间外推。</b></p>"
         },
         {
           "no": 3,
           "en": "DATA",
-          "title": "数据准备与评价切分",
-          "html": "<p>固定种子 20261025，每小时一条，共 161 条合成记录。可修改载荷倍率、观测时间、回归窗口和计划作业时长。现场数据需要钻具唯一标识、累计服役、载荷谱、检修、探伤及失效记录，未失效钻具属于删失样本，不能虚构准确失效标签。</p>"
+          "title": "钻具履历与退化标签",
+          "html": "<p style=\"margin-bottom:14px\">试点汇总 50—100 件钻具的唯一编号、累计服役、载荷谱、振动、探伤、维修和失效记录，保持同一件工具的履历可追踪。未发生失效的样本保留末次检查时间与状态。演示使用 161 条逐小时合成记录，通过改变观测时刻与拟合窗口，展示可用历史长度对趋势估计的影响。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">钻具振动与扭矩</span><span class=\"cl-s\">高频采样，随钻测量</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">钻具台账</span><span class=\"cl-s\">型号、服役历史、探伤记录</span></span><span class=\"cl-n\">失效事件标注</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">起钻检查结果</span><span class=\"cl-s\">探伤与磨损测量</span></span><span class=\"cl-n\">作为寿命标签</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">服役、载荷、探伤与检修履历</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://glossary.slb.com/terms/d/drillstring\">SLB：drillstring<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://www.slb.com/-/media/files/drilling/brochure/drillstring-vib-br\">SLB：Drillstring Vibrations and Vibration Modeling<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://data.nasa.gov/dataset/prognostics\">NASA：Prognostics<span class=\"ar\">↗</span></a></div>"
         },
         {
           "no": 4,
-          "en": "LIMITS",
-          "title": "模型适用范围与工程约束",
-          "html": "<p>RUL 假设未来载荷与当前趋势保持不变。±2 残差标准差转成的范围仅用于敏感性分析，不是已校准置信区间。当前观测期还未见失效时，不报告真实 RUL 误差；只有失效已发生才回溯评价。教学阈值不是报废标准，模型不能代替探伤或作业决策。</p><p>专业资料与方法来源：</p><ul><li><a href=\"https://glossary.slb.com/terms/d/drillstring\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：drillstring</a>：支持钻柱组成的定义。</li><li><a href=\"https://www.slb.com/-/media/files/drilling/brochure/drillstring-vib-br\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：Drillstring Vibrations and Vibration Modeling</a>：支持扭转振动可能导致连接疲劳和钻头损伤的背景，不支持本例合成寿命系数。</li><li><a href=\"https://data.nasa.gov/dataset/prognostics\" target=\"_blank\" rel=\"noopener noreferrer\">NASA：Prognostics</a>：支持 RUL 为功能失效前剩余时间的概念；本例未使用 NASA 数据，不代表 NASA 方法复现。</li></ul>"
+          "en": "DIFFICULTY",
+          "title": "稀缺失效与变载工况",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"中\">难度 中</span><span class=\"small muted\">失效样本少，载荷变化会改变退化速度</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"\"></i></div><p>落地难度中，失效事件稀少且未失效工具占多数，标签整理比单次拟合更费力。载荷切换、维修复位和不同规格也会改变退化趋势，需要在履历中明确分段。试点应先覆盖同类工具，跟踪每次探伤与复测结果，检查预测排序能否稳定把退化加快的对象提前列出。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/ts\">剩余寿命预测<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/ts\">疲劳累积模型<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/ts\">混合建模<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },

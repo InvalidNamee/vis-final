@@ -10,42 +10,56 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "套管偏心会扩大宽边与窄边流速差，窄边泥浆残留使封隔更困难。扶正器数量有限时，等距安放未必覆盖高井斜或扩径段。本例在候选节点间计算跨距挠曲代理，用动态规划在固定预算下安排支点，并与同样数量的等距方案比较。",
+      "lede": "扶正器数量受预算约束，等距安放容易遗漏高井斜或间隙变化较大的薄弱井段。AI布置优化中的动态规划自动比较支点组合，向固井设计人员交付安放深度、沿程居中度和等距方案对照。",
       "judge": [
         {
-          "label": "数据来源",
-          "value": "教学合成",
-          "desc": "固定种子20261023，非现场实测"
+          "label": "任务类型",
+          "value": "支点组合优化",
+          "desc": "动态规划作为AI布置流程的可解释搜索环节",
+          "html": "<span style=\"color:var(--c-opt)\">支点组合优化</span>"
         },
         {
-          "label": "实际方法",
-          "value": "支点预算动态规划",
-          "desc": "浏览器计算，详见模型与流程"
+          "label": "数据门槛",
+          "value": "1—3 口井",
+          "desc": "井斜、井径、套管尺寸及载荷资料"
         },
         {
-          "label": "工程边界",
-          "value": "辅助教学",
-          "desc": "不构成施工、设备控制或安全结论"
+          "label": "收益",
+          "value": "83.8 → 90.7 %",
+          "desc": "相同7个支点下，最低居中度由等距方案提高",
+          "html": "<b style=\"color:var(--jade-d);font-family:var(--mono)\">83.8 → 90.7 %</b>"
+        },
+        {
+          "label": "难度",
+          "value": "低",
+          "desc": "挠曲响应标定与扶正器数量口径是关键",
+          "html": "<span class=\"dtag\" data-d=\"低\">难度 低</span>"
         }
       ],
       "sections": [
         {
           "no": 1,
           "en": "PROBLEM",
-          "title": "套管居中度智能评估业务背景",
-          "html": "<p>套管偏心会扩大宽边与窄边流速差，窄边泥浆残留使封隔更困难。扶正器数量有限时，等距安放未必覆盖高井斜或扩径段。本例在候选节点间计算跨距挠曲代理，用动态规划在固定预算下安排支点，并与同样数量的等距方案比较。</p><figure class=\"figure\"><div style=\"overflow-x:auto\" tabindex=\"0\" role=\"region\" aria-label=\"井段居中度，窄屏横向滚动\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"井段居中度\" style=\"display:block;width:100%;min-width:620px;max-width:860px;margin:auto\"><title>井段居中度</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-8</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">0</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">21</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">60</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">50</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">120</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">79</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">180</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">108</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">240</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,64.82758620689654 146.54166666666666,76.63972758760241 169.08333333333334,80.54209378381896 191.625,77.59277356408296 214.16666666666669,64.82758620689654 236.70833333333331,83.50666480412738 259.25,94.88653933918275 281.79166666666663,87.97815000545009 304.33333333333337,64.82758620689654 326.875,79.44996724803653 349.41666666666663,79.67686257662305 371.95833333333337,73.84183668743341 394.5,64.82758620689654 417.0416666666667,72.40251374214594 439.5833333333333,75.3325045729596 462.125,73.31733996478695 484.6666666666667,64.82758620689654 507.2083333333333,72.95902572034399 529.75,75.005974215127 552.2916666666667,72.51037331947344 574.8333333333333,64.82758620689654 597.375,74.93634110041842 619.9166666666667,82.14677210876602 642.4583333333334,82.13645921323103 665,64.82758620689654\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,64.82758620689654 146.54166666666666,76.63972758760241 169.08333333333334,80.54209378381896 191.625,77.59277356408296 214.16666666666669,64.82758620689654 236.70833333333331,77.28030527171711 259.25,79.85706277303964 281.79166666666663,64.82758620689654 304.33333333333337,77.73442372517923 326.875,74.57584023432321 349.41666666666663,64.82758620689654 371.95833333333337,76.8465868476124 394.5,80.64055865810528 417.0416666666667,79.97744127739537 439.5833333333333,75.3325045729596 462.125,64.82758620689654 484.6666666666667,76.36948793360122 507.2083333333333,81.0904652337914 529.75,80.09516821924223 552.2916666666667,75.0713023569991 574.8333333333333,64.82758620689654 597.375,74.93634110041842 619.9166666666667,82.14677210876602 642.4583333333334,82.13645921323103 665,64.82758620689654\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">相对深度 / m</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">居中度 / %</text></g></svg></div><figcaption>沿井段居中度曲线对比显示薄弱跨距；安放散点标明优化支点向高载荷段集中，而非仅报告单个平均值。图中是初始参数的固定种子教学计算，交互演示可重新计算。</figcaption><p>等距方案 · 动态规划；横轴：相对深度 / m；纵轴：居中度 / %。</p></figure>"
+          "title": "套管居中度评估业务问题",
+          "html": "<p>扶正器安放间距靠经验公式，实际井径不规则时居中效果与设计偏差大；下套管前难以预判。</p><div class=\"figure\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 335\" role=\"img\" aria-label=\"井段居中度\"><title>井段居中度</title><rect width=\"720\" height=\"335\" rx=\"8\" fill=\"#f6f9f8\"/><g font-family=\"system-ui,sans-serif\" font-size=\"15\" fill=\"#334741\"><path d=\"M124 265H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"270\" text-anchor=\"end\">-8</text><text x=\"124\" y=\"291\" text-anchor=\"middle\">0</text><path d=\"M124 211.25H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"216.25\" text-anchor=\"end\">21</text><text x=\"259.25\" y=\"291\" text-anchor=\"middle\">60</text><path d=\"M124 157.5H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"162.5\" text-anchor=\"end\">50</text><text x=\"394.5\" y=\"291\" text-anchor=\"middle\">120</text><path d=\"M124 103.75H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"108.75\" text-anchor=\"end\">79</text><text x=\"529.75\" y=\"291\" text-anchor=\"middle\">180</text><path d=\"M124 50H665\" stroke=\"#d8e1df\"/><text x=\"112\" y=\"55\" text-anchor=\"end\">108</text><text x=\"665\" y=\"291\" text-anchor=\"middle\">240</text><polyline fill=\"none\" stroke=\"#267d70\" stroke-width=\"2.5\" points=\"124,64.82758620689654 146.54166666666666,76.63972758760241 169.08333333333334,80.54209378381896 191.625,77.59277356408296 214.16666666666669,64.82758620689654 236.70833333333331,83.50666480412738 259.25,94.88653933918275 281.79166666666663,87.97815000545009 304.33333333333337,64.82758620689654 326.875,79.44996724803653 349.41666666666663,79.67686257662305 371.95833333333337,73.84183668743341 394.5,64.82758620689654 417.0416666666667,72.40251374214594 439.5833333333333,75.3325045729596 462.125,73.31733996478695 484.6666666666667,64.82758620689654 507.2083333333333,72.95902572034399 529.75,75.005974215127 552.2916666666667,72.51037331947344 574.8333333333333,64.82758620689654 597.375,74.93634110041842 619.9166666666667,82.14677210876602 642.4583333333334,82.13645921323103 665,64.82758620689654\"/><polyline fill=\"none\" stroke=\"#b5692b\" stroke-width=\"2.5\" points=\"124,64.82758620689654 146.54166666666666,76.63972758760241 169.08333333333334,80.54209378381896 191.625,77.59277356408296 214.16666666666669,64.82758620689654 236.70833333333331,77.28030527171711 259.25,79.85706277303964 281.79166666666663,64.82758620689654 304.33333333333337,77.73442372517923 326.875,74.57584023432321 349.41666666666663,64.82758620689654 371.95833333333337,76.8465868476124 394.5,80.64055865810528 417.0416666666667,79.97744127739537 439.5833333333333,75.3325045729596 462.125,64.82758620689654 484.6666666666667,76.36948793360122 507.2083333333333,81.0904652337914 529.75,80.09516821924223 552.2916666666667,75.0713023569991 574.8333333333333,64.82758620689654 597.375,74.93634110041842 619.9166666666667,82.14677210876602 642.4583333333334,82.13645921323103 665,64.82758620689654\"/><text class=\"plot-x-label\" x=\"394.5\" y=\"324\" text-anchor=\"middle\">相对深度 / m</text><text class=\"plot-y-label\" x=\"24\" y=\"157.5\" transform=\"rotate(-90 24 157.5)\" text-anchor=\"middle\">居中度 / %</text></g></svg></div><div class=\"figcap\"><b>图 1</b><span>沿井段居中度曲线对比显示薄弱跨距；安放散点标明优化支点向高载荷段集中，而非仅报告单个平均值。图中是初始参数的固定种子教学计算，交互演示可重新计算。</span></div>"
         },
         {
           "no": 2,
-          "en": "METHOD",
-          "title": "扶正器安放动态规划计算方法",
-          "html": "<p>240m教学井段以10m节点离散，井斜与间隙随深度变化。；支点间抛物线型挠曲结合载荷、井斜和间隙得到居中度。；状态为已用跨距数和末支点位置，最小化居中不足平方损失。；回溯推荐支点，与相同端点和数量的等距方案评价。</p><p>简化横向载荷挠曲代理，非API扶正器性能或真实套管梁模型；24个10m候选跨距节点，井径变化与井斜影响挠度。</p>"
+          "en": "INTERVENTION",
+          "title": "扶正器布置与动态规划",
+          "html": "<p>套管偏心会使环空宽窄边流动不均，局部泥浆残留影响水泥环形成。设计人员需要在有限扶正器数量下，把支点布置到居中度薄弱的位置。AI布置流程采用动态规划作为可解释的组合搜索：以已用跨距数与末支点位置为状态，累计各跨距的居中不足平方损失，并回溯得到整段安放方案。</p><p>等距方案 · 动态规划；横轴：相对深度 / m；纵轴：居中度 / %。</p><p>计算结果交付推荐支点的相对深度、沿程居中度、最低居中度与偏心损失，并与相同数量和端点的等距方案比较。设计人员可以直接定位两种方案在哪些跨距产生差异，减少人工挪动支点后反复绘制整段曲线的工作。支点清单与居中度明细共同保留布置依据，使预算变化后的方案复核有具体对象。</p><p><b>默认教学计算在240米井段布置7个含端点支点，动态规划方案的最低居中度为90.7%，等距方案为83.8%，提高6.9个百分点。沿程居中不足平方和由1171.29降至979.21，下降16.4%。</b></p>"
         },
         {
           "no": 3,
-          "en": "LIMITS",
-          "title": "评价边界与专业资料",
-          "html": "<p>最低居中度为全节点最小值；目标是Σ(100−居中度)²而非直接最大化最低值，因此两指标可能不同时改善。</p><p>不包含真实扶正器回复力/起动力、摩阻及套管弯曲刚度，不能直接作为下套管布置表。端点固定、预算为跨距段数，实际扶正器数为预算+1。</p><p>全部数据、系数、参数范围和阈值均为教学假设，不代表现场效果。</p><ul><li><a href=\"https://glossary.slb.com/terms/c/centralizer\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：扶正器</a>：支持偏心导致泥浆通道与封隔问题，不支持本例挠曲系数或安放方案。</li><li><a href=\"https://glossary.slb.com/en/terms/c/cementing\" target=\"_blank\" rel=\"noopener noreferrer\">SLB：固井</a>：支持固井前根据井径、密度和流变设计水泥浆体积与性能，不支持本例效率公式或压力窗数字。</li></ul>"
+          "en": "DATA",
+          "title": "井身剖面与跨距响应资料",
+          "html": "<p style=\"margin-bottom:14px\">试点选择1—3口井，整理同一深度基准下的井斜、井径、套管外径与载荷资料，补充扶正器性能记录用于核对跨距响应。优化本身依赖井身剖面和受力计算，无需人工标注最佳安放位置。本例把240米井段划为24个10米跨距，以随深度变化的井斜与间隙、简化挠曲代理演示支点搜索。</p><div class=\"checklist\"><div class=\"cl-head\"><span>数据准备清单 · 5 项</span><span class=\"cl-prog\"><span id=\"cl-txt\">0 / 5</span><span class=\"cl-bar\"><i id=\"cl-fill\"></i></span></span></div><div class=\"cl-item\" data-cl=\"0\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">井径与井斜</span><span class=\"cl-s\">全井段</span></span><span class=\"cl-n\">无需标注</span></div><div class=\"cl-item\" data-cl=\"1\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">套管与扶正器参数</span><span class=\"cl-s\">型号、外径、安放记录</span></span><span class=\"cl-n\">作为输入</span></div><div class=\"cl-item\" data-cl=\"2\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">固井质量反馈</span><span class=\"cl-s\">CBL 评级</span></span><span class=\"cl-n\">作为验证</span></div><div class=\"cl-item\" data-cl=\"3\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">人工复核记录</span><span class=\"cl-s\">保留复核对象、原始证据与修订结论</span></span><span class=\"cl-n\">井斜、井径、套管尺寸及载荷资料</span></div><div class=\"cl-item\" data-cl=\"4\"><span class=\"cl-box\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12.5l5 5L20 6.5\"/></svg></span><span><span class=\"cl-t\">样本版本与评价明细</span><span class=\"cl-s\">按原始对象分组，保留评价记录与版本</span></span><span class=\"cl-n\">用于复查数值和追踪更新</span></div></div><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">专业资料与数据依据</span></p><div class=\"refs\"><a class=\"ref\" href=\"https://glossary.slb.com/terms/c/centralizer\">SLB：扶正器<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"https://glossary.slb.com/en/terms/c/cementing\">SLB：固井<span class=\"ar\">↗</span></a></div>"
+        },
+        {
+          "no": 4,
+          "en": "DIFFICULTY",
+          "title": "挠曲标定与布置目标",
+          "html": "<div style=\"display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:2px\"><span class=\"dtag\" data-d=\"低\">难度 低</span><span class=\"small muted\">挠曲响应标定与扶正器数量口径是关键</span></div><div class=\"meter\"><i class=\"on\"></i><i class=\"\"></i><i class=\"\"></i></div><p>难点在于横向载荷、井斜与间隙共同影响跨距挠曲，响应参数需要与目标套管和扶正器匹配。数量口径也要统一：模型输入为跨距段数，含固定端点的支点数等于跨距数加一。动态规划优化的是全段居中不足平方和，复核时应同时查看最低居中度和损失分布，避免用单个最小值替代整体布置目标。</p><p style=\"margin-top:18px\"><span class=\"kicker plain\" style=\"color:var(--ink-4)\">可借鉴的通用技术</span></p><div class=\"refs\"><a class=\"ref\" href=\"/method/opt\">几何计算<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">组合优化<span class=\"ar\">↗</span></a><a class=\"ref\" href=\"/method/opt\">规则引擎<span class=\"ar\">↗</span></a></div>"
         }
       ]
     },
