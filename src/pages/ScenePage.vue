@@ -3,7 +3,6 @@ import {computed} from 'vue';
 import {useAtlas,pad} from '../composables/useAtlas';
 import LegacyHtml from '../components/LegacyHtml.vue';
 import DemoHost from '../components/DemoHost.vue';
-import Crumb from '../components/layout/Crumb.vue';
 import MethodTag from '../components/common/MethodTag.vue';
 const {atlas,host,route,navigate,casesOf}=useAtlas();
 const K=(host as any).K;
@@ -26,7 +25,6 @@ const tabNo=(i:number)=>pad(i+1);
 
 <template>
   <div v-if="scene" class="page scene-page atlas-scene-page"><div class="wrap">
-    <Crumb :items="[['/','总览'],['/chain','作业链'],[`/stage/${stage.id}`,stage.name],['',scene.name]]"/>
     <header class="detail-head rise">
       <div class="dh-top">
         <div>

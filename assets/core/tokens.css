@@ -67,6 +67,10 @@
   --mono: 'JetBrains Mono','SFMono-Regular','Cascadia Mono',Consolas,'Liberation Mono',monospace;
   --sans: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI Variable','Segoe UI',
           'PingFang SC','Hiragino Sans GB','Microsoft YaHei UI','Microsoft YaHei',sans-serif;
+  --demo-font-size: 14px;
+  --demo-title-size: 20px;
+  --demo-heading-size: 16px;
+  --demo-value-size: 22px;
 
   /* ---------- 布局 ---------- */
   --nav-h: 54px;

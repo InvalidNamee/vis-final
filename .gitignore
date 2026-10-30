@@ -5,6 +5,7 @@
 # Generated packages and browser verification artifacts
 /.dist/
 /output/playwright/
+/output/defense/
 /.playwright-cli/
 /playwright-report/
 /test-results/

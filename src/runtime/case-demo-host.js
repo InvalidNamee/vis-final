@@ -38,7 +38,8 @@
     '--line', '--line-2', '--line-3', '--ink', '--ink-2', '--ink-3', '--ink-4', '--ink-inv',
     '--jade', '--jade-d', '--jade-l', '--clay', '--clay-d', '--clay-l',
     '--ok', '--ok-bg', '--warn', '--warn-bg', '--bad', '--bad-bg',
-    '--sans', '--mono', '--r-s', '--r-m', '--r-l', '--sh-1', '--sh-2'];
+    '--sans', '--mono', '--r-s', '--r-m', '--r-l', '--sh-1', '--sh-2',
+    '--demo-font-size', '--demo-title-size', '--demo-heading-size', '--demo-value-size'];
 
   var BASE_CSS =
     '.cd-box{display:block;font-family:var(--sans,system-ui,sans-serif);' +
@@ -111,7 +112,7 @@
     return String(js).replace(/<\/script/gi, '<\\/script');
   }
 
-  function buildPageDoc(pkg, token) {
+  function buildPageDoc(pkg, token, theme) {
     var files = pkg.files || [];
     var d = pkg.demo || {};
     var htmlFile = findFile(files, d.html) || firstExt(files, isHtml);
@@ -173,11 +174,15 @@
       '<script>window.__ASSETS__=' + assetsJson + ';' +
       'window.caseAsset=function(n){return window.__ASSETS__[n]||""};' +
       '(function(){var last=-1;function send(){' +
-      'var h=Math.max(document.body?document.body.scrollHeight:0,document.documentElement.scrollHeight);' +
+      // documentElement.scrollHeight includes the iframe viewport and cannot shrink with its content.
+      'var b=document.body;if(!b)return;var cs=getComputedStyle(b);' +
+      'var h=Math.ceil(Math.max(b.scrollHeight,b.getBoundingClientRect().height)+' +
+      '(parseFloat(cs.marginTop)||0)+(parseFloat(cs.marginBottom)||0));' +
       'h=Math.min(h,4200);if(Math.abs(h-last)>2){last=h;' +
       'try{parent.postMessage({__caseDemo:"' + token + '",h:h},"*")}catch(e){}}}' +
-      'document.addEventListener("DOMContentLoaded",send);window.addEventListener("load",send);' +
-      'try{if(window.ResizeObserver){new ResizeObserver(send).observe(document.documentElement)}}catch(e){}' +
+      'document.addEventListener("DOMContentLoaded",function(){send();' +
+      'try{if(window.ResizeObserver){new ResizeObserver(send).observe(document.body)}}catch(e){}});' +
+      'window.addEventListener("load",send);' +
       'var n=0,t=setInterval(function(){send();if(++n>40)clearInterval(t)},400);' +
       '})();</script' + '>';
 
@@ -189,6 +194,8 @@
       html = '<!DOCTYPE html><html><head><meta charset="utf-8">' + head + '</head><body>' + html + '</body></html>';
     }
 
+    // Apply the shell theme after package styles, including unreferenced CSS.
+    if (theme) tail += '<style data-atlas-demo-theme>' + cssText(tokenCss(':root') + theme, map, files) + '</style>';
     if (tail) {
       if (/<\/body>/i.test(html)) html = html.replace(/<\/body>/i, tail + '</body>');
       else html += tail;
@@ -206,7 +213,7 @@
     frame.setAttribute('referrerpolicy', 'no-referrer');
     frame.setAttribute('title', (pkg.meta && pkg.meta.title ? pkg.meta.title : '案例示范') + '（沙箱）');
     frame.style.height = minH + 'px';
-    frame.srcdoc = buildPageDoc(pkg, token);
+    frame.srcdoc = buildPageDoc(pkg, token, ctx && ctx.demoTheme);
     host.appendChild(frame);
 
     function onMsg(e) {
@@ -229,9 +236,9 @@
   }
 
   /* ---------------- module 模式：Shadow DOM + demo.js ---------------- */
-  function tokenCss() {
+  function tokenCss(selector) {
     var cs = global.getComputedStyle(document.documentElement);
-    var out = ':host{';
+    var out = (selector || ':host') + '{';
     TOKENS.forEach(function (t) {
       var v = cs.getPropertyValue(t);
       if (v) out += t + ':' + v.trim() + ';';
@@ -253,7 +260,8 @@
 
     var style = document.createElement('style');
     style.textContent = tokenCss() + '\n' + BASE_CSS + '\n' +
-      files.filter(function (f) { return isCss(f.name); }).map(function (f) { return String(f.data); }).join('\n');
+      files.filter(function (f) { return isCss(f.name); }).map(function (f) { return String(f.data); }).join('\n') +
+      '\n' + ((ctx && ctx.demoTheme) || '');
     shadow.appendChild(style);
 
     var box = document.createElement('div');

@@ -6,7 +6,6 @@ import {useContentStore} from '../stores/content';
 import {useSessionStore} from '../stores/session';
 import {changePassword} from '../services/management';
 import PageHead from '../components/layout/PageHead.vue';
-import Crumb from '../components/layout/Crumb.vue';
 const route=useRoute(),router=useRouter(),content=useContentStore(),session=useSessionStore(),dialog=useDialog(),message=useMessage();
 const user=ref(''),password=ref(''),passwordModal=ref(false),newPassword=ref(''),search=ref(''),editing=ref(false),model=ref<any>({});
 const section=computed(()=>String(route.params.section||'overview'));
@@ -44,7 +43,6 @@ function updatePassword(){const r=changePassword(newPassword.value);if(!r.ok)mes
 </script>
 <template>
  <div class="page"><div class="wrap">
-  <Crumb :items="[['/','总览'],['','内容管理']]"/>
   <template v-if="!session.authenticated">
    <PageHead idx="ADMIN" title="内容管理登录" blurb="本地教学管理，数据保存在当前浏览器。"/>
    <n-card class="adm-login" title="管理员登录">

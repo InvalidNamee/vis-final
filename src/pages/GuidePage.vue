@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import PageHead from '../components/layout/PageHead.vue';
-import Crumb from '../components/layout/Crumb.vue';
 import { ref } from 'vue';
 const example = `{
   "id": "my-drilling-case",
@@ -17,7 +16,6 @@ const mode=ref('page');
 
 <template>
   <div class="page atlas-guide"><div class="wrap">
-    <Crumb :items="[['/','总览'],['','接入指南']]"/>
     <PageHead idx="CONTENT INTEGRATION" title="案例接入指南" en="Case package protocol" blurb="内容模块与页面框架独立。原案例清单、文件包结构和演示接口保持兼容，外壳更新不要求案例包改写。">
       <template #actions><n-button type="primary" data-import>＋ 添加案例</n-button><n-button data-dl-template>下载原案例模板</n-button></template>
     </PageHead>

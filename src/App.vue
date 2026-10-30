@@ -4,6 +4,7 @@ import {zhCN,dateZhCN} from 'naive-ui';
 import ImportDialog from './components/ImportDialog.vue';
 import AppHeader from './components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
+import Crumb from './components/layout/Crumb.vue';
 import {createContentState,contentKey} from './state';
 import {themeOverrides} from './theme';
 const state=createContentState();provide(contentKey,state);
@@ -24,6 +25,7 @@ onErrorCaptured((e:any)=>{console.error(e);error.value=e.message;return false;})
     <a class="skip" href="#main-content" @click.prevent="focusMain">跳到主要内容</a>
     <AppHeader/>
     <main id="main-content" class="shell-main" tabindex="-1">
+      <Crumb/>
       <div v-if="error" class="wrap empty-state" role="alert"><h1>页面加载异常</h1><p>{{ error }}</p><router-link class="btn" to="/">返回地图总览</router-link></div>
       <router-view v-else v-slot="{Component,route:r}">
         <Transition name="page" mode="out-in"><component :is="Component" :key="r.path"/></Transition>

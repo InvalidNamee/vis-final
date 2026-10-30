@@ -3,7 +3,6 @@ import {computed,ref,watch} from 'vue';
 import {useDialog} from 'naive-ui';
 import {useAtlas} from '../composables/useAtlas';
 import PageHead from '../components/layout/PageHead.vue';
-import Crumb from '../components/layout/Crumb.vue';
 import CountUp from '../components/common/CountUp.vue';
 const {state,atlas,host,caseStats,tick}=useAtlas();
 const dialog=useDialog();
@@ -23,7 +22,6 @@ const originOptions=[{label:'全部案例',value:''},{label:'本地导入',value
 
 <template>
   <div class="page"><div class="wrap">
-    <Crumb :items="[['/','总览'],['','案例库']]"/>
     <PageHead idx="CASE LIBRARY" title="案例库与接入状态" en="Registered case packages" blurb="全部已注册案例、导入来源与协议校验结果。内置案例可隐藏并恢复，本地导入的案例保存在当前浏览器。"/>
     <div class="console-bar">
       <span class="stat"><span class="num"><CountUp :value="caseStats.registered"/><small>个</small></span><span class="lbl">已注册案例</span></span>

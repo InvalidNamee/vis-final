@@ -3,7 +3,6 @@ import {computed} from 'vue';
 import {useAtlas,pad} from '../composables/useAtlas';
 import {vReveal} from '../composables/useReveal';
 import PageHead from '../components/layout/PageHead.vue';
-import Crumb from '../components/layout/Crumb.vue';
 import StackBar from '../components/common/StackBar.vue';
 const {atlas,matrix,methodKeys,colorOf,caseStats,host,tick}=useAtlas();
 const ready=(st:any)=>{tick();return st.scenes.filter((s:any)=>host.Cases.byScene(s.id)).length;};
@@ -13,7 +12,6 @@ const stats=computed<[number,string][]>(()=>[[atlas.value.stages.length,'作业�
 
 <template>
   <div class="page"><div class="wrap">
-    <Crumb :items="[['/','总览'],['','作业链']]"/>
     <PageHead idx="OPERATIONS CHAIN" title="石油作业链与方法分布" en="From exploration to production" blurb="沿上游到下游的作业环节排列，每行列出各智能方法覆盖的场景数和案例接入情况。点击方法标签可直接进入带筛选的环节页。" :stats="stats"/>
     <ol class="ops">
       <li v-for="(st,i) in atlas.stages" :key="st.id" class="op-row" v-reveal="Number(i)%6">

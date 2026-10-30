@@ -2,7 +2,6 @@
 import {computed} from 'vue';
 import {useAtlas,pad} from '../composables/useAtlas';
 import PageHead from '../components/layout/PageHead.vue';
-import Crumb from '../components/layout/Crumb.vue';
 import SceneRow from '../components/common/SceneRow.vue';
 import StackBar from '../components/common/StackBar.vue';
 const {atlas,host,route,navigate,methodKeys,colorOf,tick}=useAtlas();
@@ -28,7 +27,6 @@ function clear(){navigate(route.value.path);}
 
 <template>
   <div v-if="entity" class="page browse" :data-m="isMethod?colorOf(id):undefined"><div class="wrap">
-    <Crumb :items="[['/','总览'],[isMethod?'':'/chain',isMethod?'方法反查':'作业链'],['',entity.name]]"/>
     <PageHead :idx="isMethod?`METHOD · ${entity.abbr}`:`STAGE ${pad(entity.idx)} / ${pad(atlas.stages.length)}`" :title="isMethod?`${entity.name}在石油勘探开发中的可应用场景`:`${entity.name}环节的可智能化场景`" :en="isMethod?entity.signal:entity.en" :blurb="entity.blurb||entity.desc" :stats="stats"/>
 
     <div class="filters" role="group" aria-label="场景筛选">

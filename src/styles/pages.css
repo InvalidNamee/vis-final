@@ -11,10 +11,10 @@
 
 /* ---------------- 作业链页 ---------------- */
 .ops{list-style:none;margin:0;padding:0;border-top:1px solid var(--line-2)}
-.op-row{display:grid;grid-template-columns:42px minmax(0,1fr) 150px;gap:16px;align-items:start;padding:15px 8px 15px 4px;border-bottom:1px solid var(--line);position:relative;transition:background .16s}
+.op-row{display:grid;grid-template-columns:42px minmax(0,1fr) 150px;gap:16px;align-items:start;padding:15px 8px 15px 16px;border-bottom:1px solid var(--line);position:relative;transition:background .16s}
 .op-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--jade);transform:scaleY(0);transition:transform .2s;border-radius:2px}
-.op-row:hover{background:rgba(255,255,255,.7)}
-.op-row:hover::before{transform:scaleY(.6)}
+.op-row:hover,.op-row:focus-within{background:rgba(255,255,255,.7)}
+.op-row:hover::before,.op-row:focus-within::before{transform:scaleY(.6)}
 .op-idx{font-family:var(--mono);font-size:11px;color:var(--jade);padding-top:3px;letter-spacing:.06em}
 .op-name{font-size:15px;font-weight:650;display:inline-flex;align-items:center;gap:8px}
 .op-name .en{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:var(--ink-4);font-weight:400;text-transform:uppercase}

@@ -1,0 +1,40 @@
+/* Shared by iframe and Shadow DOM demos; package layouts and plots stay local. */
+:root,.cd-box{
+  font-family:var(--sans,system-ui,sans-serif);
+  font-size:var(--demo-font-size,14px);
+  line-height:1.7;
+  color:var(--ink,#242b2e);
+  background:var(--card,#fff);
+  -webkit-text-size-adjust:100%;
+}
+:is(html,.cd-box) *{box-sizing:border-box}
+html body{font:inherit;color:inherit;background:var(--card);padding:20px;max-width:none;margin:0}
+html body main{max-width:none;padding:0;margin:0}
+:is(html,.cd-box) :is(h1,h2,h3,h4){color:var(--ink);font-weight:650;line-height:1.4;letter-spacing:-.01em}
+:is(html,.cd-box) h1{font-size:var(--demo-title-size);margin:8px 0 12px}
+:is(html,.cd-box) h2{font-size:var(--demo-heading-size);margin:0 0 12px}
+:is(html,.cd-box) :is(h3,h4){font-size:var(--demo-font-size)}
+:is(html,.cd-box) p{color:var(--ink-2);font-size:inherit;line-height:1.75}
+:is(html,.cd-box) :is(.tag,.eyebrow,.source){font-size:12px;color:var(--jade-d)}
+:is(html,.cd-box) :is(section,figure,.panel,.chart){border-color:var(--line);border-radius:var(--r-m);background:var(--card);box-shadow:none}
+:is(html,.cd-box) :is(section,figure,.panel){padding:16px;margin-block:16px}
+:is(html,.cd-box) :is(.controls,.control){background:var(--card-soft);border-color:var(--line)}
+:is(html,.cd-box) :is(label,input,select,textarea,button,output){font-family:inherit;font-size:var(--demo-font-size);line-height:1.6}
+:is(html,.cd-box) label{color:var(--ink-2)}
+:is(html,.cd-box) :is(input,select,textarea){accent-color:var(--jade)}
+:is(html,.cd-box) :is(select,textarea){border:1px solid var(--line-2);border-radius:var(--r-s);background:var(--card);color:var(--ink)}
+:is(html,.cd-box) button{min-height:34px;padding:6px 13px;border:1px solid var(--jade);border-radius:var(--r-s);background:var(--jade);color:var(--ink-inv);font-weight:500}
+:is(html,.cd-box) button:is(.quiet,.secondary,#reset,#export){background:var(--card);color:var(--jade-d);border-color:var(--line-2)}
+:is(html,.cd-box) button:hover{filter:brightness(.97)}
+:is(html,.cd-box) :is(button,input,select,textarea,summary):focus-visible{outline:2px solid var(--jade);outline-offset:3px}
+:is(html,.cd-box) :is(#metrics>div,.metric){background:var(--jade-l);border-radius:var(--r-s);padding:12px}
+:is(html,.cd-box) :is(#metrics strong,.metric strong,.result strong){font-family:var(--mono);font-size:var(--demo-value-size);font-weight:600;line-height:1.4;color:var(--jade-d)}
+:is(html,.cd-box) :is(#metrics span,.metric span,.metric small,figcaption,.legend,.hint,.muted,.detail,footer){font-size:12px;color:var(--ink-3)}
+:is(html,.cd-box) :is(#note,.notice){font-size:13px;background:var(--warn-bg);color:var(--ink-2);border-color:var(--warn);border-radius:var(--r-s)}
+:is(html,.cd-box) :is(table,summary){font-size:13px}
+:is(html,.cd-box) :is(th,td){border-color:var(--line)}
+:is(html,.cd-box) th{background:var(--card-soft);color:var(--ink-2)}
+@media(max-width:600px){
+  html body{padding:14px}
+  :is(html,.cd-box) :is(section,figure,.panel){padding:12px;margin-block:12px}
+}

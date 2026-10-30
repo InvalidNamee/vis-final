@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, inject } from 'vue';
 import { contentKey } from '../state';
+import demoTheme from '../styles/demo.css?raw';
 const props = defineProps({ scene: Object, kase: Object });
 const state = inject(contentKey), root = ref(null), error = ref('');
 let mounted = null;
@@ -10,7 +11,7 @@ function mount() {
   const demo = props.kase?.tabs?.demo;
   if (!demo?.mount) { error.value = '该案例没有可运行的演示入口。'; return; }
   mounted = demo;
-  try { demo.mount(root.value, { scene: props.scene, kase: props.kase, K: state.host.K, atlas: state.host.ATLAS }); }
+  try { demo.mount(root.value, { scene: props.scene, kase: props.kase, K: state.host.K, atlas: state.host.ATLAS, demoTheme }); }
   catch (e) { cleanup(); root.value.innerHTML = ''; error.value = `演示加载失败：${e.message}`; }
 }
 onMounted(mount);
