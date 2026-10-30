@@ -145,12 +145,12 @@
 
 /* ---------------- 作业链目录（左侧悬浮 TOC） ---------------- */
 :root{--toc-w:252px}
-.toc{position:fixed;left:0;top:var(--nav-h);bottom:0;width:var(--toc-w);z-index:50}
+.toc{position:fixed;left:0;top:var(--nav-h);bottom:0;width:var(--toc-w);z-index:50;padding:14px 0 14px 14px}
 .toc-fab{display:none}
 .toc-body{
   height:100%;display:flex;flex-direction:column;
-  background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-right:1px solid var(--line);
+  background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--sh-2);overflow:hidden;
 }
 .toc-head{display:flex;flex-direction:column;gap:2px;padding:16px 18px 12px;border-bottom:1px solid var(--line);transition:background .15s}
 .toc-head:hover{background:color-mix(in srgb,var(--jade) 5%,transparent)}
@@ -173,7 +173,7 @@
 .toc-x .n{font-family:var(--mono);font-size:10px}
 .toc-x svg{transition:transform .16s}
 .toc-st.ex .toc-x svg{transform:rotate(90deg)}
-.toc-l2{list-style:none;margin:2px 0 6px 15px;padding:0 0 0 9px;border-left:1px solid var(--line-2)}
+.toc-l2{list-style:none;margin:3px 0 8px;padding:4px;background:var(--card-soft);border:1px solid var(--line);border-radius:8px}
 .toc-l2 a{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:12px;color:var(--ink-3);line-height:1.45;transition:background .15s,color .15s}
 .toc-l2 a:hover{color:var(--ink);background:color-mix(in srgb,var(--jade) 6%,transparent)}
 .toc-l2 a.on{color:var(--jade-d);font-weight:600;background:var(--card);box-shadow:var(--sh-1)}
@@ -183,9 +183,9 @@
 .toc-lg .dot+.dot,.toc-lg .dot:nth-of-type(2){margin-left:8px}
 .toc a:focus-visible,.toc button:focus-visible{outline:2px solid var(--jade);outline-offset:-2px}
 /* 内容区为目录让位，版心在剩余宽度内居中 */
-@media (min-width:1024px){.has-toc{padding-left:var(--toc-w)}}
+@media (min-width:1024px){.has-toc{padding-left:calc(var(--toc-w) + 14px)}}
 @media (max-width:1023px){
-  .toc{top:auto;bottom:18px;left:16px;width:auto}
+  .toc{top:auto;bottom:18px;left:16px;width:auto;padding:0}
   .toc-fab{
     display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;max-width:calc(100vw - 32px);
     border:1px solid var(--line-2);border-radius:19px;background:color-mix(in srgb,var(--card) 94%,transparent);

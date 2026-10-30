@@ -1,2 +1,26 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="石油业务场景、智能方法与交互教学案例"><title>石油勘探开发的智能化可能性地图</title></head><body><div id="view"><p>正在加载智能化地图…</p></div><noscript>请启用 JavaScript。</noscript><script type="module" src="/src/main.ts"></script></body></html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/assets/core/tokens.css">
+  <link rel="stylesheet" href="/src/styles/loading.css">
+  <meta name="description" content="石油业务场景、智能方法与交互教学案例">
+  <title>石油勘探开发的智能化可能性地图</title>
+</head>
+<body>
+  <div id="view">
+    <section class="atlas-loader atlas-loader--startup" role="status" aria-live="polite" aria-busy="true">
+      <div class="atlas-loader__content">
+        <div class="atlas-loader__mark" aria-hidden="true"><i></i><i></i><i></i></div>
+        <h1 class="atlas-loader__title">智能化可能性地图</h1>
+        <p class="atlas-loader__message">正在加载作业环节与案例…</p>
+        <div class="atlas-loader__skeleton" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+    </section>
+  </div>
+  <noscript>请启用 JavaScript。</noscript>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

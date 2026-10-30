@@ -1,4 +1,5 @@
 import type { CaseFile } from '../types';
+import {showLoading} from '../components/common/loading';
 const manifests = import.meta.glob('../../plugins/**/case.json', { eager:true, import:'default' }) as Record<string, any>;
 const descriptors = import.meta.glob('../../plugins/**/plugin.json', { eager:true, import:'default' }) as Record<string, any>;
 const texts = import.meta.glob(['../../plugins/**/*.{html,htm,js,mjs,cjs,css,svg,json,csv,txt,md}','!../../plugins/_templates/**','!../../plugins/**/case.json','!../../plugins/**/plugin.json'], { query:'?raw', import:'default' });
@@ -23,7 +24,7 @@ export async function initializePlugins(){
       const c=structuredClone(manifest),cfg=c.tabs.demo,base=path.slice(0,-'case.json'.length);
       let handle:any=null,epoch=0;
       c.tabs.demo={label:cfg.label,intro:cfg.intro,mount(root:HTMLElement,ctx:any){
-        const token=++epoch;root.textContent='演示资源加载中…';
+        const token=++epoch;showLoading(root,{title:'案例演示',message:'正在加载演示资源…'});
         const entries=resourcePaths.filter(p=>p.startsWith(base));
         Promise.all(entries.map(async p=>{
           const name=p.slice(base.length);
@@ -33,7 +34,7 @@ export async function initializePlugins(){
           const response=await fetch(String(await urls[p]()));if(!response.ok)throw Error(`Resource HTTP ${response.status}: ${name}`);
           const blob=await response.blob();return window.__PackageService.readOne(new File([blob],name,{type:blob.type}));
         })).then(files=>{if(token!==epoch)return;root.textContent='';handle=window.CaseDemoHost.create(root,{files,demo:cfg,meta:c},ctx);})
-          .catch(error=>{if(token!==epoch)return;root.textContent=`演示加载失败：${error.message}。`;const button=document.createElement('button');button.textContent='重试加载';button.onclick=()=>c.tabs.demo.mount(root,ctx);root.append(button);});
+          .catch(error=>{if(token!==epoch)return;showLoading(root,{title:'演示加载失败',message:error.message,error:true,retry:()=>c.tabs.demo.mount(root,ctx)});});
       },unmount(){epoch++;handle?.destroy();handle=null;}};
       c.status='ready';window.Cases.register(c);window.ATLAS.index.byScene[scene].demo=true;
     };

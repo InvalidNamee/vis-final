@@ -27,3 +27,10 @@ const nav:[string,string,string[]][]=[['/','总览',['home']],['/chain','作业�
     </nav>
   </div></header>
 </template>
+
+<style scoped>
+.hdr-search{min-width:76px}
+.hdr-search>svg,.hdr-search kbd{flex-shrink:0}
+.hdr-search kbd{white-space:nowrap;margin-left:4px}
+@media (max-width:760px){.hdr-search{min-width:34px}}
+</style>

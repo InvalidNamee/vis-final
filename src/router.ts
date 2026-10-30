@@ -3,7 +3,7 @@ export const router=createRouter({
   history:createWebHistory(import.meta.env.BASE_URL),
   routes:[
     {path:'/',component:()=>import('./pages/HomePage.vue')},
-    {path:'/stage/:id',component:()=>import('./pages/BrowsePage.vue')},
+    {path:'/stage/:id',component:()=>import('./pages/StagePage.vue')},
     {path:'/method/:id',component:()=>import('./pages/BrowsePage.vue')},
     {path:'/scene/:id',component:()=>import('./pages/ScenePage.vue')},
     {path:'/cases',component:()=>import('./pages/CasesPage.vue')},
