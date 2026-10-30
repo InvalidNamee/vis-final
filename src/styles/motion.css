@@ -64,11 +64,3 @@ table.matrix.heat tbody tr{animation:rise .4s cubic-bezier(.2,.7,.2,1) both}
 
 /* ---------------- 案例面板切换 ---------------- */
 .panel-fade-enter-active{animation:rise .26s cubic-bezier(.2,.7,.2,1) both}
-
-/* ---------------- 环节抽屉 ---------------- */
-.stage-drawer{display:flex;flex-direction:column;gap:1px}
-.stage-drawer a{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;font-size:13px;color:var(--ink-2);transition:background .15s,color .15s}
-.stage-drawer a:hover{background:rgba(47,125,107,.07);color:var(--ink)}
-.stage-drawer a.on{background:var(--jade-l);color:var(--jade-d);font-weight:600}
-.stage-drawer .i{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
-.stage-drawer .n{font-family:var(--mono);font-size:11px;color:var(--ink-4)}

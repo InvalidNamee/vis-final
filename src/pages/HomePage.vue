@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed,ref} from 'vue';
 import {useAtlas} from '../composables/useAtlas';
+import {useSearch,openPalette} from '../composables/useSearch';
 import {vReveal} from '../composables/useReveal';
 import SectionHead from '../components/layout/SectionHead.vue';
 import SceneRow from '../components/common/SceneRow.vue';
@@ -11,8 +12,12 @@ import StageMethodMatrix from '../components/home/StageMethodMatrix.vue';
 import SystemLayers from '../components/home/SystemLayers.vue';
 const {atlas,caseStats}=useAtlas();
 const search=ref(''),hoverStage=ref('');
-const q=computed(()=>search.value.trim().toLowerCase());
-const results=computed(()=>q.value?atlas.value.allScenes.filter((s:any)=>`${s.name} ${s.intro} ${s.point} ${s.stageName}`.toLowerCase().includes(q.value)):[]);
+const {search:find}=useSearch();
+const q=computed(()=>search.value.trim());
+const hits=computed(()=>find(q.value,Infinity));
+// The home list shows scenes; other kinds are one click away in the site search dialog.
+const results=computed(()=>hits.value.filter(h=>h.kind==='scene').map(h=>atlas.value.index.byScene[h.id.slice(6)]).filter(Boolean));
+const others=computed(()=>hits.value.length-results.value.length);
 const firstDemo=computed(()=>atlas.value.allScenes.find((s:any)=>s.id==='d1')?.id||atlas.value.allScenes[0]?.id);
 </script>
 
@@ -36,7 +41,7 @@ const firstDemo=computed(()=>atlas.value.allScenes.find((s:any)=>s.id==='d1')?.i
   </div></div></section>
 
   <section v-if="q" class="section tight"><div class="wrap">
-    <div class="sub-head"><span class="kicker">SEARCH</span><h2>场景检索结果</h2><p>“{{ search.trim() }}” 匹配 {{ results.length }} 个场景，检索范围包括名称、业务背景、介入点与所属环节。</p></div>
+    <div class="sub-head"><span class="kicker">SEARCH</span><h2>场景检索结果</h2><p>“{{ q }}” 匹配 {{ results.length }} 个场景，检索范围包括名称、业务背景、介入点、数据需求与所用方法。<button v-if="others" class="lnk" type="button" @click="openPalette(q)">另有 {{ others }} 条环节、方法与案例结果 →</button></p></div>
     <TransitionGroup tag="div" name="list" class="scenes"><SceneRow v-for="s in results" :key="s.id" :scene="s" show-stage/></TransitionGroup>
     <div v-if="!results.length" class="empty"><b>没有匹配的场景</b>可换用环节名、方法名或更短的关键词。</div>
   </div></section>

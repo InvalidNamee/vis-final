@@ -137,3 +137,35 @@ test('stage pager, method grouping and wide/narrow overflow',async({page})=>{
     }
   }
 });
+test('site search palette and home search share one index',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');await expect(page.locator('main h1')).toBeVisible();
+  await page.getByRole('button',{name:'全站搜索'}).click();
+  const input=page.getByPlaceholder('搜索环节、场景、方法或案例内容…');await input.fill('微环隙');
+  await expect(page.locator('.sp-item').filter({hasText:'胶结测井特征分类'})).toHaveAttribute('href','/scene/c1?case=cement-bond-knn');
+  await input.fill('压裂');await expect(page.locator('.sp-group')).toHaveCount(4);
+  await input.press('ArrowDown');await input.press('Enter');
+  await expect(page).toHaveURL(/\/scene\/\w+$/);await expect(page.locator('.sp-input')).toHaveCount(0);
+  await page.keyboard.press('/');await expect(page.locator('.sp-input')).toBeFocused();
+  await page.keyboard.press('Escape');await expect(page.locator('.sp-input')).toHaveCount(0);
+  await page.goto('/');await page.getByPlaceholder('搜索业务名称、参数或智能化方法…').fill('压裂');
+  await expect(page.locator('.atlas-scene-card')).toHaveCount(4);
+  expect(errors).toEqual([]);
+});
+test('operations-chain TOC: 13 stages, 61 scenes and nav highlight',async({page})=>{
+  await page.goto('/scene/d1');
+  const toc=page.getByRole('complementary',{name:'作业链目录'});
+  await expect(toc.locator('.toc-l1')).toHaveCount(13);
+  await expect(toc.locator('.toc-l2 a[aria-current="page"]')).toHaveText('钻速预测与参数优化');
+  await expect(page.locator('.nav a.on')).toHaveText('作业链');
+  const collapsed=toc.locator('.toc-x[aria-expanded="false"]');
+  while(await collapsed.count())await collapsed.first().click();
+  await expect(toc.locator('.toc-l2 a')).toHaveCount(61);
+  await toc.locator('.toc-l1',{hasText:'录井'}).click();await expect(page).toHaveURL(/\/stage\/mudlogging$/);
+  await page.goto('/method/cv');await expect(page.locator('.nav a.on')).toHaveText('作业链');await expect(page.locator('.toc')).toHaveCount(0);
+  await page.goto('/');await expect(page.locator('.nav a.on')).toHaveText('总览');await expect(page.locator('.toc')).toHaveCount(0);
+  await page.setViewportSize({width:390,height:844});await page.goto('/stage/drilling');
+  await expect(page.locator('.toc-body')).toBeHidden();await page.locator('.toc-fab').click();
+  await page.locator('.toc-l2 a',{hasText:'井下复杂事故前兆预警'}).click();
+  await expect(page).toHaveURL(/\/scene\/d2$/);await expect(page.locator('.toc-body')).toBeHidden();
+});

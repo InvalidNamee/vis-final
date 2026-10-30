@@ -5,11 +5,15 @@ import ImportDialog from './components/ImportDialog.vue';
 import AppHeader from './components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
 import Crumb from './components/layout/Crumb.vue';
+import StageToc from './components/layout/StageToc.vue';
+import SearchPalette from './components/layout/SearchPalette.vue';
 import {createContentState,contentKey} from './state';
 import {themeOverrides} from './theme';
 const state=createContentState();provide(contentKey,state);
 const route=computed(()=>state.route.value),error=ref('');
 const page=computed(()=>route.value.path.split('/')[1]||'home');
+// Chain, stage and scene pages carry the fixed operations-chain TOC on the left.
+const toc=computed(()=>['chain','stage','scene'].includes(page.value));
 function focusMain(){document.getElementById('main-content')?.focus();}
 watch(()=>route.value.path,()=>{error.value='';});
 watch(()=>[state.atlas.value,route.value.path],()=>{
@@ -24,14 +28,16 @@ onErrorCaptured((e:any)=>{console.error(e);error.value=e.message;return false;})
   <n-config-provider :locale="zhCN" :date-locale="dateZhCN" :theme-overrides="themeOverrides"><n-message-provider><n-dialog-provider>
     <a class="skip" href="#main-content" @click.prevent="focusMain">跳到主要内容</a>
     <AppHeader/>
-    <main id="main-content" class="shell-main" tabindex="-1">
+    <StageToc v-if="toc"/>
+    <main id="main-content" class="shell-main" :class="{'has-toc':toc}" tabindex="-1">
       <Crumb/>
       <div v-if="error" class="wrap empty-state" role="alert"><h1>页面加载异常</h1><p>{{ error }}</p><router-link class="btn" to="/">返回地图总览</router-link></div>
       <router-view v-else v-slot="{Component,route:r}">
         <Transition name="page" mode="out-in"><component :is="Component" :key="r.path"/></Transition>
       </router-view>
     </main>
-    <AppFooter/>
+    <AppFooter :class="{'has-toc':toc}"/>
     <ImportDialog/>
+    <SearchPalette/>
   </n-dialog-provider></n-message-provider></n-config-provider>
 </template>
