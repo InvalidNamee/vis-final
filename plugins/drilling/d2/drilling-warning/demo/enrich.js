@@ -1,0 +1,5 @@
+(function(){'use strict';function periods(rows,key,label){const out=[];let start=null;rows.forEach((r,i)=>{if(r[key]&&start===null)start=r.minute;if(start!==null&&(!r[key]||i===rows.length-1)){const end=r[key]?r.minute+1:r.minute;out.push({label,start,end,group:label});start=null}});return out}
+PluginViz.mount({get:()=>({result:window.__caseResult,state:window.__caseState}),build:({result:r})=>{const rows=r.records||[],evalRows=rows.filter(p=>p.minute>=60&&p.minute<120),table=r.table.rows;
+ return [{type:'matrix',title:'前兆与报警混淆矩阵',subtitle:'仅统计当前已观测的60—119分钟评价窗；行是参考标签，列是报警结果。',xLabels:['报警','未报警'],yLabels:['前兆','正常'],values:table.map(p=>[p[1],p[2]]),unit:'分钟样点'},
+ {type:'gantt',title:'前兆参考与持续报警时间泳道',subtitle:'同一时间轴对照参考前兆区间与实际持续报警区间。',unit:'min',items:[...periods(rows,'precursor_label','参考前兆'),...periods(rows,'alarm','持续报警')]},
+ {type:'box',title:'正常与前兆时段异常分数分布',unit:'标准化分数',groups:[{label:'正常评价窗',values:evalRows.filter(p=>!p.precursor_label).map(p=>p.score)},{label:'前兆评价窗',values:evalRows.filter(p=>p.precursor_label).map(p=>p.score)}]}];}})})();

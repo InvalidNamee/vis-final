@@ -1,0 +1,4 @@
+(function(){'use strict';PluginViz.mount({get:()=>({result:window.__caseResult,state:window.__caseState}),build:({result:r,state:s})=>{const rows=r.records||[],observed=rows.map(p=>({t:p.hour,sensor:p.sensor_proxy})),fit=FailureModel.estimate(observed,s.time,s.window),forecast=r.plots[0].series.find(p=>p.name==='局部趋势外推')?.points||[],recent=rows.slice(-s.window);return[
+ {type:'band',title:'退化趋势与残差尺度范围',subtitle:'中心线为当前窗口线性外推；带宽为正负2倍窗口残差标准差的敏感范围。',xLabel:'服役时间 / h',yLabel:'归一化退化指标',points:forecast.map(([x,mean])=>({x,mean,low:mean-2*fit.sigma,high:mean+2*fit.sigma})),observed:rows.map(p=>({x:p.hour,y:p.sensor_proxy}))},
+ {type:'histogram',title:'近期退化趋势拟合残差',unit:'观测减拟合 / 归一化',values:recent.map(p=>p.sensor_proxy-p.fitted),bins:8},
+ {type:'dumbbell',title:'计划时长与剩余服役窗口',unit:'h',beforeLabel:'计划作业时长',afterLabel:'估计剩余时间',items:Number.isFinite(fit.rul)?[{label:'当前作业窗口',before:s.plan,after:fit.rul}]:[]}];}})})();

@@ -1,0 +1,78 @@
+(function () {
+  'use strict';
+  // Read the current renderer output; never rerun or alter the model.
+  const finite = Number.isFinite;
+  const numbers = values => values.filter(finite);
+  const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+  const quantile = (values, p) => {
+    const sorted = numbers(values).sort((a, b) => a - b);
+    if (!sorted.length) return null;
+    const index = (sorted.length - 1) * p, low = Math.floor(index);
+    return sorted[low] + (sorted[Math.ceil(index)] - sorted[low]) * (index - low);
+  };
+  const curve = (result, index) => (result.series?.[index]?.points || [])
+    .filter(point => finite(point[0]) && finite(point[1]));
+  const residuals = (result, observed, predicted) => {
+    const lookup = new Map(curve(result, predicted));
+    return curve(result, observed).filter(([x]) => lookup.has(x))
+      .map(([x, y]) => ({x, value: lookup.get(x) - y}));
+  };
+  const axis = (key, label, unit) => ({key, label, ...(unit ? {unit} : {})});
+  const histogram = (title, unit, values, subtitle) => ({type: 'histogram', title,
+    unit, values: numbers(values), bins: 12, subtitle});
+  const boxes = (title, unit, groups, subtitle) => ({type: 'box', title, unit,
+    groups: groups.map(group => ({...group, values: numbers(group.values)}))
+      .filter(group => group.values.length), subtitle});
+  const contour = (rows, xKey, yKey, zKey, title, xLabel, yLabel, subtitle) => {
+    const valid = rows.filter(row => [row[xKey], row[yKey], row[zKey]].every(finite));
+    const xValues = [...new Set(valid.map(row => row[xKey]))].sort((a, b) => a - b);
+    const yValues = [...new Set(valid.map(row => row[yKey]))].sort((a, b) => a - b);
+    const lookup = new Map(valid.map(row => [row[xKey] + ':' + row[yKey], row[zKey]]));
+    const values = yValues.map(y => xValues.map(x => lookup.get(x + ':' + y)));
+    // Incomplete grids are omitted rather than interpolated or filled with made-up data.
+    if (xValues.length < 2 || yValues.length < 2 || !values.every(row => row.every(finite))) return null;
+    return {type: 'contour', title, xLabel, yLabel, xValues, yValues, values, levels: 7, subtitle};
+  };
+  const episodes = (rows, key, label) => {
+    const items = []; let start = null, previous = null;
+    for (const row of rows) {
+      if (row[key] && start === null) start = row.i;
+      if (start !== null && (!row[key] || (previous !== null && row.i !== previous + 1))) {
+        items.push({label, start, end: previous + 1});
+        start = row[key] ? row.i : null;
+      }
+      previous = row.i;
+    }
+    if (start !== null) items.push({label, start, end: previous + 1});
+    return items;
+  };
+  const confusion = (rows, truthKey, flagKey, title, negative, positive, subtitle) => {
+    const values = [[0, 0], [0, 0]];
+    for (const row of rows) values[Number(Boolean(row[truthKey]))][Number(Boolean(row[flagKey]))]++;
+    return {type: 'matrix', title, unit: '条', xLabels: ['未触发', '触发复核'],
+      yLabels: [negative, positive], values, subtitle};
+  };
+  PluginViz.mount({
+    get: () => ({result: window.__DEMO_RESULT__, state: window.__DEMO_STATE__}),
+    build: ({result, state}) => {
+      if (!result || !Array.isArray(result.samples)) return [];
+      const rows = result.samples;
+      const inputs = state || result.audit?.inputs || {};
+
+      const ranked = [...rows].sort((a, b) => Number(b.ok) - Number(a.ok) || b.objective - a.objective), good = ranked.filter(row => row.ok), best = good[0];
+      const names = ['轻馏分', '中馏分', '重馏分'], keys = ['light', 'middle', 'heavy'];
+      return [
+        contour(rows, 'cut', 'reflux', 'objective', '切点与回流比目标等值线', '切点 / ℃', '回流比',
+          '全部357个实际网格；目标=轻收率+0.75×中收率−0.12×能耗，约束可行性见平行坐标。'),
+        {type: 'parallel', title: '蒸馏候选设定与约束', subtitle: '读取全网格；按可行性与目标降序排列，首条可行为当前最优。',
+          axes: [axis('cut', '切点', '℃'), axis('reflux', '回流比'), axis('energy', '能耗', '单位'), axis('end', '质量终点', '℃'), axis('objective', '目标', '分')],
+          items: ranked.map(row => ({...row, label: row.cut + '℃ · 回流比' + row.reflux, feasible: row.ok, selected: row === best})), maxLines: 160},
+        best ? {type: 'stacked', title: '高目标候选馏分组成', unit: '%', subtitle: '前6个可行候选的实际轻、中、重收率，每条合计100%。',
+          groups: good.slice(0, 6).map(row => ({label: row.cut + '℃ · 回流比' + row.reflux, segments: keys.map((key, i) => ({label: names[i], value: row[key]}))}))} : null,
+        best ? {type: 'sankey', title: '最优设定三馏分流向', unit: '%', subtitle: '以100份原油为基准，链接宽度为最优可行设定的实际收率。',
+          nodes: [{id: 'feed', label: '原油100份'}, ...names.map((label, i) => ({id: 'product-' + i, label}))],
+          links: keys.map((key, i) => ({source: 'feed', target: 'product-' + i, value: best[key]}))} : null
+      ].filter(Boolean);
+    }
+  });
+})();

@@ -48,3 +48,8 @@
 交付范围与导入重名说明见仓库 docs/钻井作业交付说明.md。
 
 HTTP 外壳重构说明（2026-10-23）：主站运行 npm run dev，通过 HTTP 访问；独立 demo/index.html 仍可本地打开。Vite 直接读取本案例目录，Python 旧入口现在只做验证；仅明确要求分发时使用 --zip。本轮 HTTP 浏览器验收覆盖教师包导入、刷新恢复、管理编辑、五个演示及钻速 CSV 下载，详情见根目录 README.md。
+
+可视化分析
+----------
+新增：响应等值线、平行坐标、分布箱线图、前后对照哑铃图。
+绘图资源包含在 demo/plugin-viz.js、demo/plugin-viz.css，数据适配位于 demo/enrich.js；整包导入和独立打开均使用包内资源。

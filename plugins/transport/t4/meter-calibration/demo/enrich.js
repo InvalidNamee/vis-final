@@ -1,0 +1,76 @@
+(function () {
+  'use strict';
+  // Read the current renderer output; never rerun or alter the model.
+  const finite = Number.isFinite;
+  const numbers = values => values.filter(finite);
+  const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+  const quantile = (values, p) => {
+    const sorted = numbers(values).sort((a, b) => a - b);
+    if (!sorted.length) return null;
+    const index = (sorted.length - 1) * p, low = Math.floor(index);
+    return sorted[low] + (sorted[Math.ceil(index)] - sorted[low]) * (index - low);
+  };
+  const curve = (result, index) => (result.series?.[index]?.points || [])
+    .filter(point => finite(point[0]) && finite(point[1]));
+  const residuals = (result, observed, predicted) => {
+    const lookup = new Map(curve(result, predicted));
+    return curve(result, observed).filter(([x]) => lookup.has(x))
+      .map(([x, y]) => ({x, value: lookup.get(x) - y}));
+  };
+  const axis = (key, label, unit) => ({key, label, ...(unit ? {unit} : {})});
+  const histogram = (title, unit, values, subtitle) => ({type: 'histogram', title,
+    unit, values: numbers(values), bins: 12, subtitle});
+  const boxes = (title, unit, groups, subtitle) => ({type: 'box', title, unit,
+    groups: groups.map(group => ({...group, values: numbers(group.values)}))
+      .filter(group => group.values.length), subtitle});
+  const contour = (rows, xKey, yKey, zKey, title, xLabel, yLabel, subtitle) => {
+    const valid = rows.filter(row => [row[xKey], row[yKey], row[zKey]].every(finite));
+    const xValues = [...new Set(valid.map(row => row[xKey]))].sort((a, b) => a - b);
+    const yValues = [...new Set(valid.map(row => row[yKey]))].sort((a, b) => a - b);
+    const lookup = new Map(valid.map(row => [row[xKey] + ':' + row[yKey], row[zKey]]));
+    const values = yValues.map(y => xValues.map(x => lookup.get(x + ':' + y)));
+    // Incomplete grids are omitted rather than interpolated or filled with made-up data.
+    if (xValues.length < 2 || yValues.length < 2 || !values.every(row => row.every(finite))) return null;
+    return {type: 'contour', title, xLabel, yLabel, xValues, yValues, values, levels: 7, subtitle};
+  };
+  const episodes = (rows, key, label) => {
+    const items = []; let start = null, previous = null;
+    for (const row of rows) {
+      if (row[key] && start === null) start = row.i;
+      if (start !== null && (!row[key] || (previous !== null && row.i !== previous + 1))) {
+        items.push({label, start, end: previous + 1});
+        start = row[key] ? row.i : null;
+      }
+      previous = row.i;
+    }
+    if (start !== null) items.push({label, start, end: previous + 1});
+    return items;
+  };
+  const confusion = (rows, truthKey, flagKey, title, negative, positive, subtitle) => {
+    const values = [[0, 0], [0, 0]];
+    for (const row of rows) values[Number(Boolean(row[truthKey]))][Number(Boolean(row[flagKey]))]++;
+    return {type: 'matrix', title, unit: '条', xLabels: ['未触发', '触发复核'],
+      yLabels: [negative, positive], values, subtitle};
+  };
+  PluginViz.mount({
+    get: () => ({result: window.__DEMO_RESULT__, state: window.__DEMO_STATE__}),
+    build: ({result, state}) => {
+      if (!result || !Array.isArray(result.samples)) return [];
+      const rows = result.samples;
+      const inputs = state || result.audit?.inputs || {};
+
+      const evaluation = rows.filter(row => row.i >= 60), k = result.metrics[0]?.value;
+      if (!finite(k)) return [];
+      const before = evaluation.map(row => row.raw - row.reference), after = evaluation.map(row => row.raw * k - row.reference);
+      return [
+        {type: 'dumbbell', title: '流量计校正前后误差', unit: 'm³/h', beforeLabel: '原表MAE', afterLabel: '校正MAE',
+          subtitle: '固定60–99的40条评价记录；两端为原模型实际输出的MAE。',
+          items: [{label: '评价平均绝对误差', before: result.metrics[1].value, after: result.metrics[2].value}]},
+        boxes('流量计校正前后残差分布', 'm³/h', [
+          {label: '原表（40点）', values: before}, {label: '稳健比例校正（40点）', values: after}],
+          '残差=读数−参考流量；校正读数使用当前中位比例系数，评价样本不参与估计。'),
+        histogram('校正后流量误差分布', 'm³/h', after, '固定评价集40条记录；误差=原表×当前比例系数−参考流量。')
+      ];
+    }
+  });
+})();

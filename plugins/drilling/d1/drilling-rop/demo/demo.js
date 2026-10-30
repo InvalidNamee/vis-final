@@ -186,6 +186,7 @@
     byId('apply').disabled = state.wob === best.wob && state.rpm === best.rpm;
     text('time-story', '假设连续钻进 100 m：当前预测需要 ' + fmt(100 / current) + ' h，推荐预测需要 ' + fmt(100 / best.value) + ' h。该时间只由进尺 ÷ 预测机械钻速计算，不是整段作业工期。');
     drawHeatmap(); drawResponse();
+    window.__caseResult={learned:learned,search:search,model:model,rows:rows,current:current,best:best}; window.__caseState=Object.assign({},state);
   }
   ids.forEach(function (id) { byId(id).addEventListener(id === 'rock' ? 'change' : 'input', function () { applied = false; render(); }); });
   byId('apply').addEventListener('click', function () { byId('wob').value = search.best.wob; byId('rpm').value = search.best.rpm; applied = true; render(); });

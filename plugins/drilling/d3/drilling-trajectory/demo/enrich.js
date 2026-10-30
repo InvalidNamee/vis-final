@@ -1,0 +1,4 @@
+(function(){'use strict';PluginViz.mount({get:()=>({result:window.__caseResult,state:window.__caseState}),build:({result:r,state:s})=>{const rows=r.records||[],base=TrajectoryModel.simulate(s,false),control=TrajectoryModel.simulate(s,true),items=[];rows.slice(1).forEach((p,i)=>items.push({label:'导向指令',start:i*30,end:(i+1)*30,group:p.u>0?'造斜':p.u<0?'降斜':'保持',value:Math.abs(p.u)}));return[
+ {type:'gantt',title:'测深区间与导向动作泳道',unit:'测深 / m',subtitle:'色块表示该30米测段执行的指令；深浅对应归一化指令绝对值。',items},
+ {type:'dumbbell',title:'控制前后终点距靶与曲率',unit:'距靶 / m',beforeLabel:'零指令',afterLabel:'滚动控制',items:[{label:'600 m终点距靶',before:base.miss,after:control.miss}]},
+ {type:'profile',title:'井斜曲率与指令共测深剖面',depth:rows.map(p=>p.measured_depth_m),tracks:[{label:'井斜',unit:'°',values:rows.map(p=>p.angle)},{label:'实际曲率',unit:'°/30m',values:rows.map(p=>p.dls)},{label:'动作指令',unit:'归一化',values:rows.map(p=>p.u)}]}];}})})();
