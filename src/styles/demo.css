@@ -3,7 +3,7 @@
   font-family:var(--sans,system-ui,sans-serif);
   font-size:var(--demo-font-size,14px);
   line-height:1.7;
-  color:var(--ink,#242b2e);
+  color:var(--ink,#0f1722);
   background:var(--card,#fff);
   -webkit-text-size-adjust:100%;
 }

@@ -30,7 +30,7 @@ ol.chain{margin:0;padding-left:0}
 @keyframes node-on{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.25);opacity:1;border-color:var(--jade)}100%{transform:scale(1)}}
 .chain>li{animation:rise .45s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--si,0) * 40ms)}
 .step.on,.step:focus-visible{background:var(--card);border-color:var(--line);box-shadow:var(--sh-2);transform:translateY(-2px);outline:none}
-.step.on::before,.step:focus-visible::before{background:var(--jade);border-color:var(--jade);box-shadow:0 0 0 4px rgba(47,125,107,.13)}
+.step.on::before,.step:focus-visible::before{background:var(--jade);border-color:var(--jade);box-shadow:0 0 0 4px color-mix(in srgb,var(--jade) 13%,transparent)}
 .step:focus-visible{box-shadow:0 0 0 2px var(--jade),var(--sh-2)}
 
 /* ---------------- 方法面板 ---------------- */
@@ -39,26 +39,26 @@ ol.chain{margin:0;padding-left:0}
 .mcard:hover .go,.mcard:focus-visible .go{transform:translateX(3px);color:var(--mc,var(--jade))}
 
 /* ---------------- 热力矩阵 ---------------- */
-table.matrix.heat td[data-l="1"]{background:rgba(47,125,107,.06)}
-table.matrix.heat td[data-l="2"]{background:rgba(47,125,107,.13)}
-table.matrix.heat td[data-l="3"]{background:rgba(47,125,107,.22)}
-table.matrix.heat td[data-l="4"]{background:rgba(47,125,107,.34)}
-table.matrix.heat td[data-l="5"]{background:rgba(47,125,107,.48)}
+table.matrix.heat td[data-l="1"]{background:color-mix(in srgb,var(--jade) 6%,transparent)}
+table.matrix.heat td[data-l="2"]{background:color-mix(in srgb,var(--jade) 13%,transparent)}
+table.matrix.heat td[data-l="3"]{background:color-mix(in srgb,var(--jade) 22%,transparent)}
+table.matrix.heat td[data-l="4"]{background:color-mix(in srgb,var(--jade) 34%,transparent)}
+table.matrix.heat td[data-l="5"]{background:color-mix(in srgb,var(--jade) 48%,transparent)}
 table.matrix.heat td[data-l="4"] a,table.matrix.heat td[data-l="5"] a{color:var(--jade-d);font-weight:600}
 table.matrix.heat td{transition:background .16s,box-shadow .16s}
 table.matrix.heat td.sum a{color:var(--ink);font-weight:600}
 /* 十字高亮：行（tr.x）与列（.x） */
 table.matrix.heat tbody tr.x th{color:var(--jade-d);background:var(--jade-l)}
-table.matrix.heat tbody tr.x td,table.matrix.heat td.x{box-shadow:inset 0 0 0 999px rgba(178,106,57,.07)}
+table.matrix.heat tbody tr.x td,table.matrix.heat td.x{box-shadow:inset 0 0 0 999px color-mix(in srgb,var(--clay) 7%,transparent)}
 table.matrix.heat thead th.x,table.matrix.heat tfoot td.x{color:var(--jade-d);background:var(--jade-l)}
 table.matrix.heat td a:hover,table.matrix.heat td a:focus-visible{color:#fff;background:var(--jade);font-weight:600;outline:none}
 table.matrix.heat tbody tr{animation:rise .4s cubic-bezier(.2,.7,.2,1) both}
 .heat-legend .k i{border:1px solid var(--line)}
-.heat-legend i[data-l="1"]{background:rgba(47,125,107,.06)}
-.heat-legend i[data-l="2"]{background:rgba(47,125,107,.13)}
-.heat-legend i[data-l="3"]{background:rgba(47,125,107,.22)}
-.heat-legend i[data-l="4"]{background:rgba(47,125,107,.34)}
-.heat-legend i[data-l="5"]{background:rgba(47,125,107,.48)}
+.heat-legend i[data-l="1"]{background:color-mix(in srgb,var(--jade) 6%,transparent)}
+.heat-legend i[data-l="2"]{background:color-mix(in srgb,var(--jade) 13%,transparent)}
+.heat-legend i[data-l="3"]{background:color-mix(in srgb,var(--jade) 22%,transparent)}
+.heat-legend i[data-l="4"]{background:color-mix(in srgb,var(--jade) 34%,transparent)}
+.heat-legend i[data-l="5"]{background:color-mix(in srgb,var(--jade) 48%,transparent)}
 .heat-legend .k{gap:2px}
 .heat-legend .sep{color:var(--line-3)}
 

@@ -43,9 +43,9 @@
 
   var BASE_CSS =
     '.cd-box{display:block;font-family:var(--sans,system-ui,sans-serif);' +
-    'font-size:13px;line-height:1.72;color:var(--ink,#242b2e);padding:2px 0 6px}' +
-    '.cd-err{border:1px solid var(--bad,#b05a51);background:var(--bad-bg,#f9e9e5);' +
-    'color:var(--bad,#b05a51);border-radius:8px;padding:11px 13px;font-size:12px;line-height:1.7}' +
+    'font-size:13px;line-height:1.72;color:var(--ink,#0f1722);padding:2px 0 6px}' +
+    '.cd-err{border:1px solid var(--bad,#c0362c);background:var(--bad-bg,#fdecea);' +
+    'color:var(--bad,#c0362c);border-radius:8px;padding:11px 13px;font-size:12px;line-height:1.7}' +
     '.cd-err b{display:block;margin-bottom:4px;font-size:12.5px}' +
     '.cd-err code{font-family:var(--mono,monospace);background:rgba(0,0,0,.05);padding:1px 4px;border-radius:3px}';
 
