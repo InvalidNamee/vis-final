@@ -1,67 +1,67 @@
 /* =========================================================
    设计令牌 Design Tokens
-   风格：暖白纸面 + 低饱和彩色分区
+   风格：冷灰白底 + 青绿主色 + 细线网格
    规则：所有颜色只在这里定义，案例与组件不得写死色值
    ========================================================= */
 
 :root{
   /* ---------- 画布 ---------- */
-  --paper:      #fbfaf6;   /* 主背景，暖白 */
-  --paper-2:    #f5f2ea;   /* 次级底板 */
-  --paper-3:    #efece1;   /* 三级底板 */
+  --paper:      #f6f7f9;   /* 主背景，冷灰白 */
+  --paper-2:    #eef0f3;   /* 次级底板 */
+  --paper-3:    #e5e8ed;   /* 三级底板 */
   --card:       #ffffff;   /* 卡片 */
-  --card-soft:  #fdfcf9;   /* 卡片内嵌区 */
+  --card-soft:  #f9fafb;   /* 卡片内嵌区 */
 
   /* ---------- 描边 ---------- */
-  --line:       #e9e4d8;
-  --line-2:     #ddd7c8;
-  --line-3:     #c9c2b0;
+  --line:       #e4e7ec;
+  --line-2:     #d4d9e0;
+  --line-3:     #b6bec9;
 
   /* ---------- 墨色（文字） ---------- */
-  --ink:        #242b2e;
-  --ink-2:      #4d565b;
-  --ink-3:      #79828a;
-  --ink-4:      #9ba3a9;
-  --ink-inv:    #fdfcf9;
+  --ink:        #0f1722;
+  --ink-2:      #364152;
+  --ink-3:      #5f6b7a;
+  --ink-4:      #8a94a3;
+  --ink-inv:    #ffffff;
 
   /* ---------- 主强调 ---------- */
-  --jade:       #2f7d6b;
-  --jade-d:     #235f51;
-  --jade-l:     #e6f1ec;
-  --clay:       #b26a39;
-  --clay-d:     #8e5229;
-  --clay-l:     #f8ecdf;
+  --jade:       #0e7c74;
+  --jade-d:     #0a5f59;
+  --jade-l:     #e4f3f1;
+  --clay:       #c2610f;
+  --clay-d:     #9a4a0b;
+  --clay-l:     #fdf0e3;
 
   /* ---------- 五类方法色（中饱和，白底可读） ---------- */
-  --c-cv:       #2f7d6b;   /* 计算机视觉 */
-  --c-ts:       #b26a39;   /* 时序预测 */
-  --c-nlp:      #7e5a8d;   /* 自然语言处理 */
-  --c-opt:      #41699b;   /* 优化算法 */
-  --c-kg:       #767a2e;   /* 知识图谱 */
+  --c-cv:       #0e7c74;   /* 计算机视觉 */
+  --c-ts:       #c2610f;   /* 时序预测 */
+  --c-nlp:      #6f4fc6;   /* 自然语言处理 */
+  --c-opt:      #2f63d1;   /* 优化算法 */
+  --c-kg:       #5f7a12;   /* 知识图谱 */
 
-  --bg-cv:      #e6f1ec;
-  --bg-ts:      #f8ecdf;
-  --bg-nlp:     #efe9f4;
-  --bg-opt:     #e7eef9;
-  --bg-kg:      #f1f1dd;
+  --bg-cv:      #e4f3f1;
+  --bg-ts:      #fdf0e3;
+  --bg-nlp:     #f0ecfb;
+  --bg-opt:     #e8effc;
+  --bg-kg:      #eff4e1;
 
   /* ---------- 语义色 ---------- */
-  --ok:         #3f8560;
-  --ok-bg:      #e7f3ea;
-  --warn:       #a97a1c;
-  --warn-bg:    #f9efd7;
-  --bad:        #b05a51;
-  --bad-bg:     #f9e9e5;
+  --ok:         #15803d;
+  --ok-bg:      #e7f6ec;
+  --warn:       #a16207;
+  --warn-bg:    #fdf5e0;
+  --bad:        #c0362c;
+  --bad-bg:     #fdecea;
 
   /* ---------- 圆角与阴影 ---------- */
-  --r-s: 5px;
-  --r-m: 9px;
-  --r-l: 14px;
-  --r-xl: 20px;
+  --r-s: 4px;
+  --r-m: 8px;
+  --r-l: 12px;
+  --r-xl: 16px;
 
-  --sh-1: 0 1px 2px rgba(48,44,30,.045);
-  --sh-2: 0 1px 2px rgba(48,44,30,.05), 0 6px 18px -10px rgba(48,44,30,.14);
-  --sh-3: 0 2px 4px rgba(48,44,30,.05), 0 14px 34px -16px rgba(48,44,30,.20);
+  --sh-1: 0 1px 2px rgba(15,23,34,.05);
+  --sh-2: 0 1px 2px rgba(15,23,34,.05), 0 8px 20px -12px rgba(15,23,34,.16);
+  --sh-3: 0 2px 4px rgba(15,23,34,.05), 0 18px 40px -18px rgba(15,23,34,.26);
 
   /* ---------- 字体 ---------- */
   --mono: 'JetBrains Mono','SFMono-Regular','Cascadia Mono',Consolas,'Liberation Mono',monospace;
@@ -86,6 +86,7 @@
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   font-family:var(--sans);
+  font-feature-settings:'cv11','ss01';
   font-size:14px;
   line-height:1.68;
   color:var(--ink);
@@ -95,38 +96,35 @@ body{
   overflow-x:hidden;
 }
 
-/* 背景：四处低饱和色晕，制造“纸面有光”的感觉，不做暗色 */
+/* 背景：顶部一道极淡的青色光晕，不做暗色 */
 body::before{
   content:'';
   position:fixed;inset:0;z-index:-2;
   background:
-    radial-gradient(1000px 620px at 6% -12%,  #e5f1eb 0%, rgba(229,241,235,0) 62%),
-    radial-gradient(880px 560px at 96% -6%,   #f9ecdf 0%, rgba(249,236,223,0) 60%),
-    radial-gradient(900px 760px at 74% 102%,  #e8eef8 0%, rgba(232,238,248,0) 62%),
-    radial-gradient(760px 620px at 18% 96%,   #f7ebee 0%, rgba(247,235,238,0) 60%),
+    radial-gradient(1100px 520px at 50% -18%, rgba(14,124,116,.07) 0%, rgba(14,124,116,0) 70%),
     var(--paper);
 }
-/* 极淡网格，只在上半页可见 */
+/* 细线网格，只在上半页可见 */
 body::after{
   content:'';
   position:fixed;inset:0;z-index:-1;pointer-events:none;
   background-image:
-    linear-gradient(to right, rgba(80,74,55,.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(80,74,55,.055) 1px, transparent 1px);
-  background-size:76px 76px;
-  mask-image:radial-gradient(ellipse 70% 46% at 50% 0%, #000 0%, transparent 82%);
-  -webkit-mask-image:radial-gradient(ellipse 70% 46% at 50% 0%, #000 0%, transparent 82%);
+    linear-gradient(to right, rgba(15,23,34,.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15,23,34,.045) 1px, transparent 1px);
+  background-size:32px 32px;
+  mask-image:radial-gradient(ellipse 72% 42% at 50% 0%, #000 0%, transparent 85%);
+  -webkit-mask-image:radial-gradient(ellipse 72% 42% at 50% 0%, #000 0%, transparent 85%);
 }
 
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input,select,textarea{font-family:inherit;font-size:inherit}
 img,svg{max-width:100%}
-::selection{background:rgba(47,125,107,.20);color:var(--ink)}
+::selection{background:rgba(14,124,116,.18);color:var(--ink)}
 
-::-webkit-scrollbar{width:11px;height:11px}
-::-webkit-scrollbar-track{background:var(--paper-2)}
-::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:6px;border:3px solid var(--paper-2)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:6px;border:3px solid var(--paper)}
 ::-webkit-scrollbar-thumb:hover{background:var(--line-3)}
 
 :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:3px}
@@ -134,9 +132,9 @@ img,svg{max-width:100%}
 /* =========================================================
    排版基元
    ========================================================= */
-h1,h2,h3,h4,h5{font-weight:650;letter-spacing:-.005em;line-height:1.3;color:var(--ink)}
+h1,h2,h3,h4,h5{font-weight:600;letter-spacing:-.012em;line-height:1.3;color:var(--ink)}
 p{color:var(--ink-2)}
-b,strong{font-weight:650;color:var(--ink)}
+b,strong{font-weight:600;color:var(--ink)}
 
 .wrap{width:min(var(--maxw),calc(100% - 48px));margin:0 auto}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
