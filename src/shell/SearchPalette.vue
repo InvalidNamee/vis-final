@@ -3,6 +3,7 @@ import {computed,nextTick,onBeforeUnmount,onMounted,ref,watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {searchSite,palette,openPalette,excerpt,type SearchKind} from '../core/search';
 import Highlight from '../components/Highlight.vue';
+import {lockScroll} from '../ui/scrollLock';
 
 const router=useRouter();
 const input=ref<HTMLInputElement|null>(null),list=ref<HTMLElement|null>(null),cursor=ref(0);
@@ -16,9 +17,9 @@ const indexOf=(id:string)=>flat.value.findIndex(h=>h.id===id);
 
 watch(()=>palette.query,()=>{cursor.value=0;});
 watch(()=>palette.open,open=>{
-  document.documentElement.classList.toggle('has-modal',open);
-  if(open){opener=document.activeElement as HTMLElement|null;void nextTick(()=>{input.value?.focus();input.value?.select();});}
-  else{opener?.focus?.();opener=null;}
+  lockScroll(open);
+  if(open){opener=document.activeElement as HTMLElement|null;void nextTick(()=>{input.value?.focus({preventScroll:true});input.value?.select();});}
+  else{opener?.focus?.({preventScroll:true});opener=null;}
 });
 const close=()=>{palette.open=false;};
 function go(i=cursor.value){const h=flat.value[i];if(!h)return;close();void router.push(h.to);}

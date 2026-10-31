@@ -1,10 +1,6 @@
-<script lang="ts">
-// Page scroll stays locked while any dialog (e.g. import + demo preview) is open.
-let openDialogs=0;
-</script>
-
 <script setup lang="ts">
 import {nextTick,onBeforeUnmount,ref,useId,watch} from 'vue';
+import {lockScroll} from './scrollLock';
 
 /* Accessible dialog: Esc and backdrop close it, focus moves in and returns to the opener. */
 const props=withDefaults(defineProps<{open:boolean;title:string;width?:string;dismissable?:boolean}>(),{width:'720px',dismissable:true});
@@ -13,19 +9,16 @@ const panel=ref<HTMLElement|null>(null),titleId=useId();
 let opener:HTMLElement|null=null,counted=false;
 const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
-function lock(on:boolean){
-  if(on===counted)return;
-  counted=on;openDialogs+=on?1:-1;
-  document.documentElement.classList.toggle('has-modal',openDialogs>0);
-}
+function lock(on:boolean){if(on!==counted){counted=on;lockScroll(on);}}
 watch(()=>props.open,async open=>{
   if(open){
     opener=document.activeElement as HTMLElement|null;
     lock(true);await nextTick();
-    (panel.value?.querySelector<HTMLElement>('[autofocus]')||panel.value)?.focus();
+    // preventScroll: focusing inside the dialog or back on a sticky opener must not move the page.
+    (panel.value?.querySelector<HTMLElement>('[autofocus]')||panel.value)?.focus({preventScroll:true});
   }else{
     lock(false);
-    opener?.focus?.();opener=null;
+    opener?.focus?.({preventScroll:true});opener=null;
   }
 },{immediate:true});
 onBeforeUnmount(()=>lock(false));

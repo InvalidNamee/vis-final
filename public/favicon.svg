@@ -1,7 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-  <rect width="48" height="48" rx="12" fill="#286957"/>
-  <g transform="translate(9 9) scale(1.25)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M3 17l5-6 4 3 4-6 5 4"/>
-    <circle cx="8" cy="11" r="1.6" fill="#fff" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="智能化可能性地图">
+  <!-- Mark: structure contours (the reservoir map), a directional well path (the operations chain)
+       and its target point. Shared by the favicon and the top-bar brand; colours match tokens.css. -->
+  <rect width="64" height="64" rx="14" fill="#0f1724"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 36.5c0-10.5 9-18.5 20.5-18.5S56 25 56 36s-8.5 18.5-20 18.5S16 47 16 36.5Z" stroke="#4d64a8" stroke-width="3.5"/>
+    <path d="M28 38c0-5 4.2-8.5 9.5-8.5S47 33 47 38s-4.5 8-9.5 8S28 43 28 38Z" stroke="#8fa6f0" stroke-width="3.5"/>
+    <path d="M8 10.5h15" stroke="#e8ecf3" stroke-width="3.5"/>
+    <path d="M15.5 10.5V21c0 9.5 9 17 22 17" stroke="#ff8a3d" stroke-width="5"/>
   </g>
+  <circle cx="37.5" cy="38" r="5.5" fill="#ff8a3d"/>
 </svg>

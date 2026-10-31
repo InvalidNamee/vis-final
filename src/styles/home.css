@@ -3,8 +3,8 @@
   radial-gradient(900px 420px at 85% -10%,color-mix(in srgb,var(--jade) 45%,transparent),transparent 70%),
   radial-gradient(700px 360px at 0% 110%,color-mix(in srgb,var(--clay) 28%,transparent),transparent 70%),
   var(--night);padding:56px 0 64px}
-/* Contour lines like a structure map. */
-.hero::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;background:repeating-radial-gradient(ellipse 620px 340px at 72% 46%,transparent 0 34px,rgba(232,236,243,.06) 34px 35px)}
+/* Contour tile drawn by ui/texture.ts; fades in once generated. */
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;background:var(--tex-night,none) 0 0/880px 880px repeat;-webkit-mask-image:linear-gradient(100deg,#000 30%,rgba(0,0,0,.35));mask-image:linear-gradient(100deg,#000 30%,rgba(0,0,0,.35))}
 .hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:44px;align-items:center}
 .hero-badges{display:flex;flex-wrap:wrap;gap:8px}
 .hero-badges span{font-family:var(--mono);font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--night-line);color:var(--night-ink-2);background:rgba(255,255,255,.04)}

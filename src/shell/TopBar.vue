@@ -5,6 +5,8 @@ import {openPalette} from '../core/search';
 import {signedIn} from '../core/session';
 
 const route=useRoute(),menu=ref(false);
+// Same file as the favicon (public/favicon.svg), resolved against the deploy base path.
+const logo=`${import.meta.env.BASE_URL}favicon.svg`;
 const section=computed(()=>route.path.split('/')[1]||'home');
 const mac=typeof navigator!=='undefined'&&/Mac|iPhone|iPad/.test(navigator.platform);
 // Stage, scene and method pages all belong to the operations chain.
@@ -23,7 +25,8 @@ watch(()=>route.fullPath,()=>{menu.value=false;});
   <header class="topbar">
     <div class="topbar-in">
       <router-link class="brand" to="/" aria-label="智能化可能性地图 总览">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="26" height="26"><rect x="4" y="5" width="24" height="4" rx="1"/><rect x="4" y="12" width="17" height="4" rx="1"/><rect x="4" y="19" width="21" height="4" rx="1"/><rect x="4" y="26" width="11" height="2" rx="1"/><path d="M26 12v13" stroke-width="2"/></svg></span>
+        <img class="brand-mark" :src="logo" width="34" height="34" alt="">
+
         <span class="brand-txt"><b>智能化可能性地图</b><small>PETRO × AI ATLAS</small></span>
       </router-link>
       <nav class="nav" :class="{open:menu}" aria-label="主导航">

@@ -1,16 +1,14 @@
 /* Shell layout: top bar, chain directory, breadcrumb, footer, shared page blocks. */
 .skip{position:fixed;left:12px;top:-60px;z-index:300;padding:8px 14px;border-radius:var(--r-m);background:var(--ink);color:var(--ink-inv);transition:top .15s}
 .skip:focus{top:10px}
-html.has-modal{overflow:hidden}
+/* ui/scrollLock.ts sets --scrollbar-w so the layout keeps its width while locked. */
+html.has-modal{overflow:hidden;padding-right:var(--scrollbar-w,0px)}
 
 /* ---------- top bar ---------- */
 .topbar{position:sticky;top:0;z-index:60;height:var(--nav-h);background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
 .topbar-in{display:flex;align-items:center;gap:22px;height:100%;padding:0 var(--gutter);max-width:1600px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.brand-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--night);color:var(--clay)}
-.brand-mark svg{fill:currentColor;stroke:var(--night-ink-2)}
-.brand-mark rect:nth-child(2){fill:var(--jade-l)}
-.brand-mark rect:nth-child(3){fill:#8fa6f0}
+.brand-mark{display:block;width:34px;height:34px;flex-shrink:0}
 .brand-txt{display:flex;flex-direction:column;line-height:1.15}
 .brand-txt b{font-size:15px;letter-spacing:-.01em}
 .brand-txt small{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-4)}
