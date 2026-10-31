@@ -1,473 +1,327 @@
 import {zipSync,strToU8} from 'fflate';
-/* =========================================================
-   案例包导入 Case Import（v2：多文件 / 文件夹）
-   ---------------------------------------------------------
-   一个「案例包」= 一个文件夹，最少一个清单，其余随便：
-
-     my-case/
-       case.json          必需。元信息 + 专业背景 + 案例流程
-       demo/index.html    可选。示范页（整页放进沙箱 iframe）
-       demo/demo.css      可选。示范页样式
-       demo/demo.js       可选。示范页脚本；没有 html 时它就是
-                                「模块模式」的挂载脚本
-       demo/*.png|svg|json… 可选。示范用到的素材，自动转 data URL
-
-   流程：下载模板 → 改内容 → 把整个文件夹拖进弹窗 → 校验 → 添加。
-   添加后案例存进 localStorage 并注册进 Cases，全站立即可见。
-   ========================================================= */
-
+/* Case package import (v2: multi-file / folder packages)
+     my-case/case.json        required: metadata, background, workflow
+     my-case/demo/index.html  optional: page-mode demo (sandboxed iframe)
+     my-case/demo/demo.js     optional: module-mode mount script when there is no HTML
+     my-case/demo/*           optional: assets, inlined as data URLs
+   Imported packages live in localStorage and register into Cases immediately.
+   Classic script on purpose: build checks load it into a vm context after stripping the import line. */
 (function (global) {
   'use strict';
 
-  var esc = function (s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  };
-
-  var KEY = 'atlas.casepack.v2';
-  var KEY_V1 = 'atlas.casepack.v1';
-  var KEY_BLOCKED = 'atlas.case.blocked.v1';
-  var ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-  var MAX_TOTAL = 6 * 1024 * 1024;
-  var WARN_TOTAL = 1.6 * 1024 * 1024;
-
-  var TEXT_EXT = ['json', 'js', 'mjs', 'css', 'html', 'htm', 'svg', 'txt', 'csv', 'tsv', 'md', 'xml', 'yaml', 'yml', 'geojson'];
-  var MIME = {
+  const KEY = 'atlas.casepack.v2';
+  const KEY_V1 = 'atlas.casepack.v1';
+  const KEY_BLOCKED = 'atlas.case.blocked.v1';
+  const ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+  const MAX_TOTAL = 6 * 1024 * 1024;
+  const WARN_TOTAL = 1.6 * 1024 * 1024;
+  const TEXT_EXT = ['json', 'js', 'mjs', 'css', 'html', 'htm', 'svg', 'txt', 'csv', 'tsv', 'md', 'xml', 'yaml', 'yml', 'geojson'];
+  const MIME = {
     png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp',
     svg: 'image/svg+xml', ico: 'image/x-icon', mp3: 'audio/mpeg', wav: 'audio/wav',
     mp4: 'video/mp4', webm: 'video/webm', woff: 'font/woff', woff2: 'font/woff2',
     ttf: 'font/ttf', otf: 'font/otf', json: 'application/json', csv: 'text/csv', pdf: 'application/pdf'
   };
 
-  var saved = [];
-  var memFallback = null;
+  let saved = [];
+  let memFallback = null;
+  let pendingFiles = [];   // demo files of the package open in the import dialog
 
-  var S = {
-    pkg: null,        /* 清单对象 */
-    manifest: null,   /* 清单文件 */
-    files: [],        /* 除清单外的示范文件 */
-    raw: [],          /* 全部文件（含清单） */
-    loading: false,
-    el: null,
-    pv: null,         /* 预览弹窗 */
-    pvHandle: null
-  };
+  function extOf(name) { const m = /\.([a-z0-9]+)$/i.exec(String(name).split('?')[0]); return m ? m[1].toLowerCase() : ''; }
+  const isTextName = n => TEXT_EXT.indexOf(extOf(n)) >= 0;
+  const isHtml = n => ['html', 'htm'].indexOf(extOf(n)) >= 0;
+  const isJs = n => ['js', 'mjs'].indexOf(extOf(n)) >= 0;
+  const isCss = n => extOf(n) === 'css';
+  const kb = n => Math.max(1, Math.round(n / 1024));
+  const today = () => { const d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
+  const sceneOf = id => (global.ATLAS && global.ATLAS.index.byScene[id]) || null;
+  const demoCfg = pkg => (pkg && ((pkg.tabs && pkg.tabs.demo) || pkg.demo)) || {};
+  const modeOf = (files, cfg) => files.length ? global.CaseDemoHost.resolveMode({ files, demo: cfg }) : 'none';
 
-  /* ---------------------------------------------------------
-     0. 小工具
-     --------------------------------------------------------- */
-  function extOf(name) {
-    var m = /\.([a-z0-9]+)$/i.exec(String(name).split('?')[0]);
-    return m ? m[1].toLowerCase() : '';
-  }
-  function isTextName(n) { return TEXT_EXT.indexOf(extOf(n)) >= 0; }
-  function isHtml(n) { var e = extOf(n); return e === 'html' || e === 'htm'; }
-  function isJs(n) { var e = extOf(n); return e === 'js' || e === 'mjs'; }
-  function isCss(n) { return extOf(n) === 'css'; }
-  function baseOf(n) { return String(n).split('/').pop(); }
-  function kb(n) { return Math.max(1, Math.round(n / 1024)); }
-
-  function today() {
-    var d = new Date();
-    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
-  }
-
-  /* 以 _ 开头的键是模板里的说明，导入时忽略 */
+  // Keys starting with _ are template notes and are dropped on import.
   function clean(obj) {
     if (Array.isArray(obj)) return obj.map(clean);
     if (!obj || typeof obj !== 'object') return obj;
-    var out = {};
-    Object.keys(obj).forEach(function (k) {
-      if (k.charAt(0) === '_') return;
-      out[k] = clean(obj[k]);
-    });
+    const out = {};
+    for (const k of Object.keys(obj)) if (k.charAt(0) !== '_') out[k] = clean(obj[k]);
     return out;
   }
 
-  /* ---------------------------------------------------------
-     1. 存储
-     --------------------------------------------------------- */
+  /* ---------------- storage ---------------- */
   function readStore(key) {
     try {
-      var raw = JSON.parse(global.localStorage.getItem(key) || '[]');
+      const raw = JSON.parse(global.localStorage.getItem(key) || '[]');
       return Array.isArray(raw) ? raw : [];
     } catch (e) {
       return (key === KEY && memFallback) || [];
     }
   }
-
   function writeStore(list) {
     memFallback = list;
-    try {
-      global.localStorage.setItem(KEY, JSON.stringify(list));
-      return true;
-    } catch (e) {
-      return false;
+    try { global.localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
+  }
+
+  // Hidden builtin cases: survives reloads; only applies to non-imported cases.
+  function readBlocklist() {
+    try { const r = JSON.parse(global.localStorage.getItem(KEY_BLOCKED) || '[]'); return Array.isArray(r) ? r : []; } catch (e) { return []; }
+  }
+  function writeBlocklist(list) {
+    try { global.localStorage.setItem(KEY_BLOCKED, JSON.stringify(list)); } catch (e) { /* storage unavailable */ }
+  }
+  function applyBlocklist() {
+    for (const id of readBlocklist()) {
+      const c = global.Cases.get(id);
+      if (c && !c.imported) global.Cases.unregister(id);
     }
   }
 
-  /* ---------------------------------------------------------
-     2. 读文件
-     --------------------------------------------------------- */
+  /* ---------------- reading files ---------------- */
   function readOne(file) {
-    return new Promise(function (resolve, reject) {
-      var name = file.webkitRelativePath || file.name;
-      var text = isTextName(name);
-      var fr = new FileReader();
-      fr.onload = function () {
-        resolve({
-          name: name,
-          size: file.size,
-          mime: file.type || MIME[extOf(name)] || (text ? 'text/plain' : 'application/octet-stream'),
-          enc: text ? 'text' : 'dataurl',
-          data: String(fr.result)
-        });
-      };
-      fr.onerror = function () { reject(new Error('读取失败：' + name)); };
-      if (text) fr.readAsText(file, 'utf-8');
-      else fr.readAsDataURL(file);
+    return new Promise((resolve, reject) => {
+      const name = file.webkitRelativePath || file.name, text = isTextName(name), fr = new FileReader();
+      fr.onload = () => resolve({
+        name, size: file.size,
+        mime: file.type || MIME[extOf(name)] || (text ? 'text/plain' : 'application/octet-stream'),
+        enc: text ? 'text' : 'dataurl',
+        data: String(fr.result)
+      });
+      fr.onerror = () => reject(new Error('读取失败：' + name));
+      if (text) fr.readAsText(file, 'utf-8'); else fr.readAsDataURL(file);
     });
   }
 
-  /* 整个文件夹上传时，路径里会带上顶层目录名，去掉它 */
+  // A folder upload prefixes every path with the folder name; drop it.
   function stripRoot(files) {
     if (files.length < 2) return files;
-    var segs = files.map(function (f) { return f.name.split('/'); });
-    if (!segs.every(function (s) { return s.length > 1; })) return files;
-    var root = segs[0][0];
-    if (!segs.every(function (s) { return s[0] === root; })) return files;
-    files.forEach(function (f) { f.name = f.name.slice(root.length + 1); });
+    const segs = files.map(f => f.name.split('/'));
+    const root = segs[0][0];
+    if (!segs.every(s => s.length > 1 && s[0] === root)) return files;
+    for (const f of files) f.name = f.name.slice(root.length + 1);
     return files;
   }
 
   function pickManifest(files) {
-    var jsons = files.filter(function (f) { return extOf(f.name) === 'json' && f.enc === 'text'; });
-    var named = jsons.filter(function (f) { return /(^|\/)(case|[a-z0-9._-]+\.case)\.json$/i.test(f.name); });
-    return named[0] || jsons[0] || null;
+    const jsons = files.filter(f => extOf(f.name) === 'json' && f.enc === 'text');
+    return jsons.find(f => /(^|\/)(case|[a-z0-9._-]+\.case)\.json$/i.test(f.name)) || jsons[0] || null;
   }
 
-  function roleOf(f) {
-    if (S.manifest && f.name === S.manifest.name) return { k: 'manifest', t: '清单' };
-    if (isHtml(f.name)) return { k: 'page', t: '示范页' };
-    if (isCss(f.name)) return { k: 'css', t: '样式' };
-    if (isJs(f.name)) return { k: 'js', t: '脚本' };
-    if (extOf(f.name) === 'json') return { k: 'data', t: '数据' };
-    return { k: 'asset', t: '素材' };
+  /* ---------------- record -> case definition ---------------- */
+  function backgroundTab(b) {
+    return {
+      label: b.label || '专业背景',
+      judge: Array.isArray(b.judge) && b.judge.length ? b.judge : null,
+      lede: b.lede || '',
+      sections: (b.sections || []).map((s, i) => ({ no: s.no || i + 1, en: s.en || '', title: s.title || '未命名段落', html: s.html || s.body || '' }))
+    };
+  }
+  function workflowTab(w) {
+    return {
+      label: w.label || '案例流程', title: w.title || '案例流程', lead: w.lead || [], stats: w.stats || null,
+      steps: (w.steps || []).map(s => ({ name: s.name || '未命名步骤', role: s.role || '', do: s.do || '', effect: s.effect || '', trap: s.trap || '' })),
+      metrics: w.metrics || null, fails: w.fails || null
+    };
   }
 
-  function demoCfg(pkg) {
-    return (pkg && ((pkg.tabs && pkg.tabs.demo) || pkg.demo)) || {};
+  // Saved uploads restore before plugins register, so a builtin reference resolves at mount time.
+  function builtinDemo(cfg) {
+    const src = global.Cases.get(cfg.builtin);
+    let target = null, resolving = false;
+    const demo = {
+      label: cfg.label || (src && src.tabs && src.tabs.demo && src.tabs.demo.label) || '可运行示范',
+      intro: cfg.intro || '',
+      mode: 'builtin',
+      mount(root, ctx) {
+        if (resolving) throw new Error('内置演示存在循环引用：' + cfg.builtin);
+        const c = global.Cases.get(cfg.builtin), d = c && c.tabs && c.tabs.demo;
+        if (!d || d === demo || typeof d.mount !== 'function') throw new Error('复用的内置演示不可用：' + cfg.builtin);
+        target = d;
+        resolving = true;
+        try { return d.mount(root, ctx); } finally { resolving = false; }
+      },
+      unmount() {
+        const previous = target;
+        target = null;
+        if (previous && typeof previous.unmount === 'function') previous.unmount();
+      }
+    };
+    return demo;
   }
 
-  /* ---------------------------------------------------------
-     2.5 隐藏名单：被"删除"的插件案例，刷新后仍保持隐藏
-     --------------------------------------------------------- */
-  function readBlocklist() {
-    try {
-      var r = JSON.parse(global.localStorage.getItem(KEY_BLOCKED) || '[]');
-      return Array.isArray(r) ? r : [];
-    } catch (e) { return []; }
-  }
-  function writeBlocklist(list) {
-    try { global.localStorage.setItem(KEY_BLOCKED, JSON.stringify(list)); } catch (e) { }
-  }
-  function applyBlocklist() {
-    readBlocklist().forEach(function (id) {
-      /* 名单只对插件案例生效；同 id 的上传案例不受影响 */
-      var c = global.Cases.get(id);
-      if (c && !c.imported) global.Cases.unregister(id);
-    });
+  function packageDemo(cfg, files, mode, meta) {
+    let handle = null;
+    return {
+      label: cfg.label || '可运行示范', intro: cfg.intro || '', mode,
+      mount(root, ctx) { handle = global.CaseDemoHost.create(root, { files, demo: cfg, meta }, ctx); },
+      unmount() { if (handle) { try { handle.destroy(); } catch (e) { /* demo already gone */ } handle = null; } }
+    };
   }
 
-  /* ---------------------------------------------------------
-     3. 案例定义
-     --------------------------------------------------------- */
   function toCase(rec) {
-    var pkg = clean(rec.pkg) || {};
-    var meta = rec.meta || {};
-    var t = pkg.tabs || {};
-    var files = rec.files || [];
-    var cfg = demoCfg(pkg);
-    var tabs = {};
-
-    if (t.background) {
-      var b = t.background;
-      tabs.background = {
-        label: b.label || '专业背景',
-        judge: Array.isArray(b.judge) && b.judge.length ? b.judge : null,
-        lede: b.lede || '',
-        sections: (b.sections || []).map(function (s, i) {
-          return {
-            no: s.no || (i + 1),
-            en: s.en || '',
-            title: s.title || '未命名段落',
-            html: s.html || s.body || ''
-          };
-        })
-      };
-    }
-
-    if (t.workflow) {
-      var w = t.workflow;
-      tabs.workflow = {
-        label: w.label || '案例流程',
-        title: w.title || '案例流程',
-        lead: w.lead || [],
-        stats: w.stats || null,
-        steps: (w.steps || []).map(function (s) {
-          return {
-            name: s.name || '未命名步骤',
-            role: s.role || '',
-            do: s.do || '',
-            effect: s.effect || '',
-            trap: s.trap || ''
-          };
-        }),
-        metrics: w.metrics || null,
-        fails: w.fails || null
-      };
-    }
-
-    /* --- 示范：三种来源 --- */
-    var mode = files.length ? global.CaseDemoHost.resolveMode({ files: files, demo: cfg }) : 'none';
-    var handle = null;
-
-    if (cfg.builtin && (mode === 'none' || mode === 'builtin')) {
-      var src = global.Cases.get(cfg.builtin), builtinDemo = null, resolvingBuiltin = false;
-      tabs.demo = {
-        label: cfg.label || (src && src.tabs && src.tabs.demo && src.tabs.demo.label) || '可运行示范',
-        intro: cfg.intro || '',
-        mode: 'builtin',
-        // Saved uploads restore before source plugins register. Resolve at mount,
-        // keeping both old references and replacement plugin IDs usable.
-        mount: function (root, ctx) {
-          if (resolvingBuiltin) throw new Error('内置演示存在循环引用：' + cfg.builtin);
-          var target = global.Cases.get(cfg.builtin);
-          if (!target || !target.tabs || !target.tabs.demo || target.tabs.demo === tabs.demo || typeof target.tabs.demo.mount !== 'function') {
-            throw new Error('复用的内置演示不可用：' + cfg.builtin);
-          }
-          builtinDemo = target.tabs.demo;
-          resolvingBuiltin = true;
-          try { return builtinDemo.mount(root, ctx); }
-          finally { resolvingBuiltin = false; }
-        },
-        unmount: function () {
-          var previous = builtinDemo; builtinDemo = null;
-          if (previous && typeof previous.unmount === 'function') previous.unmount();
-        }
-      };
-    } else if (mode === 'page' || mode === 'module') {
-      tabs.demo = {
-        label: cfg.label || '可运行示范',
-        intro: cfg.intro || '',
-        mode: mode,
-        mount: function (root, ctx) {
-          handle = global.CaseDemoHost.create(root, {
-            files: files,
-            demo: cfg,
-            meta: rec.meta
-          }, ctx);
-        },
-        unmount: function () {
-          if (handle) { try { handle.destroy(); } catch (e) { } handle = null; }
-        }
-      };
-    }
-
+    const pkg = clean(rec.pkg) || {}, meta = rec.meta || {}, t = pkg.tabs || {}, files = rec.files || [];
+    const cfg = demoCfg(pkg), mode = modeOf(files, cfg), tabs = {};
+    if (t.background) tabs.background = backgroundTab(t.background);
+    if (t.workflow) tabs.workflow = workflowTab(t.workflow);
+    if (cfg.builtin && (mode === 'none' || mode === 'builtin')) tabs.demo = builtinDemo(cfg);
+    else if (mode === 'page' || mode === 'module') tabs.demo = packageDemo(cfg, files, mode, rec.meta);
     return {
       id: meta.id,
       sceneId: meta.sceneId,
       title: meta.title,
-      methods: (meta.methods && meta.methods.length)
-        ? meta.methods.slice()
-        : ((sceneOf(meta.sceneId) || {}).methods || []).slice(),
+      methods: (meta.methods && meta.methods.length ? meta.methods : (sceneOf(meta.sceneId) || {}).methods || []).slice(),
       version: meta.version || '1.0.0',
       updated: meta.updated || today(),
       status: 'ready',
       imported: true,
       packFiles: files.length,
-      tabs: tabs
+      tabs
     };
   }
 
-  /* ---------------------------------------------------------
-     4. 校验
-     --------------------------------------------------------- */
-  function sceneOf(id) {
-    return (global.ATLAS && global.ATLAS.index.byScene[id]) || null;
+  /* ---------------- validation: [{level, msg, hint}] ---------------- */
+  function checker() {
+    const out = [];
+    const add = level => (msg, hint) => out.push({ level, msg, hint: hint || '' });
+    return { out, ok: add('ok'), warn: add('warn'), err: add('error') };
   }
 
-  function checkAll(pkg, meta, files) {
-    var out = [];
-    function ok(m, h) { out.push({ level: 'ok', msg: m, hint: h || '' }); }
-    function warn(m, h) { out.push({ level: 'warn', msg: m, hint: h || '' }); }
-    function err(m, h) { out.push({ level: 'error', msg: m, hint: h || '' }); }
+  function checkIdentity(c, meta) {
+    if (!meta.id) c.err('案例 id 没填', '建议「环节-关键词」，例如 welllog-layer');
+    else if (!ID_RE.test(meta.id)) c.err('案例 id 格式不合法：' + meta.id, '只能小写字母、数字、连字符，不能有空格或下划线');
+    else if (global.Cases.get(meta.id)) c.err('案例 id 已被占用：' + meta.id, '换一个 id；若是之前上传的旧版本，先在案例库里移除');
+    else c.ok('id 可用：' + meta.id);
 
-    files = files || [];
-
-    if (!pkg) {
-      err('还没有案例包', '把整个案例文件夹拖进左边，或点「选择文件夹」；最快的方式是先下载模板');
-      return out;
-    }
-
-    pkg = clean(pkg);
-    var t = pkg.tabs || {};
-    var cfg = demoCfg(pkg);
-
-    /* 1 id */
-    if (!meta.id) err('案例 id 没填', '建议「环节-关键词」，例如 welllog-layer');
-    else if (!ID_RE.test(meta.id)) err('案例 id 格式不合法：' + meta.id, '只能小写字母、数字、连字符，不能有空格或下划线');
-    else if (global.Cases.get(meta.id)) err('案例 id 已被占用：' + meta.id, '换一个 id；若是之前上传的旧版本，先在案例库里移除');
-    else ok('id 可用：' + meta.id);
-
-    /* 2 场景 */
-    var sc = meta.sceneId ? sceneOf(meta.sceneId) : null;
-    if (!meta.sceneId) err('没有选择所属场景', '下拉框里按环节分组，选场景即等于选定分类');
-    else if (!sc) err('场景不存在：' + meta.sceneId, '场景 id 必须来自现有业务场景');
+    const sc = meta.sceneId ? sceneOf(meta.sceneId) : null;
+    if (!meta.sceneId) c.err('没有选择所属场景', '下拉框里按环节分组，选场景即等于选定分类');
+    else if (!sc) c.err('场景不存在：' + meta.sceneId, '场景 id 必须来自现有业务场景');
     else {
-      ok('绑定场景：' + sc.stageName + ' / ' + sc.name,
-        '分类自动继承：' + sc.stageName + ' · ' + (sc.methods || []).join(' / '));
-      var occupied = global.Cases.byScene(sc.id);
-      if (occupied && occupied.id !== meta.id) {
-        warn('该场景已有案例：' + occupied.id, '上传后会覆盖它的显示（旧案例仍留在案例库里）');
-      }
+      c.ok('绑定场景：' + sc.stageName + ' / ' + sc.name, '分类自动继承：' + sc.stageName + ' · ' + (sc.methods || []).join(' / '));
+      const occupied = global.Cases.byScene(sc.id);
+      if (occupied && occupied.id !== meta.id) c.warn('该场景已有案例：' + occupied.id, '上传后会覆盖它的显示（旧案例仍留在案例库里）');
     }
 
-    /* 2.5 技术标签 */
-    var mm = meta.methods || [];
-    var badM = mm.filter(function (k) { return !(global.ATLAS.methods && global.ATLAS.methods[k]); });
-    if (badM.length) err('技术标签不存在：' + badM.join('、'),
-      '取值以首页「按方法找」面板为准；需要新类别请先让管理员在管理后台添加');
-    else if (!mm.length) ok('技术标签：继承场景', '会沿用所选场景自带的方法标签参与检索');
-    else ok('技术标签：' + mm.join(' / '), '案例库与场景页会按它展示');
+    const mm = meta.methods || [];
+    const badM = mm.filter(k => !(global.ATLAS.methods && global.ATLAS.methods[k]));
+    if (badM.length) c.err('技术标签不存在：' + badM.join('、'), '取值以首页「按方法找」面板为准；需要新类别请先让管理员在管理后台添加');
+    else if (!mm.length) c.ok('技术标签：继承场景', '会沿用所选场景自带的方法标签参与检索');
+    else c.ok('技术标签：' + mm.join(' / '), '案例库与场景页会按它展示');
 
-    /* 3 名称 */
-    if (!meta.title) err('案例名称没填', '会显示在场景页标题与案例库列表里');
-    else if (meta.title.length > 40) warn('案例名称偏长（' + meta.title.length + ' 字）', '建议 6–20 字，页面标题不折行');
-    else ok('名称：' + meta.title);
+    if (!meta.title) c.err('案例名称没填', '会显示在场景页标题与案例库列表里');
+    else if (meta.title.length > 40) c.warn('案例名称偏长（' + meta.title.length + ' 字）', '建议 6–20 字，页面标题不折行');
+    else c.ok('名称：' + meta.title);
+  }
 
-    /* 4 专业背景 */
-    if (!t.background) {
-      err('缺少 tabs.background', '专业背景是必填块，没有它场景页不会出现 tab');
-    } else {
-      var secs = t.background.sections || [];
-      if (!secs.length) err('background.sections 为空', '至少要有一段；建议四段式');
+  function checkContent(c, t) {
+    if (!t.background) c.err('缺少 tabs.background', '专业背景是必填块，没有它场景页不会出现 tab');
+    else {
+      const secs = t.background.sections || [];
+      if (!secs.length) c.err('background.sections 为空', '至少要有一段；建议四段式');
       else {
-        var bad = [];
-        secs.forEach(function (s, i) {
+        const bad = [];
+        secs.forEach((s, i) => {
           if (!s || !s.title) bad.push('sections[' + i + '] 缺 title');
           else if (!s.html && !s.body) bad.push('sections[' + i + '] 缺 html');
         });
-        if (bad.length) err('段落字段不全', bad.join('；'));
-        else ok('专业背景：' + secs.length + ' 段');
-        if (secs.length < 4) warn('只有 ' + secs.length + ' 段', '建议四段：当前做法与问题 / 智能方法介入点 / 数据准备要求 / 难度与参考');
+        if (bad.length) c.err('段落字段不全', bad.join('；'));
+        else c.ok('专业背景：' + secs.length + ' 段');
+        if (secs.length < 4) c.warn('只有 ' + secs.length + ' 段', '建议四段：当前做法与问题 / 智能方法介入点 / 数据准备要求 / 难度与参考');
       }
-      var j = t.background.judge;
-      if (j && j.length && j.length !== 4) warn('judge 有 ' + j.length + ' 项', '"30 秒判断"按四列排版，建议正好 4 项');
+      const j = t.background.judge;
+      if (j && j.length && j.length !== 4) c.warn('judge 有 ' + j.length + ' 项', '"30 秒判断"按四列排版，建议正好 4 项');
     }
 
-    /* 5 流程 */
-    if (!t.workflow) {
-      warn('没有 tabs.workflow', '页面会少"案例流程"这个 tab，可以后补');
-    } else {
-      var steps = t.workflow.steps || [];
-      if (!steps.length) err('workflow.steps 为空', '至少写一步；每步需要 name，可选 do / effect / trap');
-      else {
-        var badStep = steps.filter(function (s) { return !s || !s.name; });
-        if (badStep.length) err('有步骤缺 name', '检查 steps 数组第 ' + (steps.indexOf(badStep[0]) + 1) + ' 项');
-        else ok('案例流程：' + steps.length + ' 步');
-      }
+    if (!t.workflow) c.warn('没有 tabs.workflow', '页面会少"案例流程"这个 tab，可以后补');
+    else {
+      const steps = t.workflow.steps || [];
+      const badStep = steps.filter(s => !s || !s.name);
+      if (!steps.length) c.err('workflow.steps 为空', '至少写一步；每步需要 name，可选 do / effect / trap');
+      else if (badStep.length) c.err('有步骤缺 name', '检查 steps 数组第 ' + (steps.indexOf(badStep[0]) + 1) + ' 项');
+      else c.ok('案例流程：' + steps.length + ' 步');
     }
+  }
 
-    /* 6 示范 */
-    var mode = files.length ? global.CaseDemoHost.resolveMode({ files: files, demo: cfg }) : 'none';
-    var jsFile = files.filter(function (f) { return isJs(f.name); })[0] || null;
-    var cssFiles = files.filter(function (f) { return isCss(f.name); });
-    var htmlFile = files.filter(function (f) { return isHtml(f.name); })[0] || null;
+  // Local src / href / url() references that point outside the package.
+  function missingRefs(files, htmlFile, cssFiles) {
+    const missing = [];
+    const scan = (text, from) => {
+      const re = /(?:src|href)\s*=\s*["']([^"'#]+)["']|url\(\s*["']?([^"')]+)["']?\s*\)/gi;
+      let m;
+      while ((m = re.exec(text))) {
+        const ref = m[1] || m[2] || '';
+        if (!ref || /^(data:|https?:|mailto:|tel:|#|\/\/)/i.test(ref) || !/[.][a-z0-9]{2,5}$/i.test(ref)) continue;
+        if (!global.CaseDemoHost.findFile(files, ref)) missing.push(from + ' → ' + ref);
+      }
+    };
+    scan(htmlFile.data, 'index.html');
+    for (const f of cssFiles) scan(f.data, f.name);
+    return missing;
+  }
+
+  function checkDemo(c, cfg, files) {
+    const mode = modeOf(files, cfg);
+    const jsFile = files.find(f => isJs(f.name)) || null;
+    const htmlFile = files.find(f => isHtml(f.name)) || null;
+    const cssFiles = files.filter(f => isCss(f.name));
 
     if (mode === 'page') {
-      ok('示范：整页模式（沙箱）', htmlFile.name + ' 会在隔离的 iframe 里运行，写多复杂都不会影响主站');
-      if (htmlFile.size < 60) warn('示范页内容过短', 'index.html 看起来是空壳，检查是不是存错文件');
-      /* 引用完整性：src / href / url() 指向的本地文件在不在 */
-      var missing = [];
-      var scanRefs = function (text, from) {
-        var re = /(?:src|href)\s*=\s*["']([^"'#]+)["']|url\(\s*["']?([^"')]+)["']?\s*\)/gi, m;
-        while ((m = re.exec(text))) {
-          var ref = m[1] || m[2] || '';
-          if (!ref || /^(data:|https?:|mailto:|tel:|#|\/\/)/i.test(ref)) continue;
-          if (!/[.][a-z0-9]{2,5}$/i.test(ref)) continue;
-          if (!global.CaseDemoHost.findFile(files, ref)) missing.push(from + ' → ' + ref);
-        }
-      };
-      scanRefs(htmlFile.data, 'index.html');
-      cssFiles.forEach(function (f) { scanRefs(f.data, f.name); });
-      if (missing.length) {
-        warn('有 ' + missing.length + ' 处引用的文件不在包里', missing.slice(0, 4).join('；') + (missing.length > 4 ? ' …' : ''));
-      } else if (htmlFile) {
-        ok('示范页内引用的文件都能找到');
-      }
+      c.ok('示范：整页模式（沙箱）', htmlFile.name + ' 会在隔离的 iframe 里运行，写多复杂都不会影响主站');
+      if (htmlFile.size < 60) c.warn('示范页内容过短', 'index.html 看起来是空壳，检查是不是存错文件');
+      const missing = missingRefs(files, htmlFile, cssFiles);
+      if (missing.length) c.warn('有 ' + missing.length + ' 处引用的文件不在包里', missing.slice(0, 4).join('；') + (missing.length > 4 ? ' …' : ''));
+      else c.ok('示范页内引用的文件都能找到');
     } else if (mode === 'module') {
-      if (!jsFile) {
-        err('没有可运行的示范脚本', '模块模式需要 demo.js；或者放一个 index.html 走整页模式');
-      } else {
-        try {
-          new Function(jsFile.data);   /* 只做语法检查，不执行 */
-          ok('示范脚本语法通过：' + jsFile.name);
-        } catch (e) {
-          err('示范脚本有语法错误：' + jsFile.name, e.message);
-        }
+      if (!jsFile) c.err('没有可运行的示范脚本', '模块模式需要 demo.js；或者放一个 index.html 走整页模式');
+      else {
+        try { new Function(jsFile.data); c.ok('示范脚本语法通过：' + jsFile.name); }   // syntax check only, never executed
+        catch (e) { c.err('示范脚本有语法错误：' + jsFile.name, e.message); }
         if (!/\bmount\b/.test(jsFile.data) && !/__CASE_MOUNT__/.test(jsFile.data)) {
-          warn('脚本里没看到 mount 相关代码', '需要导出 mount(root, api)：module.exports={mount} 或 window.__CASE_MOUNT__=function(root,api){}');
+          c.warn('脚本里没看到 mount 相关代码', '需要导出 mount(root, api)：module.exports={mount} 或 window.__CASE_MOUNT__=function(root,api){}');
         }
-        ok('示范：模块模式（Shadow DOM）', '样式自动隔离，可以直接用 var(--jade) 这类站点配色令牌');
+        c.ok('示范：模块模式（Shadow DOM）', '样式自动隔离，可以直接用 var(--jade) 这类站点配色令牌');
       }
     } else if (cfg.builtin) {
-      var src = global.Cases.get(cfg.builtin);
-      if (!src || !src.tabs.demo || typeof src.tabs.demo.mount !== 'function') {
-        err('demo.builtin 指向的示范不存在：' + cfg.builtin, '改成一个已注册案例的 id，或删掉整个 demo 块');
-      } else {
-        ok('复用内置示范：' + cfg.builtin, '不推荐：包里已经有文件时，会优先用包里的示范');
-      }
+      const src = global.Cases.get(cfg.builtin);
+      if (!src || !src.tabs.demo || typeof src.tabs.demo.mount !== 'function') c.err('demo.builtin 指向的示范不存在：' + cfg.builtin, '改成一个已注册案例的 id，或删掉整个 demo 块');
+      else c.ok('复用内置示范：' + cfg.builtin, '不推荐：包里已经有文件时，会优先用包里的示范');
     } else {
-      warn('这个案例没有可运行示范', '想加示范就在包里放 demo/index.html 或 demo/demo.js；已经有文件但没被识别，检查 demo 字段');
+      c.warn('这个案例没有可运行示范', '想加示范就在包里放 demo/index.html 或 demo/demo.js；已经有文件但没被识别，检查 demo 字段');
     }
 
-    /* 7 样式文件粗检 */
-    cssFiles.forEach(function (f) {
-      var open = (f.data.match(/{/g) || []).length, close = (f.data.match(/}/g) || []).length;
-      if (open !== close) warn('样式大括号不配对：' + f.name, '{ 有 ' + open + ' 个，} 有 ' + close + ' 个，可能少了一个 }');
-    });
+    for (const f of cssFiles) {
+      const open = (f.data.match(/{/g) || []).length, close = (f.data.match(/}/g) || []).length;
+      if (open !== close) c.warn('样式大括号不配对：' + f.name, '{ 有 ' + open + ' 个，} 有 ' + close + ' 个，可能少了一个 }');
+    }
+  }
 
-    /* 8 文件清单与体积 */
-    var total = files.reduce(function (a, f) { return a + f.size; }, 0) + ((S.manifest && S.manifest.size) || 0);
+  function checkSize(c, cfg, files, pkg) {
+    const total = files.reduce((a, f) => a + f.size, 0);
     if (!files.length) {
-      if (!cfg.builtin) warn('包里只有清单，没有示范文件', '这是允许的（只有讲解没有示范），但带示范的场景更容易被立项');
-      else ok('只有清单 + 复用内置示范');
+      if (!cfg.builtin) c.warn('包里只有清单，没有示范文件', '这是允许的（只有讲解没有示范），但带示范的场景更容易被立项');
+      else c.ok('只有清单 + 复用内置示范');
     } else {
-      ok('文件清单：' + (files.length + 1) + ' 个，共 ' + kb(total) + ' KB',
-        files.map(function (f) { return f.name; }).slice(0, 6).join('、') + (files.length > 6 ? ' …' : ''));
-      if (total > MAX_TOTAL) err('包太大：' + kb(total) + ' KB', '上限 6 MB；图片先压缩，视频请放外部链接');
-      else if (total > WARN_TOTAL) warn('包偏大（' + kb(total) + ' KB）', '会占用浏览器本地存储，建议压到 1.5 MB 以内');
+      c.ok('文件清单：' + (files.length + 1) + ' 个，共 ' + kb(total) + ' KB', files.map(f => f.name).slice(0, 6).join('、') + (files.length > 6 ? ' …' : ''));
+      if (total > MAX_TOTAL) c.err('包太大：' + kb(total) + ' KB', '上限 6 MB；图片先压缩，视频请放外部链接');
+      else if (total > WARN_TOTAL) c.warn('包偏大（' + kb(total) + ' KB）', '会占用浏览器本地存储，建议压到 1.5 MB 以内');
     }
-
-    /* 9 安全 */
-    var all = JSON.stringify(pkg);
-    if (/<script/i.test(all)) err('清单内容里出现 <script> 标签', '清单只放文字；脚本请放进单独的 .js 文件');
-    if (all.length > 200000) warn('清单偏大（' + Math.round(all.length / 1024) + ' KB）', '长图建议改成精简的 SVG 路径');
-
-    return out;
+    const all = JSON.stringify(pkg);
+    if (/<script/i.test(all)) c.err('清单内容里出现 <script> 标签', '清单只放文字；脚本请放进单独的 .js 文件');
+    if (all.length > 200000) c.warn('清单偏大（' + Math.round(all.length / 1024) + ' KB）', '长图建议改成精简的 SVG 路径');
   }
 
-  function summarize(list) {
-    var e = 0, w = 0;
-    list.forEach(function (x) { if (x.level === 'error') e++; else if (x.level === 'warn') w++; });
-    return { errors: e, warns: w, oks: list.length - e - w };
+  function checkAll(pkg, meta, files) {
+    const c = checker();
+    if (!pkg) {
+      c.err('还没有案例包', '把整个案例文件夹拖进左边，或点「选择文件夹」；最快的方式是先下载模板');
+      return c.out;
+    }
+    const p = clean(pkg), list = files || [];
+    checkIdentity(c, meta);
+    checkContent(c, p.tabs || {});
+    checkDemo(c, demoCfg(p), list);
+    checkSize(c, demoCfg(p), list, p);
+    return c.out;
   }
 
-  /* ---------------------------------------------------------
-     5. 模板（清单 + 示范页 + 脚本 + 样式）
-     --------------------------------------------------------- */
+  /* ---------------- templates (downloaded verbatim by 下载案例模板) ---------------- */
   function templateManifest() {
     return {
       _readme: '这是案例包清单模板。以 _ 开头的字段是说明文字，导入时会被忽略，可以删掉。',
@@ -704,64 +558,55 @@ import {zipSync,strToU8} from 'fflate';
     ''
   ].join('\n');
 
+  /* ---------------- lifecycle ---------------- */
   function loadSaved() {
-    /* v2 */
-    saved = readStore(KEY).filter(function (r) { return r && r.pkg && r.meta && r.meta.id; });
-    /* v1：只有清单没有文件，按原样升级 */
-    readStore(KEY_V1).forEach(function (r) {
-      if (!r || !r.pkg || !r.meta || !r.meta.id) return;
-      if (saved.some(function (x) { return x.meta.id === r.meta.id; })) return;
+    saved = readStore(KEY).filter(r => r && r.pkg && r.meta && r.meta.id);
+    // v1 records only hold the manifest; they upgrade in memory and storage is left untouched.
+    for (const r of readStore(KEY_V1)) {
+      if (!r || !r.pkg || !r.meta || !r.meta.id || saved.some(x => x.meta.id === r.meta.id)) continue;
       saved.push({ v: 1, pkg: r.pkg, meta: r.meta, files: [], savedAt: r.savedAt });
-    });
-
-    saved.forEach(function (r) {
-      if (global.Cases.get(r.meta.id)) return;   /* JS 插件优先 */
-      global.Cases.register(toCase(r));
-    });
-    /* 最后应用隐藏名单：被删除的插件案例不再出现 */
+    }
+    for (const r of saved) if (!global.Cases.get(r.meta.id)) global.Cases.register(toCase(r));   // JS plugins win
     applyBlocklist();
   }
 
-  /* 删除案例：上传案例 = 移除本地存储；插件案例 = 记入隐藏名单。
-     两者都在本次会话内立即注销并触发页面重渲染，不刷新。 */
-  function remove(id, confirmed) {
-    var c = global.Cases.get(id);
-    if (!c) return false;
-    var isImported = !!c.imported;
-    var msg = isImported
-      ? '从本机移除案例「' + (c.title || id) + '」？\n将删除浏览器里保存的这份案例包，磁盘上的文件不受影响。'
-      : '删除插件案例「' + (c.title || id) + '」？\n它的 .js 文件仍留在磁盘上，但会立即从站点消失，刷新后也保持隐藏；\n在案例库的「已隐藏」区可以随时恢复。';
-    if (!confirmed && !global.confirm(msg)) return false;
+  const notice = (title, sub) => global.dispatchEvent(new CustomEvent('atlas:notice', { detail: { title, sub } }));
 
-    if (isImported) {
-      saved = saved.filter(function (r) { return r.meta.id !== id; });
+  // Imported case: drop the stored package. Builtin case: add to the hidden list.
+  function remove(id, confirmed) {
+    const c = global.Cases.get(id);
+    if (!c) return false;
+    const name = c.title || id;
+    const msg = c.imported
+      ? '从本机移除案例「' + name + '」？\n将删除浏览器里保存的这份案例包，磁盘上的文件不受影响。'
+      : '删除插件案例「' + name + '」？\n它的 .js 文件仍留在磁盘上，但会立即从站点消失，刷新后也保持隐藏；\n在案例库的「已隐藏」区可以随时恢复。';
+    if (!confirmed && !global.confirm(msg)) return false;
+    if (c.imported) {
+      saved = saved.filter(r => r.meta.id !== id);
       writeStore(saved);
     } else {
-      var bl = readBlocklist();
+      const bl = readBlocklist();
       if (bl.indexOf(id) < 0) { bl.push(id); writeBlocklist(bl); }
     }
     global.Cases.unregister(id);
-    toast('已删除「' + (c.title || id) + '」', '页面已同步更新');
-    global.dispatchEvent(new Event('atlas:changed'));
+    notice('已删除「' + name + '」', '页面已同步更新');
     return true;
   }
 
-  /* 恢复被隐藏的插件案例：移出名单后刷新，让插件脚本重新注册 */
+  // The plugin loader re-registers the case once it leaves the hidden list.
   function restore(id) {
-    var bl = readBlocklist().filter(function (x) { return x !== id; });
-    writeBlocklist(bl);
+    writeBlocklist(readBlocklist().filter(x => x !== id));
     global.__restorePlugin(id);
     return true;
   }
 
-  /* 管理后台编辑案例元信息：只支持本机上传的案例（插件案例的内容在磁盘文件里）。
-     patch = { title, sceneId, methods, version, updated }，全部可选。 */
+  // Only imported cases are editable; patch = { title, sceneId, methods, version, updated }.
+  // Validation happens on a copy so a rejected edit leaves the stored record unchanged.
   function updateMeta(id, patch) {
-    var rec = saved.filter(function (r) { return r.meta.id === id; })[0];
-    if (!rec) return { ok: false, error: '不是本机上传的案例，无法在线编辑（插件案例请改源文件）' };
-    var original = rec;
-    rec = Object.assign({}, rec, {meta:Object.assign({}, rec.meta)});
-    var p = patch || {};
+    const original = saved.find(r => r.meta.id === id);
+    if (!original) return { ok: false, error: '不是本机上传的案例，无法在线编辑（插件案例请改源文件）' };
+    const rec = Object.assign({}, original, { meta: Object.assign({}, original.meta) });
+    const p = patch || {};
     if (p.title != null) rec.meta.title = String(p.title).slice(0, 40);
     if (p.version != null) rec.meta.version = String(p.version).slice(0, 16);
     if (p.updated != null) rec.meta.updated = String(p.updated).slice(0, 10);
@@ -771,11 +616,9 @@ import {zipSync,strToU8} from 'fflate';
     }
     if (p.methods != null) {
       if (!Array.isArray(p.methods)) return { ok: false, error: 'methods 应为数组' };
-      rec.meta.methods = p.methods.filter(function (k) {
-        return global.ATLAS.methods && global.ATLAS.methods[k];
-      });
+      rec.meta.methods = p.methods.filter(k => global.ATLAS.methods && global.ATLAS.methods[k]);
     }
-    var next = saved.map(function(r){return r === original ? rec : r;});
+    const next = saved.map(r => r === original ? rec : r);
     if (!writeStore(next)) return { ok: false, error: '浏览器存储失败' };
     saved = next;
     global.Cases.unregister(id);
@@ -783,42 +626,40 @@ import {zipSync,strToU8} from 'fflate';
     return { ok: true };
   }
 
-  function exported() {
-    return saved.map(function (r) {
-      return { id: r.meta.id, title: r.meta.title, sceneId: r.meta.sceneId, files: (r.files || []).length, savedAt: r.savedAt };
-    });
-  }
+  const list = () => saved.map(r => ({ id: r.meta.id, title: r.meta.title, sceneId: r.meta.sceneId, files: (r.files || []).length, savedAt: r.savedAt }));
 
-
-  function toast(title, sub) { global.dispatchEvent(new CustomEvent('atlas:notice', {detail:{title,sub}})); }
   function makeZip(entries) {
-    var files = {};
-    entries.forEach(function(e) { files[e.name] = e.binary || strToU8(e.text || ''); });
-    return new Blob([zipSync(files, {level:0})], {type:'application/zip'});
+    const files = {};
+    for (const e of entries) files[e.name] = e.binary || strToU8(e.text || '');
+    return new Blob([zipSync(files, { level: 0 })], { type: 'application/zip' });
   }
-  function open(opts) { global.__ImportUI.open(opts || {}); }
-  function close() { global.__ImportUI.close(); }
+
+  function commit(pkg, meta, files) {
+    const errors = checkAll(pkg, meta, files).filter(r => r.level === 'error');
+    if (errors.length) return { ok: false, error: errors.map(r => r.msg).join('; ') };
+    const rec = { v: 2, pkg, meta, files, savedAt: new Date().toISOString() };
+    const next = saved.filter(r => r.meta.id !== meta.id).concat(rec);
+    const stored = writeStore(next);
+    saved = next;
+    global.Cases.register(toCase(rec));
+    return { ok: true, stored };
+  }
+
   global.CaseImport = {
-    open, close, loadSaved, remove:function(id){return remove(id,false);},restore,updateMeta,
-    blockedList:readBlocklist,list:exported,template:templateManifest,
-    check:function(pkg,meta){return checkAll(pkg,meta,S.files);},makeZip,
-    templates:{manifest:TPL_README,html:TPL_HTML,css:TPL_CSS,js:TPL_JS}
+    open: opts => global.__ImportUI.open(opts || {}),
+    close: () => global.__ImportUI.close(),
+    loadSaved, remove: id => remove(id, false), restore, updateMeta,
+    blockedList: readBlocklist, list, template: templateManifest,
+    check: (pkg, meta) => checkAll(pkg, meta, pendingFiles),
+    makeZip,
+    templates: { manifest: TPL_README, html: TPL_HTML, css: TPL_CSS, js: TPL_JS }
   };
+  // Shell-only service used by the import dialog and admin pages.
   global.__PackageService = {
-    readOne,stripRoot,pickManifest,toCase,
-    setFiles:function(files){S.files=files;},
-    check:function(pkg,meta,files){return checkAll(pkg,meta,files);},
-    removeConfirmed:function(id){return remove(id,true);},
-    commit:function(pkg,meta,files){
-      var errors=checkAll(pkg,meta,files).filter(function(r){return r.level==='error';});
-      if(errors.length)return {ok:false,error:errors.map(function(r){return r.msg;}).join('; ')};
-      var rec={v:2,pkg,meta,files,savedAt:new Date().toISOString()};
-      var next=saved.filter(function(r){return r.meta.id!==meta.id;}).concat(rec);
-      var stored=writeStore(next);saved=next;
-      global.Cases.register(toCase(rec));
-      global.dispatchEvent(new Event('atlas:changed'));
-      return {ok:true,stored};
-    }
+    readOne, stripRoot, pickManifest, toCase, commit,
+    setFiles: files => { pendingFiles = files; },
+    check: checkAll,
+    removeConfirmed: id => remove(id, true)
   };
   loadSaved();
 })(window);

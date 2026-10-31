@@ -25,8 +25,9 @@ let browser;
   await page.goto(origin+'/atlas/#/stage/drilling');
   await page.waitForURL('**/atlas/stage/drilling');
   // 路由页懒加载且带过渡，先等列表渲染再计数
-  await page.locator('.atlas-scene-card').nth(4).waitFor();
-  if(await page.locator('.atlas-scene-card').count()!==5)throw Error('Incorrect base-path scene list');
+  const cards=page.getByRole('list',{name:'场景目录'}).locator('.scene-card');
+  await cards.nth(4).waitFor();
+  if(await cards.count()!==5)throw Error('Incorrect base-path scene list');
   if((await fetch(origin+'/atlas/assets/missing.js')).status!==404)throw Error('Missing asset must return 404');
   if(errors.length)throw Error(errors.join('\n'));
   console.log('PASS: /atlas/ History deep link, refresh, legacy hash, demo resources, missing asset 404');

@@ -1006,170 +1006,105 @@ window.ATLAS = {
   ]
 };
 
-/* ---------- 派生索引与工具函数 ---------- */
+/* =========================================================
+   Derived index and the admin overlay.
+   Builtin data above is read-only; admin edits live in localStorage and merge here:
+     methods  atlas.methods.user.v1  { key: def | {deleted:true} }
+     scenes   atlas.scenes.user.v1   { upserts:{id:def}, deleted:[id] }
+   reindex() rebuilds stages[].scenes and every index; user scenes carry __user.
+   Build checks load this file into a bare vm context, so it must stay a classic script.
+   ========================================================= */
 (function (A) {
-  A.index = { scene: {}, byMethod: {}, byStage: {} };
-  A.stages.forEach(function (st) {
-    A.index.byStage[st.id] = st;
-    st.scenes.forEach(function (sc) {
-      sc.stageId = st.id;
-      sc.stageName = st.name;
-      sc.stageIdx = st.idx;
-      sc.status = sc.status || 'full';
-      sc.methods = sc.methods || [];
-      sc.refs = sc.refs || [];
-      sc.data = sc.data || [];
-      sc.datasets = sc.datasets || [];
-      sc.cross = sc.cross || [];
-      A.index.scene[sc.id] = sc;
-      sc.methods.forEach(function (m) {
-        (A.index.byMethod[m] = A.index.byMethod[m] || []).push(sc);
-      });
-    });
-  });
+  const K_M = 'atlas.methods.user.v1';
+  const K_S = 'atlas.scenes.user.v1';
+  const ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+  const DIFFS = ['低', '中', '高'];
+  const PALETTE = ['cv', 'ts', 'nlp', 'opt', 'kg'];   // new methods rotate through the five method colours
 
-  A.index.byId = A.index.scene;
-  A.index.byScene = A.index.scene;
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function changed() {
+    if (typeof window.dispatchEvent === 'function' && typeof Event === 'function') window.dispatchEvent(new Event('atlas:changed'));
+  }
 
-  A.allScenes = A.stages.reduce(function (a, s) { return a.concat(s.scenes); }, []);
+  const userMethods = lsGet(K_M) || {};
+  const stored = lsGet(K_S);
+  const sceneEdits = stored && stored.upserts ? { upserts: stored.upserts, deleted: stored.deleted || [] } : { upserts: {}, deleted: [] };
+
+  A.colors = { cv: 'cv', ts: 'ts', nlp: 'nlp', opt: 'opt', kg: 'kg' };
+  const colorKeyOf = key => A.colors[key] || (userMethods[key] && userMethods[key].colorKey) || 'cv';
+
+  function userScene(u) {
+    return {
+      id: u.id, name: u.name, methods: (u.methods || []).slice(),
+      diff: DIFFS.indexOf(u.diff) >= 0 ? u.diff : '中',
+      diffWhy: u.diffWhy || '', point: u.point || '', intro: u.intro || '',
+      problem: u.problem || '', data: u.data || [], refs: u.refs || [],
+      status: u.status || 'full', __user: true
+    };
+  }
+
+  A.reindex = function () {
+    for (const k of Object.keys(userMethods)) {
+      const m = userMethods[k];
+      if (m && m.deleted) { delete A.methods[k]; continue; }
+      A.methods[k] = { key: k, abbr: m.abbr, name: m.name, desc: m.desc || '', signal: m.signal || '', colorKey: m.colorKey || 'cv' };
+      A.colors[k] = m.colorKey || 'cv';
+    }
+
+    // Drop injected, edited and deleted scenes, then append upserts in insertion order.
+    for (const st of A.stages) st.scenes = st.scenes.filter(sc => !sc.__user && !sceneEdits.upserts[sc.id] && sceneEdits.deleted.indexOf(sc.id) < 0);
+    for (const id of Object.keys(sceneEdits.upserts)) {
+      const u = sceneEdits.upserts[id];
+      (A.stages.find(st => st.id === u.stageId) || A.stages[0]).scenes.push(userScene(u));
+    }
+
+    const index = { scene: {}, byMethod: {}, byStage: {} };
+    for (const st of A.stages) {
+      index.byStage[st.id] = st;
+      for (const sc of st.scenes) {
+        Object.assign(sc, { stageId: st.id, stageName: st.name, stageIdx: st.idx, status: sc.status || 'full' });
+        for (const key of ['methods', 'refs', 'data', 'datasets', 'cross']) sc[key] = sc[key] || [];
+        index.scene[sc.id] = sc;
+        for (const mk of sc.methods) if (A.methods[mk]) (index.byMethod[mk] = index.byMethod[mk] || []).push(sc);
+      }
+    }
+    index.byId = index.byScene = index.scene;
+    A.index = index;
+    A.allScenes = A.stages.reduce((a, s) => a.concat(s.scenes), []);
+    changed();
+  };
 
   A.stats = function () {
-    var total = A.allScenes.length;
-    var full = A.allScenes.filter(function (s) { return s.status === 'full'; }).length;
-    var diff = { 低: 0, 中: 0, 高: 0 };
-    A.allScenes.forEach(function (s) { diff[s.diff] = (diff[s.diff] || 0) + 1; });
-    return { total: total, full: full, ext: total - full, diff: diff };
+    const total = A.allScenes.length, full = A.allScenes.filter(s => s.status === 'full').length;
+    const diff = { 低: 0, 中: 0, 高: 0 };
+    for (const s of A.allScenes) diff[s.diff] = (diff[s.diff] || 0) + 1;
+    return { total, full, ext: total - full, diff };
   };
 
   A.countByStageMethod = function () {
-    var m = {};
-    var mkeys = Object.keys(A.methods);
-    A.stages.forEach(function (st) {
+    const m = {}, keys = Object.keys(A.methods);
+    for (const st of A.stages) {
       m[st.id] = {};
-      mkeys.forEach(function (k) { m[st.id][k] = 0; });
-      st.scenes.forEach(function (sc) {
-        sc.methods.forEach(function (k) { m[st.id][k] = (m[st.id][k] || 0) + 1; });
-      });
-    });
+      for (const k of keys) m[st.id][k] = 0;
+      for (const sc of st.scenes) for (const k of sc.methods) m[st.id][k] = (m[st.id][k] || 0) + 1;
+    }
     return m;
   };
-})(window.ATLAS);
 
-/* =========================================================
-   管理员运行时覆盖层：技术（methods）与场景（scenes）的增删改
-   ---------------------------------------------------------
-   内置数据在 data.js 里是只读的；管理员在后台的改动写入
-   localStorage，加载时在这里合并生效。三类操作：
-     · 技术：atlas.methods.user.v1  { key: def|{deleted:true} }
-     · 场景：atlas.scenes.user.v1   { upserts:{id:def}, deleted:[id] }
-   合并策略：重建 stages[].scenes 与全部索引，用户场景带 __user 标记。
-   ========================================================= */
-(function (A) {
-  var K_M = 'atlas.methods.user.v1';
-  var K_S = 'atlas.scenes.user.v1';
-  var ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-  var DIFFS = ['低', '中', '高'];
-  /* 新增技术的配色轮换：借用现有五个 CSS 颜色类 */
-  var PALETTE = ['cv', 'ts', 'nlp', 'opt', 'kg'];
-
-  function lsGet(k) {
-    try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; }
-  }
-  function lsSet(k, v) {
-    try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; }
-  }
-
-  var userMethods = lsGet(K_M) || {};
-  var sceneEdits = (function () {
-    var r = lsGet(K_S);
-    if (r && r.upserts) return { upserts: r.upserts, deleted: r.deleted || [] };
-    return { upserts: {}, deleted: [] };
-  })();
-
-  A.colors = { cv: 'cv', ts: 'ts', nlp: 'nlp', opt: 'opt', kg: 'kg' };
-  function colorKeyOf(key) {
-    return A.colors[key] || (userMethods[key] && userMethods[key].colorKey) || 'cv';
-  }
-
-  /* ---------- 重建全部索引（内部数据 + 用户覆盖） ---------- */
-  A.reindex = function () {
-    /* 1. 技术覆盖 */
-    Object.keys(userMethods).forEach(function (k) {
-      var m = userMethods[k];
-      if (m && m.deleted) { delete A.methods[k]; return; }
-      A.methods[k] = {
-        key: k, abbr: m.abbr, name: m.name, desc: m.desc || '',
-        signal: m.signal || '', colorKey: m.colorKey || 'cv'
-      };
-      A.colors[k] = m.colorKey || 'cv';
-    });
-
-    /* 2. 场景覆盖：先从 stages 里摘掉用户注入的、被改的、被删的 */
-    A.stages.forEach(function (st) {
-      st.scenes = st.scenes.filter(function (sc) {
-        if (sc.__user) return false;
-        return !sceneEdits.upserts[sc.id] && sceneEdits.deleted.indexOf(sc.id) < 0;
-      });
-    });
-
-    /* 3. 用户场景重新挂回（保持 upserts 的插入顺序） */
-    Object.keys(sceneEdits.upserts).forEach(function (id) {
-      var u = sceneEdits.upserts[id];
-      var st = A.index.byStage[u.stageId] || A.stages[0];
-      var sc = {
-        id: u.id, name: u.name, methods: (u.methods || []).slice(),
-        diff: DIFFS.indexOf(u.diff) >= 0 ? u.diff : '中',
-        diffWhy: u.diffWhy || '', point: u.point || '', intro: u.intro || '',
-        problem: u.problem || '', data: u.data || [], refs: u.refs || [],
-        status: u.status || 'full', __user: true
-      };
-      st.scenes.push(sc);
-    });
-
-    /* 4. 重建索引 */
-    A.index = { scene: {}, byMethod: {}, byStage: {} };
-    A.stages.forEach(function (st) {
-      A.index.byStage[st.id] = st;
-      st.scenes.forEach(function (sc) {
-        sc.stageId = st.id;
-        sc.stageName = st.name;
-        sc.stageIdx = st.idx;
-        sc.status = sc.status || 'full';
-        sc.methods = sc.methods || [];
-        sc.refs = sc.refs || [];
-        sc.data = sc.data || [];
-        sc.datasets = sc.datasets || [];
-        sc.cross = sc.cross || [];
-        A.index.scene[sc.id] = sc;
-        sc.methods.forEach(function (mk) {
-          if (!A.methods[mk]) return;
-          (A.index.byMethod[mk] = A.index.byMethod[mk] || []).push(sc);
-        });
-      });
-    });
-    A.index.byId = A.index.scene;
-    A.index.byScene = A.index.scene;
-    A.allScenes = A.stages.reduce(function (a, s) { return a.concat(s.scenes); }, []);
-  };
-
-  /* ---------- 技术增删改 ---------- */
   A.saveMethod = function (m) {
     if (!m || !m.key || !ID_RE.test(m.key)) return { ok: false, error: 'key 不合法：只允许小写字母、数字、连字符' };
     if (!m.abbr) return { ok: false, error: '缩写（如 CV / TS）不能为空' };
     if (!m.name) return { ok: false, error: '名称不能为空' };
-    var isNew = !A.methods[m.key];
-    var colorKey = m.colorKey || colorKeyOf(m.key);
-    if (isNew) {
-      var used = PALETTE.map(function (c) {
-        return Object.keys(A.methods).filter(function (k) { return colorKeyOf(k) === c; }).length;
-      });
-      var min = Math.min.apply(null, used);
-      colorKey = m.colorKey || PALETTE[used.indexOf(min)];
+    let colorKey = m.colorKey || colorKeyOf(m.key);
+    if (!A.methods[m.key]) {
+      // A new method takes the least used of the five palette colours.
+      const used = PALETTE.map(c => Object.keys(A.methods).filter(k => colorKeyOf(k) === c).length);
+      colorKey = m.colorKey || PALETTE[used.indexOf(Math.min.apply(null, used))];
     }
     userMethods[m.key] = {
       abbr: String(m.abbr).slice(0, 6), name: String(m.name).slice(0, 24),
-      desc: String(m.desc || '').slice(0, 300), signal: String(m.signal || '').slice(0, 40),
-      colorKey: colorKey
+      desc: String(m.desc || '').slice(0, 300), signal: String(m.signal || '').slice(0, 40), colorKey
     };
     if (!lsSet(K_M, userMethods)) return { ok: false, error: '浏览器存储失败（可能空间不足）' };
     A.reindex();
@@ -1178,29 +1113,27 @@ window.ATLAS = {
 
   A.deleteMethod = function (key) {
     if (!A.methods[key]) return { ok: false, error: '没有这个技术类别' };
-    var used = A.allScenes.filter(function (s) { return s.methods.indexOf(key) >= 0; });
-    if (used.length) return { ok: false, error: '还有 ' + used.length + ' 个场景在用它，先把它们的场景改掉再删' };
+    const used = A.allScenes.filter(s => s.methods.indexOf(key) >= 0).length;
+    if (used) return { ok: false, error: '还有 ' + used + ' 个场景在用它，先把它们的场景改掉再删' };
     userMethods[key] = { deleted: true };
     if (!lsSet(K_M, userMethods)) return { ok: false, error: '浏览器存储失败' };
     A.reindex();
     return { ok: true };
   };
 
-  /* ---------- 场景增删改 ---------- */
   A.saveScene = function (sc) {
     if (!sc || !sc.id || !ID_RE.test(sc.id)) return { ok: false, error: '场景 id 不合法：只允许小写字母、数字、连字符' };
     if (!sc.name) return { ok: false, error: '场景名称不能为空' };
     if (!sc.stageId || !A.index.byStage[sc.stageId]) return { ok: false, error: '所属环节不存在：' + sc.stageId };
-    var ms = (sc.methods || []).filter(function (k) { return A.methods[k]; });
-    if (!ms.length) return { ok: false, error: '至少要勾选一个技术类别' };
+    const methods = (sc.methods || []).filter(k => A.methods[k]);
+    if (!methods.length) return { ok: false, error: '至少要勾选一个技术类别' };
+    const clip = (v, n) => String(v || '').slice(0, n);
     sceneEdits.upserts[sc.id] = {
-      id: sc.id, name: String(sc.name).slice(0, 40), stageId: sc.stageId,
-      methods: ms, diff: sc.diff, diffWhy: String(sc.diffWhy || '').slice(0, 200),
-      point: String(sc.point || '').slice(0, 400), intro: String(sc.intro || '').slice(0, 400),
-      problem: String(sc.problem || '').slice(0, 400), status: sc.status || 'full'
+      id: sc.id, name: clip(sc.name, 40), stageId: sc.stageId, methods, diff: sc.diff,
+      diffWhy: clip(sc.diffWhy, 200), point: clip(sc.point, 400), intro: clip(sc.intro, 400),
+      problem: clip(sc.problem, 400), status: sc.status || 'full'
     };
-    var di = sceneEdits.deleted.indexOf(sc.id);
-    if (di >= 0) sceneEdits.deleted.splice(di, 1);
+    sceneEdits.deleted = sceneEdits.deleted.filter(x => x !== sc.id);
     if (!lsSet(K_S, sceneEdits)) return { ok: false, error: '浏览器存储失败' };
     A.reindex();
     return { ok: true };
@@ -1208,9 +1141,7 @@ window.ATLAS = {
 
   A.deleteScene = function (id) {
     if (!A.index.byScene[id]) return { ok: false, error: '没有这个场景' };
-    if (window.Cases && window.Cases.bySceneAll && window.Cases.bySceneAll(id).length) {
-      return { ok: false, error: '该场景已有案例接入，先删除案例再删场景' };
-    }
+    if (window.Cases && window.Cases.bySceneAll && window.Cases.bySceneAll(id).length) return { ok: false, error: '该场景已有案例接入，先删除案例再删场景' };
     delete sceneEdits.upserts[id];
     if (sceneEdits.deleted.indexOf(id) < 0) sceneEdits.deleted.push(id);
     if (!lsSet(K_S, sceneEdits)) return { ok: false, error: '浏览器存储失败' };
@@ -1218,11 +1149,8 @@ window.ATLAS = {
     return { ok: true };
   };
 
-  A.isUserScene = function (id) {
-    return !!(sceneEdits.upserts[id] && A.index.byScene[id] && A.index.byScene[id].__user);
-  };
+  A.isUserScene = id => !!(sceneEdits.upserts[id] && A.index.byScene[id] && A.index.byScene[id].__user);
 
-  /* 启动时应用一次用户覆盖 */
   A.reindex();
 })(window.ATLAS);
 

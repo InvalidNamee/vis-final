@@ -1,10 +1,9 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest';
-import {createPinia,setActivePinia} from 'pinia';
 import {mount} from '@vue/test-utils';
-import LegacyHtml from '../../src/components/LegacyHtml.vue';
-import {zipSync,unzipSync,strFromU8} from 'fflate';
+import ContentHtml from '../../src/components/ContentHtml.vue';
+import {unzipSync,strFromU8} from 'fflate';
 beforeEach(async()=>{
-  vi.resetModules();localStorage.clear();sessionStorage.clear();setActivePinia(createPinia());
+  vi.resetModules();localStorage.clear();sessionStorage.clear();
   await import('../../src/content/atlas.js');await import('../../src/runtime/registry.js');await import('../../src/runtime/kit.js');await import('../../src/runtime/case-demo-host.js');
   window.__ImportUI={open:vi.fn(),close:vi.fn()};window.__restorePlugin=vi.fn();await import('../../src/services/packages.js');
 });
@@ -62,5 +61,5 @@ describe('public service contracts',()=>{
   });
 });
 it('content HTML preserves checklist interaction without Vue template execution',async()=>{
- const html=window.K.checklist([['钻井记录','时序','复核']]);const wrapper=mount(LegacyHtml,{props:{html}});await wrapper.get('.cl-item').trigger('click');expect(wrapper.get('#cl-txt').text()).toBe('1 / 1');wrapper.unmount();
+ const html=window.K.checklist([['钻井记录','时序','复核']]);const wrapper=mount(ContentHtml,{props:{html}});await wrapper.get('.cl-item').trigger('click');expect(wrapper.get('#cl-txt').text()).toBe('1 / 1');wrapper.unmount();
 });

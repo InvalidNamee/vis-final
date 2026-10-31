@@ -19,6 +19,6 @@ function guard(root:string,allAssets:boolean){return (req:any,res:any,next:any)=
 export default defineConfig({
   plugins:[vue(),{name:'atlas-static-404',configResolved(c){config=c;},configureServer(server){server.middlewares.use(guard(server.config.root,false));},configurePreviewServer(server){server.middlewares.use(guard(resolve(server.config.root,server.config.build.outDir),true));}}],base:process.env.ATLAS_BASE || '/',
   server:{host:'0.0.0.0',port:5173,watch:{ignored:['**/.dist/**','**/dist/**','**/output/**']}},
-  build:{outDir:'dist',emptyOutDir:true,rolldownOptions:{output:{codeSplitting:{groups:[...caseGroups,{name:'framework',test:/node_modules\/(?:vue|@vue|pinia|vue-router)\//,priority:30},{name:'naive-data',test:/node_modules\/naive-ui\/es\/(?:data-table|upload|select|tree|virtual-list)\//,priority:20},{name:'naive-ui',test:/node_modules\/(?:naive-ui|vueuc|vooks|css-render)\//,priority:10}]}}}},
+  build:{outDir:'dist',emptyOutDir:true,rolldownOptions:{output:{codeSplitting:{groups:[...caseGroups,{name:'framework',test:/node_modules\/(?:vue|@vue|vue-router)\//,priority:30},{name:'search',test:/node_modules\/minisearch\//,priority:20}]}}}},
   test:{environment:'happy-dom',include:['tests/unit/**/*.test.ts']},
 });

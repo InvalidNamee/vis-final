@@ -1,74 +1,152 @@
 <script setup lang="ts">
-import {computed,h,ref,watch} from 'vue';
+import {computed,ref,watch} from 'vue';
 import {useRoute,useRouter} from 'vue-router';
-import {NButton,NTag,useDialog,useMessage} from 'naive-ui';
-import {useContentStore} from '../stores/content';
-import {useSessionStore} from '../stores/session';
-import {changePassword} from '../services/management';
-import PageHead from '../components/layout/PageHead.vue';
-const route=useRoute(),router=useRouter(),content=useContentStore(),session=useSessionStore(),dialog=useDialog(),message=useMessage();
-const user=ref(''),password=ref(''),passwordModal=ref(false),newPassword=ref(''),search=ref(''),editing=ref(false),model=ref<any>({});
-const section=computed(()=>String(route.params.section||'overview'));
-const title=computed(()=>({overview:'管理概览',cases:'案例管理',methods:'智能方法管理',scenes:'业务场景管理'}[section.value]||'管理概览'));
-const options=[{label:'管理概览',key:'overview'},{label:'案例管理',key:'cases'},{label:'智能方法管理',key:'methods'},{label:'业务场景管理',key:'scenes'}];
-const rows=computed(()=>{const all=section.value==='cases'?content.cases:section.value==='methods'?Object.values(content.atlas.methods):content.atlas.allScenes;return all.filter((r:any)=>JSON.stringify(r).toLowerCase().includes(search.value.toLowerCase()));});
-const methodOptions=computed(()=>Object.entries(content.atlas.methods).map(([value,m]:any)=>({value,label:m.name})));
-const stageOptions=computed(()=>content.atlas.stages.map((s:any)=>({value:s.id,label:s.name})));
-const sceneOptions=computed(()=>content.atlas.allScenes.map((s:any)=>({value:s.id,label:s.stageName+' / '+s.name})));
-function navigate(key:string){void router.push('/admin'+(key==='overview'?'':'/'+key));}
-function signIn(){const r=session.login(user.value,password.value);if(!r.ok)message.error(r.error||'登录失败');else {password.value='';void router.push('/admin/cases');}}
-function edit(row?:any){
- if(section.value==='cases'&&!row?.imported){message.info('内置案例请修改分类插件源文件；此处可隐藏或恢复。');return;}
- model.value=row?JSON.parse(JSON.stringify(row)):{key:'',id:'',name:'',title:'',abbr:'',desc:'',signal:'',stageId:content.atlas.stages[0]?.id,methods:[],diff:'中',status:'full',intro:'',point:'',problem:'',diffWhy:''};editing.value=true;
+import {atlas,cases,methodKeys,colorOf} from '../core/store';
+import {signedIn,signIn,signOut,changePassword} from '../core/session';
+import {DIFFS} from '../core/format';
+import {confirm,toast} from '../ui/feedback';
+import PageHeader from '../components/PageHeader.vue';
+import Modal from '../ui/Modal.vue';
+import DataTable from '../ui/DataTable.vue';
+import ChipChecks from '../ui/ChipChecks.vue';
+import type {Result} from '../types';
+
+type Section='overview'|'cases'|'methods'|'scenes';
+const route=useRoute(),router=useRouter();
+const SECTIONS:{key:Section;label:string}[]=[{key:'overview',label:'管理概览'},{key:'cases',label:'案例管理'},{key:'methods',label:'智能方法管理'},{key:'scenes',label:'业务场景管理'}];
+const section=computed<Section>(()=>(SECTIONS.find(s=>s.key===route.params.section)?.key)||'overview');
+const title=computed(()=>SECTIONS.find(s=>s.key===section.value)!.label);
+const to=(key:Section)=>key==='overview'?'/admin':`/admin/${key}`;
+
+const user=ref(''),password=ref('');
+function login(){
+  const r=signIn(user.value,password.value);
+  if(!r.ok){toast('error',r.error||'登录失败');return;}
+  password.value='';void router.push('/admin/cases');
 }
-function save(){let r;
- if(section.value==='cases')r=window.CaseImport.updateMeta(model.value.id,{title:model.value.title,sceneId:model.value.sceneId,methods:model.value.methods,version:model.value.version,updated:model.value.updated});
- else if(section.value==='methods')r=window.ATLAS.saveMethod(model.value);
- else r=window.ATLAS.saveScene(model.value);
- if(!r.ok){message.error(r.error||'保存失败');return;}content.refresh();editing.value=false;message.success('修改已保存');if(route.query.edit)void router.replace({path:route.path});
+function logout(){signOut();void router.push('/');}
+const passwordOpen=ref(false),newPassword=ref('');
+function savePassword(){
+  const r=changePassword(newPassword.value);
+  if(!r.ok){toast('error',r.error||'修改失败');return;}
+  newPassword.value='';passwordOpen.value=false;toast('ok','密码已更新');
 }
-function remove(row:any){dialog.warning({title:section.value==='cases'?(row.imported?'移除导入案例':'隐藏内置案例'):'删除管理条目',content:'确认后将更新当前浏览器中的记录。',positiveText:'确认',negativeText:'取消',onPositiveClick:()=>{let r;
- if(section.value==='cases')r={ok:window.__PackageService.removeConfirmed(row.id)};
- else if(section.value==='methods')r=window.ATLAS.deleteMethod(row.key);else r=window.ATLAS.deleteScene(row.id);
- if(!r.ok)message.error(r.error||'操作失败');else {content.refresh();message.success('已更新');}
- }});}
-const columns=computed<any[]>(()=>[
- {title:'ID',key:section.value==='methods'?'key':'id',width:160},
- {title:'名称',key:section.value==='cases'?'title':'name',minWidth:200},
- ...(section.value==='cases'?[{title:'来源',key:'imported',width:110,render:(r:any)=>h(NTag,{type:r.imported?'success':'default'},()=>r.imported?'本地导入':'内置')},{title:'版本',key:'version',width:90}]:section.value==='scenes'?[{title:'所属环节',key:'stageName',width:100},{title:'难度',key:'diff',width:70}]:[{title:'缩写',key:'abbr',width:100}]),
- {title:'操作',key:'actions',width:180,render:(r:any)=>h('div',{style:'display:flex;gap:8px'},[h(NButton,{size:'small',onClick:()=>edit(r)},()=> '编辑'),h(NButton,{size:'small',onClick:()=>remove(r)},()=>section.value==='cases'&&!r.imported?'隐藏':'删除')])}
+
+const search=ref('');
+watch(section,()=>{search.value='';});
+const source=computed<any[]>(()=>section.value==='cases'?cases.value:section.value==='methods'?Object.values(atlas.value.methods):atlas.value.allScenes);
+const rows=computed(()=>{const q=search.value.toLowerCase();return source.value.filter(r=>JSON.stringify(r).toLowerCase().includes(q));});
+const columns=computed(()=>[
+  {key:section.value==='methods'?'key':'id',title:'ID',width:'160px',mono:true},
+  {key:section.value==='cases'?'title':'name',title:'名称'},
+  ...(section.value==='cases'?[{key:'imported',title:'来源',width:'110px'},{key:'version',title:'版本',width:'90px',mono:true}]
+    :section.value==='scenes'?[{key:'stageName',title:'所属环节',width:'110px'},{key:'diff',title:'难度',width:'70px'}]
+      :[{key:'abbr',title:'缩写',width:'100px',mono:true}]),
+  {key:'actions',title:'操作',width:'170px'},
 ]);
-watch(()=>[route.query.edit,section.value,content.cases],()=>{if(route.query.edit&&section.value==='cases'){const row=content.cases.find((r:any)=>r.id===route.query.edit);if(row)edit(row);}}, {immediate:true});
-function updatePassword(){const r=changePassword(newPassword.value);if(!r.ok)message.error(r.error||'修改失败');else{newPassword.value='';passwordModal.value=false;message.success('密码已更新');}}
+const rowKey=(r:any)=>r.id||r.key;
+
+const editing=ref(false),isNew=ref(false),model=ref<Record<string,any>>({});
+const methodOptions=computed(()=>methodKeys.value.map(k=>({value:k,label:atlas.value.methods[k].name,abbr:atlas.value.methods[k].abbr,color:colorOf(k)})));
+function edit(row?:any){
+  if(section.value==='cases'&&!row?.imported){toast('info','内置案例请修改分类插件源文件','此处可隐藏或恢复。');return;}
+  isNew.value=!row;
+  model.value=row?JSON.parse(JSON.stringify(row)):{key:'',id:'',name:'',abbr:'',desc:'',signal:'',stageId:atlas.value.stages[0]?.id,methods:[],diff:'中',status:'full',intro:'',point:'',problem:'',diffWhy:''};
+  editing.value=true;
+}
+function save(){
+  const m=model.value;
+  const r:Result=section.value==='cases'?window.CaseImport.updateMeta(m.id,{title:m.title,sceneId:m.sceneId,methods:m.methods,version:m.version,updated:m.updated})
+    :section.value==='methods'?window.ATLAS.saveMethod(m):window.ATLAS.saveScene(m);
+  if(!r.ok){toast('error','保存失败',r.error);return;}
+  editing.value=false;toast('ok','修改已保存');
+  if(route.query.edit)void router.replace({path:route.path});
+}
+async function remove(row:any){
+  const builtin=section.value==='cases'&&!row.imported;
+  const ok=await confirm({title:section.value==='cases'?(row.imported?'移除导入案例':'隐藏内置案例'):'删除管理条目',body:`「${row.title||row.name}」的更改只作用于当前浏览器。`,danger:!builtin});
+  if(!ok)return;
+  const r:Result=section.value==='cases'?{ok:window.__PackageService.removeConfirmed(row.id)}
+    :section.value==='methods'?window.ATLAS.deleteMethod(row.key):window.ATLAS.deleteScene(row.id);
+  if(!r.ok)toast('error','操作失败',r.error);else if(section.value!=='cases')toast('ok','已更新');
+}
+// Legacy links: /admin/cases?edit=<id> opens the editor.
+watch(()=>[route.query.edit,section.value,cases.value] as const,([id])=>{
+  if(!id||section.value!=='cases'||editing.value)return;
+  const row=cases.value.find(c=>c.id===id);if(row)edit(row);
+},{immediate:true});
 </script>
+
 <template>
- <div class="page"><div class="wrap">
-  <template v-if="!session.authenticated">
-   <PageHead idx="ADMIN" title="内容管理登录" blurb="本地教学管理，数据保存在当前浏览器。"/>
-   <n-card class="adm-login" title="管理员登录">
-    <n-alert type="info" style="margin-bottom:16px">初始账号 admin / admin123，已有账号继续有效。</n-alert>
-    <n-form @submit.prevent="signIn"><n-form-item label="账号"><n-input v-model:value="user" placeholder="管理员账号" autocomplete="username"/></n-form-item><n-form-item label="密码"><n-input v-model:value="password" type="password" placeholder="管理员密码" autocomplete="current-password" @keydown.enter.prevent="signIn"/></n-form-item><n-button type="primary" block @click="signIn">登录</n-button></n-form>
-   </n-card>
-  </template>
-  <template v-else>
-   <PageHead idx="ADMIN" :title="title" blurb="案例元数据、智能方法与业务场景的本地管理；修改以浏览器覆盖层叠加在源数据上。">
-    <template #actions><n-button size="small" @click="passwordModal=true">修改密码</n-button><n-button size="small" @click="session.logout();router.push('/')">退出管理</n-button></template>
-   </PageHead>
-   <n-menu class="adm-menu" mode="horizontal" :value="section" :options="options" @update:value="navigate"/>
-   <div v-if="section==='overview'" class="adm-stats">
-    <router-link to="/admin/cases"><div class="n">{{ content.cases.length }}</div><div class="l">案例</div></router-link>
-    <router-link to="/admin/scenes"><div class="n">{{ content.atlas.allScenes.length }}</div><div class="l">业务场景</div></router-link>
-    <router-link to="/admin/methods"><div class="n">{{ Object.keys(content.atlas.methods).length }}</div><div class="l">智能方法</div></router-link>
-   </div>
-   <template v-else><div class="adm-tools"><n-input v-model:value="search" placeholder="搜索管理条目" clearable/><n-button v-if="section!=='cases'" type="primary" @click="edit()">新增条目</n-button><n-button v-else type="primary" data-import>添加案例</n-button></div><n-data-table size="small" :columns="columns" :data="rows" :row-key="(r:any)=>r.id||r.key" :pagination="{pageSize:10}" :scroll-x="760"/></template>
-  </template>
- </div></div>
- <n-modal v-model:show="editing" preset="card" title="管理条目编辑" style="width:min(650px,94vw)"><n-form :model="model">
-  <template v-if="section==='cases'"><n-form-item label="案例名称"><n-input v-model:value="model.title" :maxlength="40" placeholder="案例名称"/></n-form-item><n-form-item label="所属场景"><n-select v-model:value="model.sceneId" :options="sceneOptions" filterable/></n-form-item><n-form-item label="版本"><n-input v-model:value="model.version"/></n-form-item><n-form-item label="更新日期"><n-input v-model:value="model.updated"/></n-form-item></template>
-  <template v-else><n-form-item :label="section==='methods'?'方法 ID':'场景 ID'"><n-input v-if="section==='methods'" v-model:value="model.key"/><n-input v-else v-model:value="model.id"/></n-form-item><n-form-item label="名称"><n-input v-model:value="model.name" placeholder="条目名称"/></n-form-item></template>
-  <template v-if="section==='methods'"><n-form-item label="缩写"><n-input v-model:value="model.abbr"/></n-form-item><n-form-item label="方法说明"><n-input v-model:value="model.desc" type="textarea"/></n-form-item><n-form-item label="处理任务"><n-input v-model:value="model.signal"/></n-form-item></template>
-  <template v-if="section==='scenes'"><n-form-item label="所属环节"><n-select v-model:value="model.stageId" :options="stageOptions"/></n-form-item><n-form-item label="技术难度"><n-select v-model:value="model.diff" :options="['低','中','高'].map(value=>({label:value,value}))"/></n-form-item><n-form-item label="内容状态"><n-select v-model:value="model.status" :options="[{label:'已收录',value:'full'},{label:'待扩展',value:'ext'}]"/></n-form-item><n-form-item v-for="field in [{key:'intro',label:'业务背景'},{key:'point',label:'智能方法介入点'},{key:'problem',label:'业务问题'},{key:'diffWhy',label:'技术难度说明'}]" :key="field.key" :label="field.label"><n-input v-model:value="model[field.key]" type="textarea"/></n-form-item></template>
-  <n-form-item v-if="section!=='methods'" label="智能方法"><n-select v-model:value="model.methods" :options="methodOptions" multiple/></n-form-item>
- </n-form><template #footer><n-space justify="end"><n-button @click="editing=false">取消</n-button><n-button type="primary" @click="save">保存修改</n-button></n-space></template></n-modal>
- <n-modal v-model:show="passwordModal" preset="card" title="管理密码修改" style="width:min(460px,94vw)"><n-input v-model:value="newPassword" type="password" placeholder="新密码（至少 6 位）"/><template #footer><n-button type="primary" @click="updatePassword">保存密码</n-button></template></n-modal>
+  <div class="page admin"><div class="wrap">
+    <template v-if="!signedIn">
+      <PageHeader idx="ADMIN" title="内容管理登录" blurb="本地教学管理，数据保存在当前浏览器。"/>
+      <form class="adm-login" @submit.prevent="login">
+        <h2>管理员登录</h2>
+        <p class="note">初始账号 admin / admin123，已有账号继续有效。账号只做操作门槛，不是安全边界。</p>
+        <label class="field"><span>账号</span><input v-model="user" class="ui-input" placeholder="管理员账号" autocomplete="username"></label>
+        <label class="field"><span>密码</span><input v-model="password" class="ui-input" type="password" placeholder="管理员密码" autocomplete="current-password"></label>
+        <button type="submit" class="btn primary block">登录</button>
+      </form>
+    </template>
+    <template v-else>
+      <PageHeader idx="ADMIN" :title="title" blurb="案例元数据、智能方法与业务场景的本地管理；修改以浏览器覆盖层叠加在源数据上。">
+        <template #actions><button type="button" class="btn sm" @click="passwordOpen=true">修改密码</button><button type="button" class="btn sm ghost" @click="logout">退出管理</button></template>
+      </PageHeader>
+      <nav class="adm-nav" aria-label="管理分区">
+        <router-link v-for="s in SECTIONS" :key="s.key" :to="to(s.key)" :aria-current="section===s.key?'page':undefined">{{ s.label }}</router-link>
+      </nav>
+      <div v-if="section==='overview'" class="adm-stats">
+        <router-link to="/admin/cases"><b>{{ cases.length }}</b><span>案例</span></router-link>
+        <router-link to="/admin/scenes"><b>{{ atlas.allScenes.length }}</b><span>业务场景</span></router-link>
+        <router-link to="/admin/methods"><b>{{ methodKeys.length }}</b><span>智能方法</span></router-link>
+      </div>
+      <template v-else>
+        <div class="adm-tools">
+          <input v-model="search" class="ui-input" type="search" placeholder="搜索管理条目" aria-label="搜索管理条目">
+          <button v-if="section!=='cases'" type="button" class="btn primary" @click="edit()">新增条目</button>
+          <button v-else type="button" class="btn primary" data-import>添加案例</button>
+        </div>
+        <DataTable :key="section" :columns="columns" :rows="rows" :row-key="rowKey" :label="title">
+          <template #imported="{row}"><span :class="row.imported?'badge-ready':'badge-wip'">{{ row.imported?'本地导入':'内置' }}</span></template>
+          <template #actions="{row}">
+            <span class="row-acts"><button type="button" class="btn sm" @click="edit(row)">编辑</button><button type="button" class="btn sm ghost" @click="remove(row)">{{ section==='cases'&&!row.imported?'隐藏':'删除' }}</button></span>
+          </template>
+        </DataTable>
+      </template>
+    </template>
+  </div></div>
+
+  <Modal :open="editing" title="管理条目编辑" width="640px" @close="editing=false">
+    <form class="adm-form" @submit.prevent="save">
+      <template v-if="section==='cases'">
+        <label class="field"><span>案例名称</span><input v-model="model.title" class="ui-input" maxlength="40" placeholder="案例名称"></label>
+        <label class="field"><span>所属场景</span><select v-model="model.sceneId" class="ui-select"><optgroup v-for="st in atlas.stages" :key="st.id" :label="st.name"><option v-for="s in st.scenes" :key="s.id" :value="s.id">{{ s.name }}</option></optgroup></select></label>
+        <div class="field-row"><label class="field"><span>版本</span><input v-model="model.version" class="ui-input mono"></label><label class="field"><span>更新日期</span><input v-model="model.updated" class="ui-input mono" placeholder="YYYY-MM-DD"></label></div>
+      </template>
+      <template v-else>
+        <label class="field"><span>{{ section==='methods'?'方法 ID':'场景 ID' }}</span><input v-if="section==='methods'" v-model="model.key" class="ui-input mono" :readonly="!isNew"><input v-else v-model="model.id" class="ui-input mono" :readonly="!isNew"></label>
+        <label class="field"><span>名称</span><input v-model="model.name" class="ui-input" placeholder="条目名称"></label>
+      </template>
+      <template v-if="section==='methods'">
+        <label class="field"><span>缩写</span><input v-model="model.abbr" class="ui-input mono"></label>
+        <label class="field"><span>方法说明</span><textarea v-model="model.desc" class="ui-input" rows="3"></textarea></label>
+        <label class="field"><span>处理任务</span><input v-model="model.signal" class="ui-input"></label>
+      </template>
+      <template v-if="section==='scenes'">
+        <div class="field-row">
+          <label class="field"><span>所属环节</span><select v-model="model.stageId" class="ui-select"><option v-for="st in atlas.stages" :key="st.id" :value="st.id">{{ st.name }}</option></select></label>
+          <label class="field"><span>技术难度</span><select v-model="model.diff" class="ui-select"><option v-for="d in DIFFS" :key="d" :value="d">{{ d }}</option></select></label>
+          <label class="field"><span>内容状态</span><select v-model="model.status" class="ui-select"><option value="full">已收录</option><option value="ext">待扩展</option></select></label>
+        </div>
+        <label v-for="f in [{key:'intro',label:'业务背景'},{key:'point',label:'智能方法介入点'},{key:'problem',label:'业务问题'},{key:'diffWhy',label:'技术难度说明'}]" :key="f.key" class="field"><span>{{ f.label }}</span><textarea v-model="model[f.key]" class="ui-input" rows="2"></textarea></label>
+      </template>
+      <div v-if="section!=='methods'" class="field"><span>智能方法</span><ChipChecks v-model="model.methods" :options="methodOptions" label="智能方法"/></div>
+    </form>
+    <template #footer><button type="button" class="btn" @click="editing=false">取消</button><button type="button" class="btn primary" @click="save">保存修改</button></template>
+  </Modal>
+  <Modal :open="passwordOpen" title="管理密码修改" width="440px" @close="passwordOpen=false">
+    <label class="field"><span>新密码</span><input v-model="newPassword" class="ui-input" type="password" placeholder="新密码（至少 6 位）" autocomplete="new-password"></label>
+    <template #footer><button type="button" class="btn primary" @click="savePassword">保存密码</button></template>
+  </Modal>
 </template>

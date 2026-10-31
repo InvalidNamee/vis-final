@@ -2,7 +2,7 @@
 .atlas-loader{display:grid;place-items:center;min-height:240px;padding:36px 24px;text-align:center;color:var(--ink);font-family:var(--sans)}
 .atlas-loader--startup{min-height:100vh;min-height:100dvh;background:var(--paper)}
 .atlas-loader__content{width:min(100%,320px)}
-.atlas-loader__mark{display:flex;align-items:center;justify-content:center;gap:5px;width:58px;height:58px;margin:0 auto 22px;border:1px solid color-mix(in srgb,var(--jade) 18%,var(--line));border-radius:16px;background:var(--jade-l);color:var(--jade)}
+.atlas-loader__mark{display:flex;align-items:center;justify-content:center;gap:5px;width:58px;height:58px;margin:0 auto 22px;border:1px solid var(--night-2);border-radius:16px;background:var(--night);color:var(--clay)}
 .atlas-loader__mark i{display:block;width:4px;height:14px;border-radius:2px;background:currentColor;animation:atlas-loading-pulse 1.2s ease-in-out infinite}
 .atlas-loader__mark i:nth-child(2){height:26px;animation-delay:.15s}
 .atlas-loader__mark i:nth-child(3){height:20px;animation-delay:.3s}

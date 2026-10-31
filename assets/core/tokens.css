@@ -1,171 +1,68 @@
 /* =========================================================
-   设计令牌 Design Tokens
-   风格：冷灰白底 + 青绿主色 + 细线网格
-   规则：所有颜色只在这里定义，案例与组件不得写死色值
+   Design tokens — the only place colours are defined.
+   Token names are a public contract: CaseDemoHost copies them into demos,
+   and module demos may use var(--jade) etc. directly. Values may change, names may not.
+   Look: warm survey paper, ink navy text, cobalt primary (--jade), drill orange accent (--clay).
    ========================================================= */
-
 :root{
-  /* ---------- 画布 ---------- */
-  --paper:      #f6f7f9;   /* 主背景，冷灰白 */
-  --paper-2:    #eef0f3;   /* 次级底板 */
-  --paper-3:    #e5e8ed;   /* 三级底板 */
-  --card:       #ffffff;   /* 卡片 */
-  --card-soft:  #f9fafb;   /* 卡片内嵌区 */
+  --paper:#f4f2ec; --paper-2:#ebe8df; --paper-3:#e0dccf;
+  --card:#fffefb; --card-soft:#f8f6f0;
+  --line:#e4e0d4; --line-2:#d3cebf; --line-3:#aba591;
+  --ink:#141b24; --ink-2:#36404c; --ink-3:#5b6571; --ink-4:#878f98; --ink-inv:#ffffff;
 
-  /* ---------- 描边 ---------- */
-  --line:       #e4e7ec;
-  --line-2:     #d4d9e0;
-  --line-3:     #b6bec9;
+  --jade:#2346c8; --jade-d:#1a3596; --jade-l:#e8edfb;     /* primary (historic name) */
+  --clay:#cc5a16; --clay-d:#a0430c; --clay-l:#fcede1;     /* accent */
 
-  /* ---------- 墨色（文字） ---------- */
-  --ink:        #0f1722;
-  --ink-2:      #364152;
-  --ink-3:      #5f6b7a;
-  --ink-4:      #8a94a3;
-  --ink-inv:    #ffffff;
+  --c-cv:#0b7d86; --c-ts:#cc5a16; --c-nlp:#7347c4; --c-opt:#a97409; --c-kg:#4f7f1c;
+  --bg-cv:#e2f2f3; --bg-ts:#fcede1; --bg-nlp:#efe9f9; --bg-opt:#f8f0dc; --bg-kg:#ebf3e1;
 
-  /* ---------- 主强调 ---------- */
-  --jade:       #0e7c74;
-  --jade-d:     #0a5f59;
-  --jade-l:     #e4f3f1;
-  --clay:       #c2610f;
-  --clay-d:     #9a4a0b;
-  --clay-l:     #fdf0e3;
+  --ok:#2f7d32; --ok-bg:#e8f3e5; --warn:#a66a00; --warn-bg:#fbf1dc; --bad:#bf3626; --bad-bg:#fbe9e5;
 
-  /* ---------- 五类方法色（中饱和，白底可读） ---------- */
-  --c-cv:       #0e7c74;   /* 计算机视觉 */
-  --c-ts:       #c2610f;   /* 时序预测 */
-  --c-nlp:      #6f4fc6;   /* 自然语言处理 */
-  --c-opt:      #2f63d1;   /* 优化算法 */
-  --c-kg:       #5f7a12;   /* 知识图谱 */
+  /* dark band: hero, footer, code */
+  --night:#0f1724; --night-2:#182338; --night-line:rgba(232,236,243,.12); --night-ink:#eef1f6; --night-ink-2:#a7b1c2;
 
-  --bg-cv:      #e4f3f1;
-  --bg-ts:      #fdf0e3;
-  --bg-nlp:     #f0ecfb;
-  --bg-opt:     #e8effc;
-  --bg-kg:      #eff4e1;
+  --r-s:4px; --r-m:8px; --r-l:12px; --r-xl:18px;
+  --sh-1:0 1px 2px rgba(20,27,36,.06);
+  --sh-2:0 1px 2px rgba(20,27,36,.05),0 10px 24px -14px rgba(20,27,36,.24);
+  --sh-3:0 2px 6px rgba(20,27,36,.06),0 26px 50px -22px rgba(20,27,36,.34);
 
-  /* ---------- 语义色 ---------- */
-  --ok:         #15803d;
-  --ok-bg:      #e7f6ec;
-  --warn:       #a16207;
-  --warn-bg:    #fdf5e0;
-  --bad:        #c0362c;
-  --bad-bg:     #fdecea;
+  --mono:'JetBrains Mono','SFMono-Regular','Cascadia Mono',Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI Variable','Segoe UI','PingFang SC','HarmonyOS Sans SC','Hiragino Sans GB','Microsoft YaHei UI','Microsoft YaHei',sans-serif;
+  --demo-font-size:14px; --demo-title-size:20px; --demo-heading-size:16px; --demo-value-size:22px;
 
-  /* ---------- 圆角与阴影 ---------- */
-  --r-s: 4px;
-  --r-m: 8px;
-  --r-l: 12px;
-  --r-xl: 16px;
-
-  --sh-1: 0 1px 2px rgba(15,23,34,.05);
-  --sh-2: 0 1px 2px rgba(15,23,34,.05), 0 8px 20px -12px rgba(15,23,34,.16);
-  --sh-3: 0 2px 4px rgba(15,23,34,.05), 0 18px 40px -18px rgba(15,23,34,.26);
-
-  /* ---------- 字体 ---------- */
-  --mono: 'JetBrains Mono','SFMono-Regular','Cascadia Mono',Consolas,'Liberation Mono',monospace;
-  --sans: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI Variable','Segoe UI',
-          'PingFang SC','Hiragino Sans GB','Microsoft YaHei UI','Microsoft YaHei',sans-serif;
-  --demo-font-size: 14px;
-  --demo-title-size: 20px;
-  --demo-heading-size: 16px;
-  --demo-value-size: 22px;
-
-  /* ---------- 布局 ---------- */
-  --nav-h: 54px;
-  --maxw: 1180px;
-  --sp-1: 6px;  --sp-2: 10px;  --sp-3: 14px;
-  --sp-4: 20px; --sp-5: 28px;  --sp-6: 40px;
+  --nav-h:60px; --maxw:1200px; --toc-w:268px; --gutter:clamp(16px,4vw,32px);
+  --ease:cubic-bezier(.2,.7,.2,1);
 }
 
-/* =========================================================
-   Reset
-   ========================================================= */
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{
-  font-family:var(--sans);
-  font-feature-settings:'cv11','ss01';
-  font-size:14px;
-  line-height:1.68;
-  color:var(--ink);
-  background:var(--paper);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  overflow-x:hidden;
-}
-
-/* 背景：顶部一道极淡的青色光晕，不做暗色 */
-body::before{
-  content:'';
-  position:fixed;inset:0;z-index:-2;
-  background:
-    radial-gradient(1100px 520px at 50% -18%, rgba(14,124,116,.07) 0%, rgba(14,124,116,0) 70%),
-    var(--paper);
-}
-/* 细线网格，只在上半页可见 */
-body::after{
-  content:'';
-  position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background-image:
-    linear-gradient(to right, rgba(15,23,34,.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15,23,34,.045) 1px, transparent 1px);
-  background-size:32px 32px;
-  mask-image:radial-gradient(ellipse 72% 42% at 50% 0%, #000 0%, transparent 85%);
-  -webkit-mask-image:radial-gradient(ellipse 72% 42% at 50% 0%, #000 0%, transparent 85%);
-}
-
+*,*::before,*::after{box-sizing:border-box}
+*{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--nav-h) + 16px)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;min-height:100vh}
 a{color:inherit;text-decoration:none}
-button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;cursor:pointer}
-input,select,textarea{font-family:inherit;font-size:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
 img,svg{max-width:100%}
-::selection{background:rgba(14,124,116,.18);color:var(--ink)}
-
+::selection{background:color-mix(in srgb,var(--jade) 22%,transparent);color:var(--ink)}
+:focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:3px}
 ::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:6px;border:3px solid var(--paper)}
 ::-webkit-scrollbar-thumb:hover{background:var(--line-3)}
 
-:focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:3px}
-
-/* =========================================================
-   排版基元
-   ========================================================= */
-h1,h2,h3,h4,h5{font-weight:600;letter-spacing:-.012em;line-height:1.3;color:var(--ink)}
+h1,h2,h3,h4,h5{font-weight:650;letter-spacing:-.012em;line-height:1.3;color:var(--ink)}
 p{color:var(--ink-2)}
-b,strong{font-weight:600;color:var(--ink)}
+b,strong{font-weight:650;color:var(--ink)}
 
-.wrap{width:min(var(--maxw),calc(100% - 48px));margin:0 auto}
+.wrap{width:min(var(--maxw),calc(100% - 2 * var(--gutter)));margin-inline:auto}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-
-.kicker{
-  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--jade-d);display:inline-flex;align-items:center;gap:9px;
-}
-.kicker::before{content:'';width:20px;height:1.5px;background:currentColor;opacity:.55;border-radius:2px}
-.kicker.plain::before{display:none}
-.kicker.clay{color:var(--clay-d)}
-
-.eyebrow{
-  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);
-}
-
-.lede{font-size:13.5px;line-height:1.8;color:var(--ink-2)}
-
-/* 工具类 */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--clay-d);display:inline-flex;align-items:center;gap:8px}
+.kicker::before{content:'';width:18px;height:2px;background:currentColor;border-radius:2px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-4)}
 .muted{color:var(--ink-3)}
-.small{font-size:12px}
-.nowrap{white-space:nowrap}
-.hr{height:1px;background:var(--line);border:0;margin:0}
-.stack{display:flex;flex-direction:column}
-.row{display:flex;align-items:center}
+.small{font-size:12.5px}
 
-/* 动效：轻微上浮，不做夸张动画 */
-@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.rise{animation:rise .42s cubic-bezier(.2,.7,.3,1) both}
-.d1{animation-delay:.03s}.d2{animation-delay:.06s}.d3{animation-delay:.09s}.d4{animation-delay:.12s}.d5{animation-delay:.15s}
-
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{animation:rise .5s var(--ease) both}
+.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}.d4{animation-delay:.16s}.d5{animation-delay:.2s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

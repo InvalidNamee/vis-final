@@ -1,5 +1,5 @@
 import {beforeAll,describe,it,expect} from 'vitest';
-import {tokenize,buildDocs,buildIndex,runSearch,mark,excerpt} from '../../src/composables/useSearch';
+import {tokenize,buildDocs,buildIndex,runSearch,mark,excerpt} from '../../src/core/search';
 const manifests=import.meta.glob('../../plugins/**/case.json',{eager:true,import:'default'}) as Record<string,any>;
 let ms:ReturnType<typeof buildIndex>,docs:ReturnType<typeof buildDocs>;
 beforeAll(async()=>{

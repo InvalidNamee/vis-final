@@ -11,7 +11,7 @@ const stages=[...new Set(packages.map(p=>path.relative(root,p.folder).split(path
 test('all original scenes have exactly one replacement builtin',async({page})=>{
   expect(packages).toHaveLength(Object.keys(titles.scenes).length);
   expect(new Set(packages.map(p=>p.meta.sceneId)).size).toBe(61);
-  await page.goto('/cases');await expect(page.locator('.atlas-library-card')).toHaveCount(12);
+  await page.goto('/cases');await expect(page.locator('.lib-card')).toHaveCount(12);
   expect(await page.evaluate(()=>window.Cases.stats().coveredScenes)).toBe(61);
   expect(await page.evaluate(()=>window.Cases.stats().withDemo)).toBe(61);
   const errors=await page.evaluate(()=>Object.entries(window.Cases.validateAll()).flatMap(([id,checks]:any)=>checks.filter((c:any)=>c.level==='error').map((c:any)=>id+': '+c.label)));
@@ -28,9 +28,9 @@ for(const stage of stages){
        for(const tab of ['bg','flow','demo']){
          await page.goto(`/scene/${meta.sceneId}?tab=${tab}`);
          await expect(page.locator('main h1')).toHaveText(titles.scenes[meta.sceneId]);
-         if(tab==='bg')await expect(page.locator('.atlas-content-section').first()).toBeVisible();
+         if(tab==='bg')await expect(page.locator('.content-section').first()).toBeVisible();
          if(tab==='flow')await expect(page.locator('.pipeline .pstep').first()).toBeVisible();
-         if(tab!=='demo')expect(await page.locator('.atlas-content-html svg').count()).toBeGreaterThan(0);
+         if(tab!=='demo')expect(await page.locator('.content-html svg').count()).toBeGreaterThan(0);
          else{
            const frame=page.frameLocator('#case-demo-root iframe');
            await expect(frame.locator('h1')).toBeVisible();
