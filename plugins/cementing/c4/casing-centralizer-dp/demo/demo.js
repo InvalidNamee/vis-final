@@ -1,16 +1,16 @@
 window.chartSVG=function chartSVG(chart){
- const colors=['#267d70','#b5692b','#7659a8','#2a82b1','#a74040','#68743a'];
+ const colors=['var(--jade)','var(--clay)','var(--c-nlp)','var(--c-cv)','var(--bad)','var(--c-opt)'];
  const points=chart.series.flatMap(s=>s.points).filter(d=>d.every(Number.isFinite));
  let xmin=Math.min(...points.map(p=>p[0])),xmax=Math.max(...points.map(p=>p[0])),ymin=Math.min(0,...points.map(p=>p[1])),ymax=Math.max(...points.map(p=>p[1]));
  if(xmin===xmax){xmin-=1;xmax+=1}if(ymin===ymax){ymin-=1;ymax+=1}let pad=(ymax-ymin)*.08;ymax+=pad;ymin-=pad;
  const X=x=>124+541*(x-xmin)/(xmax-xmin),Y=y=>265-215*(y-ymin)/(ymax-ymin),fmt=v=>Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)<.01&&v!==0?v.toExponential(1):Number(v.toFixed(2));
- let g='';for(let i=0;i<5;i++){let t=i/4,y=ymin+(ymax-ymin)*t,x=xmin+(xmax-xmin)*t;g+=`<path d="M124 ${Y(y)}H665" stroke="#d8e1df"/><text x="112" y="${Y(y)+5}" text-anchor="end">${fmt(y)}</text><text x="${X(x)}" y="291" text-anchor="middle">${fmt(x)}</text>`}
+ let g='';for(let i=0;i<5;i++){let t=i/4,y=ymin+(ymax-ymin)*t,x=xmin+(xmax-xmin)*t;g+=`<path d="M124 ${Y(y)}H665" stroke="var(--line)"/><text x="112" y="${Y(y)+5}" text-anchor="end">${fmt(y)}</text><text x="${X(x)}" y="291" text-anchor="middle">${fmt(x)}</text>`}
  chart.series.forEach((s,i)=>{let pts=s.points.filter(d=>d.every(Number.isFinite));if(!s.scatter&&pts.length)g+=`<polyline fill="none" stroke="${colors[i%6]}" stroke-width="2.5" points="${pts.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/>`;if(s.scatter||pts.length<20)g+=pts.map(p=>`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${pts.length===1?6:3}" fill="${colors[i%6]}" fill-opacity=".8"/>`).join('')});
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 335" role="img" aria-label="${esc(chart.title)}" style="display:block;width:100%;min-width:620px;max-width:860px;margin:auto"><title>${esc(chart.title)}</title><rect width="720" height="335" rx="8" fill="#f6f9f8"/><g font-family="system-ui,sans-serif" font-size="15" fill="#334741">${g}<text class="plot-x-label" x="394.5" y="324" text-anchor="middle">${esc(chart.xlabel)}</text><text class="plot-y-label" x="24" y="157.5" transform="rotate(-90 24 157.5)" text-anchor="middle">${esc(chart.ylabel)}</text></g></svg>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 335" role="img" aria-label="${esc(chart.title)}" style="display:block;width:100%;min-width:620px;max-width:860px;margin:auto"><title>${esc(chart.title)}</title><rect width="720" height="335" rx="8" fill="var(--card-soft)"/><g font-family="system-ui,sans-serif" font-size="15" fill="var(--ink)">${g}<text class="plot-x-label" x="394.5" y="324" text-anchor="middle">${esc(chart.xlabel)}</text><text class="plot-y-label" x="24" y="157.5" transform="rotate(-90 24 157.5)" text-anchor="middle">${esc(chart.ylabel)}</text></g></svg>`;
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 (function browserApp(){
- const M=window.CaseModel,C=M.config,$=s=>document.querySelector(s),colors=['#267d70','#b5692b','#7659a8','#2a82b1','#a74040','#68743a'];let state={...M.defaults},result;
+ const M=window.CaseModel,C=M.config,$=s=>document.querySelector(s),colors=['var(--jade)','var(--clay)','var(--c-nlp)','var(--c-cv)','var(--bad)','var(--c-opt)'];let state={...M.defaults},result;
  $('#controls').innerHTML=C.controls.map(c=>`<div class="control"><label for="${c.key}"><span>${c.label}</span><output id="${c.key}-value">${c.value}</output></label><input id="${c.key}" type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.value}"/></div>`).join('');
  function escape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
  function fmt(v){if(v===null||v===undefined||!Number.isFinite(+v))return '不可定义';return (+v).toLocaleString('zh-CN',{maximumFractionDigits:3})}

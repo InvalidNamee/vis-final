@@ -8,12 +8,12 @@
     const extent=(k)=>{const v=all.map(a=>a[k]);let a=Math.min(...v),b=Math.max(...v);if(a===b){a-=1;b+=1;}return [a,b];};
     const xr=p.xRange||extent(0),yr=p.yRange||extent(1),x=v=>L+(v-xr[0])/(xr[1]-xr[0])*(W-L-R),y=v=>H-B-(v-yr[0])/(yr[1]-yr[0])*(H-T-B);
     let svg=`<defs><clipPath id="clip${index}"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}"/></clipPath></defs>`;
-    for(let i=0;i<=4;i++){const xv=xr[0]+(xr[1]-xr[0])*i/4,yv=yr[0]+(yr[1]-yr[0])*i/4;svg+=`<path d="M${L} ${y(yv)}H${W-R}" stroke="#e3e8e4"/><text x="${L-10}" y="${y(yv)+5}" text-anchor="end">${f(yv,p.decimals??1)}</text><text x="${x(xv)}" y="${H-B+27}" text-anchor="middle">${f(xv,p.xDecimals??0)}</text>`;}
+    for(let i=0;i<=4;i++){const xv=xr[0]+(xr[1]-xr[0])*i/4,yv=yr[0]+(yr[1]-yr[0])*i/4;svg+=`<path d="M${L} ${y(yv)}H${W-R}" stroke="var(--line)"/><text x="${L-10}" y="${y(yv)+5}" text-anchor="end">${f(yv,p.decimals??1)}</text><text x="${x(xv)}" y="${H-B+27}" text-anchor="middle">${f(xv,p.xDecimals??0)}</text>`;}
     svg+=`<text x="${L}" y="22">${esc(p.yLabel)}</text><text x="${(L+W-R)/2}" y="${H-8}" text-anchor="middle">${esc(p.xLabel)}</text><g clip-path="url(#clip${index})">`;
-    (p.bands||[]).forEach(b=>{svg+=`<rect x="${x(b.from)}" y="${T}" width="${x(b.to)-x(b.from)}" height="${H-T-B}" fill="#f8ecdf"/>`;});
-    (p.hlines||[]).forEach(v=>svg+=`<path d="M${L} ${y(v)}H${W-R}" stroke="#a34138" stroke-width="2" stroke-dasharray="6 5"/>`);
-    (p.vlines||[]).forEach(v=>svg+=`<path d="M${x(v)} ${T}V${H-B}" stroke="#8e5229" stroke-width="2" stroke-dasharray="6 5"/>`);
-    const colors=['#2f7d6b','#41699b','#b26a39','#7e5a8d'];
+    (p.bands||[]).forEach(b=>{svg+=`<rect x="${x(b.from)}" y="${T}" width="${x(b.to)-x(b.from)}" height="${H-T-B}" fill="var(--warn-bg)"/>`;});
+    (p.hlines||[]).forEach(v=>svg+=`<path d="M${L} ${y(v)}H${W-R}" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 5"/>`);
+    (p.vlines||[]).forEach(v=>svg+=`<path d="M${x(v)} ${T}V${H-B}" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 5"/>`);
+    const colors=['var(--jade)','var(--clay)','var(--clay)','var(--c-nlp)'];
     p.series.forEach((s,i)=>{const pts=s.points.filter(a=>a.every(Number.isFinite)),color=s.color||colors[i%4];if(s.dots)pts.forEach(a=>svg+=`<circle cx="${x(a[0])}" cy="${y(a[1])}" r="3.5" fill="${color}" opacity=".65"><title>${esc(s.name)}：${f(a[0])}, ${f(a[1])}</title></circle>`);else svg+=`<path d="${pts.map((a,j)=>(j?'L':'M')+x(a[0])+','+y(a[1])).join(' ')}" fill="none" stroke="${color}" stroke-width="2.5" ${s.dashed?'stroke-dasharray="7 5"':''}/>`;});svg+='</g>';
     return `<article class="chart"><h2>${esc(p.title)}</h2><p>${esc(p.note)}</p><div class="chart-scroll" role="region" tabindex="0" aria-label="${esc(p.title)}，窄屏可横向滚动"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title+'；'+p.yLabel+'；'+p.xLabel)}">${svg}</svg></div><div class="legend">${p.series.map((s,i)=>`<span><i style="background:${s.color||colors[i%4]}"></i>${esc(s.name)}</span>`).join('')}</div></article>`;
   }

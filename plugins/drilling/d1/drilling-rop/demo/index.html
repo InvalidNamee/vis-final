@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>钻速预测与参数优化 · 交互实验</title>
-  <link rel="stylesheet" href="demo.css">
+  <link rel="stylesheet" href="plugin-theme.css"><link rel="stylesheet" href="demo.css">
 <link rel="stylesheet" href="plugin-viz.css"></head>
 <body>
 <main>
@@ -61,7 +61,7 @@
     <article class="validation">
       <div class="section-heading"><div><h2>独立测试井预测误差</h2><p>测试集只评价，不用于挑选模型或参数。</p></div></div>
       <div class="chart-scroll" tabindex="0" role="region" aria-label="交互图表，窄屏可横向滚动"><svg id="scatter" viewBox="0 0 510 280" role="img" aria-label="独立测试井上，合成观测钻速与模型预测钻速的对比散点图"></svg></div>
-      <div class="legend rock-legend"><span><i style="background:#2f7d6b"></i>砂岩</span><span><i style="background:#41699b"></i>页岩</span><span><i style="background:#b26a39"></i>致密灰岩</span></div>
+      <div class="legend rock-legend"><span><i style="background:var(--jade)"></i>砂岩</span><span><i style="background:var(--clay)"></i>页岩</span><span><i style="background:var(--clay)"></i>致密灰岩</span></div>
       <div class="metrics"><span>测试 MAE <b id="mae">—</b> m/h</span><span>测试 R² <b id="r2">—</b></span><span>均值基线 MAE <b id="baseline">—</b> m/h</span></div>
       <p class="hint">点越靠近对角线，预测越接近合成观测值。MAE 是平均绝对误差；R² 衡量相对均值预测的拟合程度，可为负数。</p>
     </article>

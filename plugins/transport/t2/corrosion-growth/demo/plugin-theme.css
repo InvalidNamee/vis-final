@@ -1,0 +1,32 @@
+/* Offline snapshot of assets/core/tokens.css; refreshed by sync.cjs.
+   Unlayered framework tokens always override these standalone defaults. */
+@layer plugin-defaults {
+ :root {
+  --paper:#f4f2ec; --paper-2:#ebe8df; --paper-3:#e0dccf;
+  --card:#fffefb; --card-soft:#f8f6f0;
+  --line:#e4e0d4; --line-2:#d3cebf; --line-3:#aba591;
+  --ink:#141b24; --ink-2:#36404c; --ink-3:#5b6571; --ink-4:#878f98; --ink-inv:#ffffff;
+  --jade:#2346c8; --jade-d:#1a3596; --jade-l:#e8edfb;
+  --clay:#cc5a16; --clay-d:#a0430c; --clay-l:#fcede1;
+  --c-cv:#0b7d86; --c-ts:#cc5a16; --c-nlp:#7347c4; --c-opt:#a97409; --c-kg:#4f7f1c;
+  --bg-cv:#e2f2f3; --bg-ts:#fcede1; --bg-nlp:#efe9f9; --bg-opt:#f8f0dc; --bg-kg:#ebf3e1;
+  --ok:#2f7d32; --ok-bg:#e8f3e5; --warn:#a66a00; --warn-bg:#fbf1dc; --bad:#bf3626; --bad-bg:#fbe9e5;
+  --night:#0f1724; --night-2:#182338; --night-line:rgba(232,236,243,.12); --night-ink:#eef1f6; --night-ink-2:#a7b1c2;
+  --r-s:4px; --r-m:8px; --r-l:12px; --r-xl:18px;
+  --sh-1:0 1px 2px rgba(20,27,36,.06);
+  --sh-2:0 1px 2px rgba(20,27,36,.05),0 10px 24px -14px rgba(20,27,36,.24);
+  --sh-3:0 2px 6px rgba(20,27,36,.06),0 26px 50px -22px rgba(20,27,36,.34);
+  --mono:'JetBrains Mono','SFMono-Regular','Cascadia Mono',Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI Variable','Segoe UI','PingFang SC','HarmonyOS Sans SC','Hiragino Sans GB','Microsoft YaHei UI','Microsoft YaHei',sans-serif;
+  --demo-font-size:14px; --demo-title-size:20px; --demo-heading-size:16px; --demo-value-size:22px;
+  --nav-h:60px; --maxw:1200px; --toc-w:268px; --gutter:clamp(16px,4vw,32px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+ }
+}
+/* Bound drawing dimensions without stretching their aspect ratio. Long plots scroll locally. */
+body svg[viewBox]{max-width:900px;height:auto;margin-inline:auto}
+body img{display:block;max-width:100%;max-height:480px;width:auto;height:auto;object-fit:contain;margin-inline:auto}
+body canvas.raster{max-width:100%;max-height:480px;object-fit:contain}
+body .chart-scroll,body .plot-scroll,body .scroll:has(svg,canvas,img){max-height:600px;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;overscroll-behavior-y:auto}
+body .plugin-scroll-y{overflow-y:auto}
+body figure:has(svg){overflow-y:hidden}

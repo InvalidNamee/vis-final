@@ -116,17 +116,17 @@
   function readState() { return { rock: +byId('rock').value, wob: +byId('wob').value, rpm: +byId('rpm').value, flow: +byId('flow').value, maxWob: +byId('max-wob').value, maxRpm: +byId('max-rpm').value }; }
   function line(x1, y1, x2, y2, extra) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" ' + (extra || '') + '/>'; }
   function label(x, y, value, extra) { return '<text x="' + x + '" y="' + y + '" ' + (extra || '') + '>' + value + '</text>'; }
-  function color(t) { t = Math.max(0, Math.min(1, t)); var low = [235, 245, 237], high = [36, 112, 100]; return 'rgb(' + low.map(function (c, j) { return Math.round(c + (high[j] - c) * t); }).join(',') + ')'; }
+  function color(t) { t = Math.max(0, Math.min(1, t)); return 'color-mix(in srgb,var(--jade) ' + (t * 100) + '%,var(--jade-l))'; }
   function drawHeatmap() {
     var x0 = 64, y0 = 25, width = 560, height = 328, cw = width / 31, ch = height / 41;
     function x(w) { return x0 + ((w - 40) / 4 + 0.5) * cw; }
     function y(r) { return y0 + ((220 - r) / 4 + 0.5) * ch; }
     var s = '<title id="heat-title">参数组合与预测机械钻速热力图</title><desc id="heat-desc">' + ROCKS[state.rock] + '，排量 ' + state.flow + ' L/s。灰色斜线区超出操作上限，圆圈是当前参数，菱形是推荐参数。</desc>';
-    s += '<defs><pattern id="excluded" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#edf0ef"/><path d="M-1 1L1-1M0 7L7 0M6 8L8 6" stroke="#b5bdbb" stroke-width="1"/></pattern><linearGradient id="ramp">';
+    s += '<defs><pattern id="excluded" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="var(--card-soft)"/><path d="M-1 1L1-1M0 7L7 0M6 8L8 6" stroke="var(--line-2)" stroke-width="1"/></pattern><linearGradient id="ramp">';
     for (var c = 0; c <= 4; c++) s += '<stop offset="' + c * 25 + '%" stop-color="' + color(c / 4) + '"/>';
     s += '</linearGradient></defs>';
     search.grid.forEach(function (p) { s += '<rect x="' + (x(p.wob) - cw / 2) + '" y="' + (y(p.rpm) - ch / 2) + '" width="' + (cw + 0.15) + '" height="' + (ch + 0.15) + '" fill="' + (p.feasible ? color(p.value / 50) : 'url(#excluded)') + '"><title>钻压 ' + p.wob + ' kN，转速 ' + p.rpm + ' r/min：' + fmt(p.value) + ' m/h' + (p.feasible ? '' : '，超出操作上限') + '</title></rect>'; });
-    s += '<rect x="' + x0 + '" y="' + y0 + '" width="' + width + '" height="' + height + '" fill="none" stroke="#b5bdbb"/>';
+    s += '<rect x="' + x0 + '" y="' + y0 + '" width="' + width + '" height="' + height + '" fill="none" stroke="var(--line-2)"/>';
     [40, 60, 80, 100, 120, 140, 160].forEach(function (v) { s += label(x(v), y0 + height + 21, v, 'text-anchor="middle"'); });
     [60, 100, 140, 180, 220].forEach(function (v) { s += label(x0 - 12, y(v) + 4, v, 'text-anchor="end"'); });
     s += label(x0 + width / 2, y0 + height + 47, '钻压 kN', 'text-anchor="middle"');
@@ -134,9 +134,9 @@
     s += '<rect x="' + (x0 + width - 150) + '" y="' + (y0 + height + 62) + '" width="150" height="8" fill="url(#ramp)"/>';
     s += label(x0 + width - 150, y0 + height + 84, '0') + label(x0 + width, y0 + height + 84, '50 m/h', 'text-anchor="end"');
     var b = search.best, bx = x(b.wob), by = y(b.rpm);
-    s += '<path d="M' + bx + ' ' + (by - 9) + 'l9 9-9 9-9-9z" fill="#41699b" stroke="white" stroke-width="2"/>';
-    s += '<circle cx="' + x(state.wob) + '" cy="' + y(state.rpm) + '" r="7" fill="white" stroke="#242b2e" stroke-width="2.5"/>';
-    if (state.wob === b.wob && state.rpm === b.rpm) s += '<circle cx="' + bx + '" cy="' + by + '" r="3" fill="#41699b"/>';
+    s += '<path d="M' + bx + ' ' + (by - 9) + 'l9 9-9 9-9-9z" fill="var(--clay)" stroke="var(--card)" stroke-width="2"/>';
+    s += '<circle cx="' + x(state.wob) + '" cy="' + y(state.rpm) + '" r="7" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>';
+    if (state.wob === b.wob && state.rpm === b.rpm) s += '<circle cx="' + bx + '" cy="' + by + '" r="3" fill="var(--clay)"/>';
     byId('heatmap').innerHTML = s;
   }
   function drawResponse() {
@@ -144,15 +144,15 @@
     function x(v) { return left + (v - 40) / 120 * (w - left - right); }
     function y(v) { return h - bottom - v / 60 * (h - bottom - top); }
     var s = '';
-    [0, 20, 40, 60].forEach(function (v) { s += line(left, y(v), w - right, y(v), 'stroke="#e1e7e3"') + label(left - 8, y(v) + 4, v, 'text-anchor="end"'); });
+    [0, 20, 40, 60].forEach(function (v) { s += line(left, y(v), w - right, y(v), 'stroke="var(--line)"') + label(left - 8, y(v) + 4, v, 'text-anchor="end"'); });
     [40, 80, 120, 160].forEach(function (v) { s += label(x(v), h - bottom + 26, v, 'text-anchor="middle"'); });
     var path = '';
     for (var wob = 40; wob <= 160; wob += 2) path += (wob === 40 ? 'M' : 'L') + x(wob) + ',' + y(model.predict({ wob: wob, rpm: state.rpm, flow: state.flow, rock: state.rock }));
-    s += '<path d="' + path + '" fill="none" stroke="#2f7d6b" stroke-width="3"/>';
-    s += line(x(state.maxWob), top, x(state.maxWob), h - bottom, 'stroke="#41699b" stroke-dasharray="5 4"');
+    s += '<path d="' + path + '" fill="none" stroke="var(--jade)" stroke-width="3"/>';
+    s += line(x(state.maxWob), top, x(state.maxWob), h - bottom, 'stroke="var(--clay)" stroke-dasharray="5 4"');
     var limitX = x(state.maxWob), labelRight = limitX < left + 80;
     s += label(limitX + (labelRight ? 7 : -7), top + 12, '钻压上限', 'text-anchor="' + (labelRight ? 'start' : 'end') + '"');
-    s += '<circle cx="' + x(state.wob) + '" cy="' + y(model.predict(state)) + '" r="5" fill="white" stroke="#242b2e" stroke-width="2"/>';
+    s += '<circle cx="' + x(state.wob) + '" cy="' + y(model.predict(state)) + '" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>';
     s += label(left, 22, '预测钻速 m/h', 'class="plot-y-label"') + label(w / 2, h - 5, '钻压 kN', 'text-anchor="middle"');
     byId('response').innerHTML = s;
   }
@@ -161,9 +161,9 @@
     function x(v) { return left + v / max * (right - left); }
     function y(v) { return bottom - v / max * (bottom - top); }
     var s = '';
-    [0, 20, 40, 60].forEach(function (v) { s += line(left, y(v), right, y(v), 'stroke="#e1e7e3"') + label(left - 8, y(v) + 4, v, 'text-anchor="end"') + label(x(v), bottom + 26, v, 'text-anchor="middle"'); });
-    s += line(x(0), y(0), x(max), y(max), 'stroke="#8e9994" stroke-dasharray="5 4"');
-    learned.test.forEach(function (p) { s += '<circle cx="' + x(p.rop) + '" cy="' + y(model.predict(p)) + '" r="3" fill="' + ['#2f7d6b', '#41699b', '#b26a39'][p.rock] + '" opacity=".6"><title>' + ROCKS[p.rock] + ' · 虚拟井 ' + p.well + '：观测 ' + fmt(p.rop) + '，预测 ' + fmt(model.predict(p)) + ' m/h</title></circle>'; });
+    [0, 20, 40, 60].forEach(function (v) { s += line(left, y(v), right, y(v), 'stroke="var(--line)"') + label(left - 8, y(v) + 4, v, 'text-anchor="end"') + label(x(v), bottom + 26, v, 'text-anchor="middle"'); });
+    s += line(x(0), y(0), x(max), y(max), 'stroke="var(--ink-4)" stroke-dasharray="5 4"');
+    learned.test.forEach(function (p) { s += '<circle cx="' + x(p.rop) + '" cy="' + y(model.predict(p)) + '" r="3" fill="' + ['var(--jade)', 'var(--clay)', 'var(--clay)'][p.rock] + '" opacity=".6"><title>' + ROCKS[p.rock] + ' · 虚拟井 ' + p.well + '：观测 ' + fmt(p.rop) + '，预测 ' + fmt(model.predict(p)) + ' m/h</title></circle>'; });
     s += label(left, 22, '模型预测 m/h', 'class="plot-y-label"') + label(270, 276, '合成观测钻速 m/h', 'text-anchor="middle"');
     byId('scatter').innerHTML = s;
     text('mae', fmt(learned.score.mae, 2)); text('r2', fmt(learned.score.r2, 3)); text('baseline', fmt(learned.baseline.mae, 2));
