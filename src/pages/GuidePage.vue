@@ -31,7 +31,7 @@ const mode=ref('page');
     index.html
     demo.css
     demo.js</pre>
-        <p>ZIP 先解压，通过“添加案例”选择文件夹、拖入文件夹或多选文件。每个案例需有唯一 ID，并绑定现有 sceneId。</p>
+        <p>通过“添加案例”直接选择或拖入 ZIP，也可选择文件夹或多选文件。ZIP 支持文件位于根目录或外包一层文件夹。每个案例需有唯一 ID，并绑定现有 sceneId。</p>
       </article>
       <article class="guide-card"><span class="gc-no mono">02 · MANIFEST</span><h2>内容清单字段</h2>
         <pre class="code-block"><template v-for="(t,i) in tokens" :key="i"><span v-if="t.kind" :class="t.kind">{{ t.text }}</span><template v-else>{{ t.text }}</template></template></pre>

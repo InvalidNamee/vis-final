@@ -1,6 +1,7 @@
 import {computed,markRaw,reactive} from 'vue';
 import {track} from '../core/store';
 import type {CaseFile,CaseMeta} from '../types';
+import {readImportFiles} from './packageFiles';
 
 /* Import dialog state. Reading and validation stay in services/packages.js (window.__PackageService). */
 const today=()=>new Date().toISOString().slice(0,10);
@@ -32,7 +33,7 @@ export async function readPackage(input:File[]){
   importer.loading=true;importer.error='';
   try{
     const svc=window.__PackageService;
-    const rows=svc.stripRoot(await Promise.all(input.map(svc.readOne)));
+    const rows=svc.stripRoot(await readImportFiles(input,svc.readOne));
     if(token!==generation)return;
     const manifest=svc.pickManifest(rows);
     if(!manifest)throw Error('没有找到案例 JSON 清单');

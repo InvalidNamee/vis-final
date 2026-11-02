@@ -11,6 +11,7 @@ import type {DemoHandle} from '../types';
 
 const router=useRouter();
 const dragging=ref(false),preview=ref(false),previewRoot=ref<HTMLElement|null>(null);
+const sourceInput=ref<HTMLInputElement|null>(null);
 let handle:DemoHandle|null=null;
 
 const methodOptions=computed(()=>methodKeys.value.map(k=>({value:k,label:atlas.value.methods[k].name,abbr:atlas.value.methods[k].abbr,color:colorOf(k)})));
@@ -44,12 +45,13 @@ watch(()=>[importer.visible,importer.files],()=>{preview.value=false;});
     <div class="imp-grid">
       <div class="imp-source">
         <label class="imp-drop" :class="{on:dragging}" @dragover.prevent="dragging=true" @dragleave.self="dragging=false" @drop.prevent="dropped">
-          <input class="sr-only" type="file" multiple @change="picked">
+          <input ref="sourceInput" class="sr-only" type="file" multiple @change="picked">
           <span class="imp-drop-ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></span>
-          <b>拖入案例文件夹或多选文件</b>
-          <span>case.json 与 demo 资源一起选择，ZIP 请先解压。</span>
+          <b>拖入 ZIP、案例文件夹或多选文件</b>
+          <span>ZIP 可直接导入，兼容根目录文件及外包一层文件夹。</span>
         </label>
         <div class="imp-pick">
+          <button type="button" class="btn sm" @click="sourceInput?.click()">选择 ZIP</button>
           <label class="btn sm"><input class="sr-only" type="file" webkitdirectory multiple @change="picked">选择文件夹</label>
           <button type="button" class="btn sm ghost" @click="downloadTemplate">下载案例模板</button>
         </div>

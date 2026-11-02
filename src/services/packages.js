@@ -79,20 +79,21 @@ import {zipSync,strToU8} from 'fflate';
   function readOne(file) {
     return new Promise((resolve, reject) => {
       const name = file.webkitRelativePath || file.name, text = isTextName(name), fr = new FileReader();
+      const mime = file.type || MIME[extOf(name)] || (text ? 'text/plain' : 'application/octet-stream');
       fr.onload = () => resolve({
         name, size: file.size,
-        mime: file.type || MIME[extOf(name)] || (text ? 'text/plain' : 'application/octet-stream'),
+        mime,
         enc: text ? 'text' : 'dataurl',
         data: String(fr.result)
       });
       fr.onerror = () => reject(new Error('读取失败：' + name));
-      if (text) fr.readAsText(file, 'utf-8'); else fr.readAsDataURL(file);
+      if (text) fr.readAsText(file, 'utf-8'); else fr.readAsDataURL(file.slice(0, file.size, mime));
     });
   }
 
   // A folder upload prefixes every path with the folder name; drop it.
   function stripRoot(files) {
-    if (files.length < 2) return files;
+    if (!files.length) return files;
     const segs = files.map(f => f.name.split('/'));
     const root = segs[0][0];
     if (!segs.every(s => s.length > 1 && s[0] === root)) return files;
